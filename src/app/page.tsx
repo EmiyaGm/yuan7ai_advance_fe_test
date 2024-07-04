@@ -1,113 +1,167 @@
-import Image from "next/image";
+'use client'
+
+import Image from 'next/image'
+import { act, useState } from 'react'
 
 export default function Home() {
+  const [active, setActive] = useState(0)
+
+  const changeActive = (index: number) => {
+    setActive(index)
+  }
+
+  const getNextButton = () => {
+    switch (active) {
+      case 0:
+        return (
+          <div className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer">
+            进入到四方连续
+          </div>
+        )
+      case 1:
+        return (
+          <div className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer">
+            进入到通用分层
+          </div>
+        )
+      case 2:
+        return (
+          <div className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer">
+            进入到矢量生成
+          </div>
+        )
+      default:
+        return <div></div>
+    }
+  }
+
+  const getDeal = () => {
+    switch (active) {
+      case 2:
+        return (
+          <div className='pt-[24px]'>
+            <div className="text-[10px] text-black font-extrabold">图层：</div>
+            <div></div>
+            <div className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer my-0 mx-auto">
+              下载psd文件
+            </div>
+          </div>
+        )
+      case 3:
+        return (
+          <div className='pt-[24px]'>
+            <div>颜色：</div>
+            <div></div>
+            <div className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer my-0 mx-auto">
+              下载svg文件
+            </div>
+          </div>
+        )
+      default:
+        return <div></div>
+    }
+  }
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <div className="childrenHeight bg-white rounded-[34px] flex items-center justify-between w-screen">
+      <div className="w-[122px] bg-[#F6F4FE] h-full flex items-center flex-col relative rounded-l-[34px]">
+        <div
+          className={
+            active === 0
+              ? 'w-[70px] h-[68px] rounded-md border border-black mt-[134px] mb-[49px] flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer'
+              : 'w-[70px] h-[68px] rounded-md border border-black mt-[134px] mb-[49px] flex items-center justify-center text-[15px] font-extrabold cursor-pointer'
+          }
+          onClick={() => changeActive(0)}
+        >
+          高清
+          <br />
+          放大
+        </div>
+        <div
+          className={
+            active === 1
+              ? 'w-[70px] h-[68px] rounded-md border border-black mb-[49px] flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer'
+              : 'w-[70px] h-[68px] rounded-md border border-black mb-[49px] flex items-center justify-center text-[15px] font-extrabold cursor-pointer'
+          }
+          onClick={() => changeActive(1)}
+        >
+          四方
+          <br />
+          连续
+        </div>
+        <div
+          className={
+            active === 2
+              ? 'w-[70px] h-[68px] rounded-md border border-black mb-[49px] flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer'
+              : 'w-[70px] h-[68px] rounded-md border border-black mb-[49px] flex items-center justify-center text-[15px] font-extrabold cursor-pointer'
+          }
+          onClick={() => changeActive(2)}
+        >
+          通用
+          <br />
+          分层
+        </div>
+        <div
+          className={
+            active === 3
+              ? 'w-[70px] h-[68px] rounded-md border border-black mb-[49px] flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer'
+              : 'w-[70px] h-[68px] rounded-md border border-black mb-[49px] flex items-center justify-center text-[15px] font-extrabold cursor-pointer'
+          }
+          onClick={() => changeActive(3)}
+        >
+          矢量
+          <br />
+          生成
+        </div>
+        <div className=" absolute w-[205px] h-[267px] bg-[#F6F4FE] bottom-0 rounded-[18px] left-3 pt-[15px]">
+          <Image
+            src="/images/wechat.png"
+            alt="wechat"
+            width={187}
+            height={192}
+            className=" rounded-[13px] wechatShadow"
+          />
+          <div className="text-[13px] font-extrabold pt-[22px] pl-2">
+            元七AI｜纺织业AI图案专家👆
+          </div>
         </div>
       </div>
-
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
+      <div className="flex-1 h-full py-[39px]">
+        <div className="h-full border-r border-black/[.2] flex items-center flex-col">
+          <div></div>
+          <div className="w-[599px] h-[584px] rounded-xl bg-[#F7F7F7] flex items-center justify-center">
+            <div></div>
+          </div>
+          <div className="relative w-full pt-[56px]">
+            <div className="bg-[#F4F5F8] w-[39px] h-[38px] rounded-md absolute right-[69px] top-[18px] cursor-pointer flex items-center justify-center">
+              <Image
+                src="/images/delete.png"
+                alt="delete"
+                width={28}
+                height={30}
+              />
+            </div>
+            <div className="w-[217px] h-[29px] bg-black text-white text-[15px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer">
+              生成
+            </div>
+          </div>
+        </div>
       </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+      <div className="flex-1 h-full py-[39px]">
+        <div className="h-full pl-[62px] pr-[57px]">
+          <div className="h-[593px] bg-black"></div>
+          {active === 0 || active === 1 ? (
+            <div className="flex items-center justify-between mt-[37px]">
+              <div className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer">
+                下载文件
+              </div>
+              {getNextButton()}
+            </div>
+          ) : (
+            getDeal()
+          )}
+        </div>
       </div>
-    </main>
-  );
+    </div>
+  )
 }

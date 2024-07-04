@@ -2,32 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-}
-
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  background: rgba(51, 0, 255, 0.4);
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+.childrenHeight{
+  height: calc(100vh - 80px);
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+}
+
+.wechatShadow {
+  box-shadow: 0px 3.727px 3.727px 0px rgba(0, 0, 0, 0.25);
 }
