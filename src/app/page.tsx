@@ -1,32 +1,96 @@
 'use client'
 
 import Image from 'next/image'
-import { act, useState } from 'react'
+import { useState } from 'react'
+import firstResult from '../../public/images/firstResult.png'
+import secondResult from '../../public/images/secondResult.png'
+import thirdResult from '../../public/images/thirdResult.png'
+import forthResult from '../../public/images/forthResult.png'
+import { message } from 'antd'
 
 export default function Home() {
   const [active, setActive] = useState(0)
 
+  const [firstActive, setFristActive] = useState(0)
+
+  const [file, setFile] = useState<any>()
+
+  const [resultFile, setResultFile] = useState<any>()
+
+  const [originImage, setOriginImage] = useState<any>(null)
+
+  const [loading, setLoading] = useState(false)
+
+  const dealImage = () => {
+    if (file) {
+      setLoading(true)
+      setTimeout(() => {
+        setLoading(false)
+        if (active === 0) {
+          setResultFile(firstResult)
+        } else if (active === 1) {
+          setResultFile(secondResult)
+        } else if (active === 2) {
+          setResultFile(thirdResult)
+        } else if (active === 3) {
+          setResultFile(forthResult)
+        }
+      }, 15000)
+    } else {
+      message.info('请选择需要处理的图片')
+    }
+  }
+
+  const changeFile = (e: any) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const reader = new FileReader()
+      reader.readAsDataURL(e.target.files[0])
+      reader.onload = () => {
+        console.log(reader.result)
+        setOriginImage(reader.result)
+        setFile(e.target.files[0])
+      }
+    }
+  }
+
   const changeActive = (index: number) => {
     setActive(index)
+    setResultFile(null)
+    setFile(null)
+  }
+
+  const nextStep = () => {
+    if (active < 3) {
+      changeActive(active + 1)
+    }
   }
 
   const getNextButton = () => {
     switch (active) {
       case 0:
         return (
-          <div className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer">
+          <div
+            className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer"
+            onClick={nextStep}
+          >
             进入到四方连续
           </div>
         )
       case 1:
         return (
-          <div className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer">
+          <div
+            className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer"
+            onClick={nextStep}
+          >
             进入到通用分层
           </div>
         )
       case 2:
         return (
-          <div className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer">
+          <div
+            className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer"
+            onClick={nextStep}
+          >
             进入到矢量生成
           </div>
         )
@@ -39,22 +103,92 @@ export default function Home() {
     switch (active) {
       case 2:
         return (
-          <div className='pt-[24px]'>
+          <div className="pt-[24px]">
             <div className="text-[10px] text-black font-extrabold">图层：</div>
-            <div></div>
-            <div className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer my-0 mx-auto">
-              下载psd文件
+            <div>
+              {resultFile ? (
+                <div className="w-[109px] h-[117px] flex items-center justify-around flex-col bg-[#F4F5F8]">
+                  <Image
+                    src={resultFile}
+                    alt="resultFile"
+                    width={100}
+                    height={96}
+                    objectFit="cover"
+                    style={{ width: '100px', height: '96px' }}
+                  />
+                  <div className="text-[10px] text-black text-center">
+                    图层1
+                  </div>
+                </div>
+              ) : (
+                <></>
+              )}
             </div>
+            {resultFile ? (
+              <div className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer my-0 mx-auto">
+                <a href="/thirdResult.psd" download="result">
+                  下载psd文件
+                </a>
+              </div>
+            ) : (
+              <div
+                className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer my-0 mx-auto"
+                onClick={() => {
+                  if (file) {
+                    message.info('请生成所需要的psd文件')
+                  } else {
+                    message.info('请选择需要生成的文件')
+                  }
+                }}
+              >
+                下载psd文件
+              </div>
+            )}
           </div>
         )
       case 3:
         return (
-          <div className='pt-[24px]'>
-            <div>颜色：</div>
-            <div></div>
-            <div className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer my-0 mx-auto">
-              下载svg文件
+          <div className="pt-[24px]">
+            <div className="text-[10px] text-black font-extrabold">颜色：</div>
+            <div>
+              {resultFile ? (
+                <div className="w-[50px] h-[54px] flex items-center justify-around flex-col bg-[#F4F5F8]">
+                  <Image
+                    src={resultFile}
+                    alt="resultFile"
+                    width={39}
+                    height={39}
+                    objectFit="cover"
+                    style={{ width: '39px', height: '39px' }}
+                  />
+                  <div className="text-[10px] text-black text-center">
+                    颜色1
+                  </div>
+                </div>
+              ) : (
+                <></>
+              )}
             </div>
+            {resultFile ? (
+              <div className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer my-0 mx-auto">
+                <a href="/forthResult.svg" download="result">
+                  下载svg文件
+                </a>
+              </div>
+            ) : (
+              <div
+                className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer my-0 mx-auto"
+                onClick={() => {
+                  if (file) {
+                    message.info('请生成所需要的svg文件')
+                  } else {
+                    message.info('请选择需要生成的文件')
+                  }
+                }}
+              >
+                下载svg文件
+              </div>
+            )}
           </div>
         )
       default:
@@ -128,9 +262,39 @@ export default function Home() {
       </div>
       <div className="flex-1 h-full py-[39px]">
         <div className="h-full border-r border-black/[.2] flex items-center flex-col">
-          <div></div>
+          {active === 0 ? (
+            <div className="flex items-center justify-around mb-[35px]">
+              <div className="text-[15px] font-extrabold">放大风格：</div>
+              <div className="w-[111px] h-[23px] border border-black rounded-[14px] flex items-center justify-center text-[10px] cursor-pointer">
+                渲染风格
+              </div>
+              <div className="w-[111px] h-[23px] border border-black rounded-[14px] flex items-center justify-center text-[10px] mx-[46px] cursor-pointer">
+                实边绘画风格
+              </div>
+              <div className="w-[111px] h-[23px] border border-black rounded-[14px] flex items-center justify-center text-[10px] cursor-pointer">
+                照片风格
+              </div>
+            </div>
+          ) : (
+            <div className="h-[58px]"></div>
+          )}
+
           <div className="w-[599px] h-[584px] rounded-xl bg-[#F7F7F7] flex items-center justify-center">
-            <div></div>
+            {file ? (
+              <Image
+                src={originImage}
+                alt="originImage"
+                width={395}
+                height={404}
+              />
+            ) : (
+              <input
+                type="file"
+                className="file-input file-input-bordered file-input-primary w-full max-w-xs"
+                accept="image/png, image/jpeg"
+                onChange={changeFile}
+              />
+            )}
           </div>
           <div className="relative w-full pt-[56px]">
             <div className="bg-[#F4F5F8] w-[39px] h-[38px] rounded-md absolute right-[69px] top-[18px] cursor-pointer flex items-center justify-center">
@@ -139,22 +303,66 @@ export default function Home() {
                 alt="delete"
                 width={28}
                 height={30}
+                onClick={() => {
+                  setFile(null)
+                }}
               />
             </div>
-            <div className="w-[217px] h-[29px] bg-black text-white text-[15px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer">
+            <div
+              className="w-[217px] h-[29px] bg-black text-white text-[15px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
+              onClick={dealImage}
+            >
               生成
             </div>
           </div>
         </div>
       </div>
       <div className="flex-1 h-full py-[39px]">
-        <div className="h-full pl-[62px] pr-[57px]">
-          <div className="h-[593px] bg-black"></div>
+        <div className="h-full pl-[62px] pr-[57px] pt-[58px]">
+          <div className="h-[593px] relative">
+            <div className="flex items-center justify-center">
+              {resultFile ? (
+                <Image src={resultFile} alt="resultFile" height={593} />
+              ) : (
+                <></>
+              )}
+            </div>
+            {loading ? (
+              <div className=" absolute h-[593px] bg-black/[.23] top-0 left-0 w-full flex items-center justify-center">
+                <span className="loading loading-infinity loading-lg"></span>
+              </div>
+            ) : (
+              <></>
+            )}
+          </div>
           {active === 0 || active === 1 ? (
             <div className="flex items-center justify-between mt-[37px]">
-              <div className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer">
-                下载文件
-              </div>
+              {resultFile ? (
+                <div className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer">
+                  {active === 0 ? (
+                    <a href="/firstResult.png" download="result">
+                      下载文件
+                    </a>
+                  ) : (
+                    <a href="/secondResult.png" download="result">
+                      下载文件
+                    </a>
+                  )}
+                </div>
+              ) : (
+                <div
+                  className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer"
+                  onClick={() => {
+                    if (file) {
+                      message.info('请生成所需要的svg文件')
+                    } else {
+                      message.info('请选择需要生成的文件')
+                    }
+                  }}
+                >
+                  下载文件
+                </div>
+              )}
               {getNextButton()}
             </div>
           ) : (
