@@ -7,12 +7,12 @@ import secondResult from '../../public/images/secondResult.png'
 import thirdResult from '../../public/images/thirdResult.png'
 import forthResult from '../../public/images/forthResult.png'
 import { message } from 'antd'
-import { fetchGetModels, fetchRedesignFile } from '@/api'
+import { fetchGetImage, fetchGetModels, fetchRedesignFile } from '@/api'
 
 export default function Home() {
   const [active, setActive] = useState(0)
 
-  const [firstActive, setFristActive] = useState(0)
+  const [firstActive, setFirstActive] = useState(0)
 
   const [file, setFile] = useState<any>()
 
@@ -46,7 +46,7 @@ export default function Home() {
     if (e.target.files && e.target.files.length > 0) {
       const reader = new FileReader()
       reader.readAsDataURL(e.target.files[0])
-      // redesignFile(e.target.files[0])
+      redesignFile(e.target.files[0])
       reader.onload = () => {
         console.log(reader.result)
         setOriginImage(reader.result)
@@ -204,14 +204,46 @@ export default function Home() {
     })
   }
 
+  const [uid, setUid] = useState('')
+
   const redesignFile = (file: any) => {
-    fetchRedesignFile({ function: 0 }, file)
+    let sendValues = {}
+    if (active === 0) {
+      sendValues = { function: 0 }
+    } else if (active === 1) {
+      sendValues = { function: 1, option: 0 }
+    } else if (active === 2) {
+      sendValues = { function: 2, option: 4, out_format: 'psd' }
+    } else {
+      sendValues = { option: 6, out_format: 'svg' }
+    }
+    fetchRedesignFile(sendValues, file)
       .then((res) => {
         console.log(res)
+        if (res && res.success) {
+          if (res.data && res.data.uid) {
+            if (Array.isArray(res.data.uid) && res.data.uid.length > 0) {
+              setUid(res.data.uid[0])
+              getImage(res.data.uid[0])
+            }
+          }
+        }
       })
       .catch((error) => {
         console.log(error)
       })
+  }
+
+  const getImage = (id: any) => {
+    if (id) {
+      fetchGetImage(id)
+        .then((res) => {
+          console.log(res)
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    }
   }
 
   useEffect(() => {

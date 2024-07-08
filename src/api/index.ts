@@ -17,15 +17,12 @@ export const fetchRedesignFile = async (data: any, file: any) => {
   const formData = new FormData()
   formData.append('image_in', file)
   for (const [key, value] of Object.entries<any>(data)) {
-    formData.append(key, value);
+    formData.append(key, value)
   }
   // formData.append('function', 0)
-  const resp = await fetch(`${baseUrl}/api/v1/redesign/file`, {
+  const resp = await fetch(`${baseUrl}/api/v1/redesgin/file`, {
     method: 'POST',
     body: formData,
-    headers: {
-      'content-type': 'multipart/form-data',
-    },
   })
 
   const json = await resp.json()
