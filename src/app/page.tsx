@@ -1,12 +1,13 @@
 'use client'
 
 import Image from 'next/image'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import firstResult from '../../public/images/firstResult.png'
 import secondResult from '../../public/images/secondResult.png'
 import thirdResult from '../../public/images/thirdResult.png'
 import forthResult from '../../public/images/forthResult.png'
 import { message } from 'antd'
+import { fetchGetModels, fetchRedesignFile } from '@/api'
 
 export default function Home() {
   const [active, setActive] = useState(0)
@@ -45,6 +46,7 @@ export default function Home() {
     if (e.target.files && e.target.files.length > 0) {
       const reader = new FileReader()
       reader.readAsDataURL(e.target.files[0])
+      // redesignFile(e.target.files[0])
       reader.onload = () => {
         console.log(reader.result)
         setOriginImage(reader.result)
@@ -195,6 +197,26 @@ export default function Home() {
         return <div></div>
     }
   }
+
+  const getModels = () => {
+    fetchGetModels({ catrgory: 1 }).then((res) => {
+      console.log(res)
+    })
+  }
+
+  const redesignFile = (file: any) => {
+    fetchRedesignFile({ function: 0 }, file)
+      .then((res) => {
+        console.log(res)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+  }
+
+  useEffect(() => {
+    getModels()
+  }, [])
 
   return (
     <div className="childrenHeight bg-white rounded-[34px] flex items-center justify-between w-screen">
