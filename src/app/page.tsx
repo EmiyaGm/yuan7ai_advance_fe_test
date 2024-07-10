@@ -8,6 +8,7 @@ import thirdResult from '../../public/images/thirdResult.png'
 import forthResult from '../../public/images/forthResult.png'
 import { message } from 'antd'
 import { fetchGetImage, fetchGetModels, fetchRedesignFile } from '@/api'
+import { baseUrl } from '@/api/config'
 
 export default function Home() {
   const [active, setActive] = useState(0)
@@ -27,15 +28,16 @@ export default function Home() {
       setLoading(true)
       setTimeout(() => {
         setLoading(false)
-        if (active === 0) {
-          setResultFile(firstResult)
-        } else if (active === 1) {
-          setResultFile(secondResult)
-        } else if (active === 2) {
-          setResultFile(thirdResult)
-        } else if (active === 3) {
-          setResultFile(forthResult)
-        }
+        // if (active === 0) {
+        //   setResultFile(firstResult)
+        // } else if (active === 1) {
+        //   setResultFile(secondResult)
+        // } else if (active === 2) {
+        //   setResultFile(thirdResult)
+        // } else if (active === 3) {
+        //   setResultFile(forthResult)
+        // }
+        setResultFile(`${baseUrl}/api/v1/image/${uid}`)
       }, 15000)
     } else {
       message.info('请选择需要处理的图片')
@@ -231,7 +233,7 @@ export default function Home() {
           if (res.data && res.data.uid) {
             if (Array.isArray(res.data.uid) && res.data.uid.length > 0) {
               setUid(res.data.uid[0])
-              getImage(res.data.uid[0])
+              // getImage(res.data.uid[0])
             }
           }
         }
@@ -254,7 +256,7 @@ export default function Home() {
   }
 
   useEffect(() => {
-    getModels()
+    // getModels()
   }, [])
 
   return (
