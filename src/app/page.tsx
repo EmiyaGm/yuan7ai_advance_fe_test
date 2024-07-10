@@ -345,7 +345,7 @@ export default function Home() {
               <input
                 type="file"
                 className="file-input file-input-bordered file-input-primary w-full max-w-xs"
-                accept="image/png, image/jpeg"
+                accept="image/*"
                 onChange={changeFile}
               />
             )}

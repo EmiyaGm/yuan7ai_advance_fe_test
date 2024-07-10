@@ -12,6 +12,7 @@
     "@ant-design/nextjs-registry": "^1.0.0",
     "antd": "^5.19.1",
     "next": "14.2.4",
+    "postcss-mobile-forever": "^4.1.4",
     "react": "^18",
     "react-dom": "^18"
   },
@@ -19,10 +20,12 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "autoprefixer": "^10.4.19",
     "daisyui": "^4.12.10",
     "eslint": "^8",
     "eslint-config-next": "14.2.4",
     "postcss": "^8",
+    "postcss-px-to-viewport-8-plugin": "^1.2.5",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }
