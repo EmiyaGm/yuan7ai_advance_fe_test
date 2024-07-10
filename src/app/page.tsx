@@ -385,7 +385,7 @@ export default function Home() {
           <div className="h-[593px] relative">
             <div className="flex items-center justify-center">
               {resultFile ? (
-                <Image src={resultFile} alt="resultFile" height={593} />
+                <Image src={resultFile} alt="resultFile" height={593} width={617} />
               ) : (
                 <></>
               )}
