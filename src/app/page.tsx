@@ -23,22 +23,11 @@ export default function Home() {
 
   const [loading, setLoading] = useState(false)
 
+  const [fileLoading, setFileLoading] = useState(false)
+
   const dealImage = () => {
     if (file) {
-      setLoading(true)
-      setTimeout(() => {
-        setLoading(false)
-        // if (active === 0) {
-        //   setResultFile(firstResult)
-        // } else if (active === 1) {
-        //   setResultFile(secondResult)
-        // } else if (active === 2) {
-        //   setResultFile(thirdResult)
-        // } else if (active === 3) {
-        //   setResultFile(forthResult)
-        // }
-        setResultFile(`${baseUrl}/api/v1/image/${uid}`)
-      }, 15000)
+      redesignFile(file)
     } else {
       message.info('请选择需要处理的图片')
     }
@@ -48,11 +37,11 @@ export default function Home() {
     if (e.target.files && e.target.files.length > 0) {
       const reader = new FileReader()
       reader.readAsDataURL(e.target.files[0])
-      redesignFile(e.target.files[0])
-      reader.onload = () => {
-        console.log(reader.result)
+      setFileLoading(true)
+      reader.onloadend = () => {
         setOriginImage(reader.result)
         setFile(e.target.files[0])
+        setFileLoading(false)
       }
     }
   }
@@ -208,7 +197,12 @@ export default function Home() {
 
   const [uid, setUid] = useState('')
 
+  const resultFileLoad = () => {
+    setLoading(false)
+  }
+
   const redesignFile = (file: any) => {
+    setLoading(true)
     let sendValues = {}
     if (active === 0) {
       sendValues = {
@@ -233,7 +227,7 @@ export default function Home() {
           if (res.data && res.data.uid) {
             if (Array.isArray(res.data.uid) && res.data.uid.length > 0) {
               setUid(res.data.uid[0])
-              // getImage(res.data.uid[0])
+              setResultFile(`${baseUrl}/api/v1/image/${res.data.uid[0]}`)
             }
           }
         }
@@ -342,7 +336,7 @@ export default function Home() {
             <div className="h-[58px]"></div>
           )}
 
-          <div className="w-[599px] h-[584px] rounded-xl bg-[#F7F7F7] flex items-center justify-center">
+          <div className="w-[599px] h-[584px] rounded-xl bg-[#F7F7F7] flex items-center justify-center relative">
             {file ? (
               <Image
                 src={originImage}
@@ -350,6 +344,10 @@ export default function Home() {
                 width={395}
                 height={404}
               />
+            ) : fileLoading ? (
+              <div className=" absolute h-[593px] bg-black/[.23] top-0 left-0 w-full flex items-center justify-center">
+                <span className="loading loading-infinity loading-lg"></span>
+              </div>
             ) : (
               <input
                 type="file"
@@ -385,7 +383,13 @@ export default function Home() {
           <div className="h-[593px] relative">
             <div className="flex items-center justify-center">
               {resultFile ? (
-                <Image src={resultFile} alt="resultFile" height={593} width={617} />
+                <Image
+                  src={resultFile}
+                  alt="resultFile"
+                  height={593}
+                  width={617}
+                  onLoad={resultFileLoad}
+                />
               ) : (
                 <></>
               )}
