@@ -220,9 +220,9 @@ export default function Home() {
         model: 'L01',
       }
     } else if (active === 1) {
-      sendValues = { function: 1, option: 0 }
+      sendValues = { function: 1, option: 2 }
     } else if (active === 2) {
-      sendValues = { function: 2, option: 5, out_format: 'psd' }
+      sendValues = { function: 2, option: 4, out_format: 'psd' }
     } else {
       sendValues = { option: 6, out_format: 'svg', function: 2 }
     }
