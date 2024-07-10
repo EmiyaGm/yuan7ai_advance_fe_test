@@ -209,13 +209,20 @@ export default function Home() {
   const redesignFile = (file: any) => {
     let sendValues = {}
     if (active === 0) {
-      sendValues = { function: 0 }
+      sendValues = {
+        function: 0,
+        option: 4,
+        image_width: 1024,
+        image_height: 1024,
+        dpi: 300,
+        model: 'L01',
+      }
     } else if (active === 1) {
       sendValues = { function: 1, option: 0 }
     } else if (active === 2) {
-      sendValues = { function: 2, option: 4, out_format: 'psd' }
+      sendValues = { function: 2, option: 5, out_format: 'psd' }
     } else {
-      sendValues = { option: 6, out_format: 'svg' }
+      sendValues = { option: 6, out_format: 'svg', function: 2 }
     }
     fetchRedesignFile(sendValues, file)
       .then((res) => {
