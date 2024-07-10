@@ -231,7 +231,11 @@ export default function Home() {
           }
         } else {
           setLoading(false)
-          message.error('生成失败')
+          if (res.message) {
+            message.error(res.message)
+          } else {
+            message.error('生成失败')
+          }
         }
       })
       .catch((error) => {
