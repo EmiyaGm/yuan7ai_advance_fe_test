@@ -222,7 +222,6 @@ export default function Home() {
     }
     fetchRedesignFile(sendValues, file)
       .then((res) => {
-        console.log(res)
         if (res && res.success) {
           if (res.data && res.data.uid) {
             if (Array.isArray(res.data.uid) && res.data.uid.length > 0) {
@@ -230,10 +229,15 @@ export default function Home() {
               setResultFile(`${baseUrl}/api/v1/image/${res.data.uid[0]}`)
             }
           }
+        } else {
+          setLoading(false)
+          message.error('生成失败')
         }
       })
       .catch((error) => {
         console.log(error)
+        setLoading(false)
+        message.error('生成失败')
       })
   }
 
