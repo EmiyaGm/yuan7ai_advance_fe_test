@@ -262,7 +262,7 @@ export default function Home() {
   }, [])
 
   return (
-    <div className="childrenHeight bg-white rounded-[34px] flex items-center justify-between w-screen">
+    <div className="childrenHeight bg-white rounded-[34px] flex items-center justify-between w-screen my-0 mx-auto">
       <div className="w-[122px] bg-[#F6F4FE] h-full flex items-center flex-col relative rounded-l-[34px]">
         <div
           className={
