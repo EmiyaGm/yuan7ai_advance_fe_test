@@ -2,10 +2,6 @@
 
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
-import firstResult from '../../public/images/firstResult.png'
-import secondResult from '../../public/images/secondResult.png'
-import thirdResult from '../../public/images/thirdResult.png'
-import forthResult from '../../public/images/forthResult.png'
 import { message } from 'antd'
 import { fetchGetImage, fetchGetModels, fetchRedesignFile } from '@/api'
 import { baseUrl } from '@/api/config'
@@ -336,7 +332,7 @@ export default function Home() {
           className={
             active === 0
               ? 'w-[70px] h-[68px] rounded-md border border-black mt-[134px] mb-[49px] flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer'
-              : 'w-[70px] h-[68px] rounded-md border border-black mt-[134px] mb-[49px] flex items-center justify-center text-[15px] font-extrabold cursor-pointer'
+              : 'w-[70px] h-[68px] rounded-md border border-black mt-[134px] mb-[49px] flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button'
           }
           onClick={() => changeActive(0)}
         >
@@ -348,7 +344,7 @@ export default function Home() {
           className={
             active === 1
               ? 'w-[70px] h-[68px] rounded-md border border-black mb-[49px] flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer'
-              : 'w-[70px] h-[68px] rounded-md border border-black mb-[49px] flex items-center justify-center text-[15px] font-extrabold cursor-pointer'
+              : 'w-[70px] h-[68px] rounded-md border border-black mb-[49px] flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button'
           }
           onClick={() => changeActive(1)}
         >
@@ -360,7 +356,7 @@ export default function Home() {
           className={
             active === 2
               ? 'w-[70px] h-[68px] rounded-md border border-black mb-[49px] flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer'
-              : 'w-[70px] h-[68px] rounded-md border border-black mb-[49px] flex items-center justify-center text-[15px] font-extrabold cursor-pointer'
+              : 'w-[70px] h-[68px] rounded-md border border-black mb-[49px] flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button'
           }
           onClick={() => changeActive(2)}
         >
@@ -372,7 +368,7 @@ export default function Home() {
           className={
             active === 3
               ? 'w-[70px] h-[68px] rounded-md border border-black mb-[49px] flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer'
-              : 'w-[70px] h-[68px] rounded-md border border-black mb-[49px] flex items-center justify-center text-[15px] font-extrabold cursor-pointer'
+              : 'w-[70px] h-[68px] rounded-md border border-black mb-[49px] flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button'
           }
           onClick={() => changeActive(3)}
         >
