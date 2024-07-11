@@ -28,8 +28,8 @@ export function Header() {
   ]
 
   useEffect(() => {
-    if (localStorage.getItem('yqai-accout')) {
-      setAccount(localStorage.getItem('yqai-accout'))
+    if (localStorage.getItem('yqai-account')) {
+      setAccount(localStorage.getItem('yqai-account'))
     } else {
       setAccount('')
     }
@@ -87,7 +87,7 @@ export function Header() {
             >
               <Input
                 prefix={<UserOutlined className="site-form-item-icon" />}
-                placeholder="Username"
+                placeholder="用户名"
               />
             </Form.Item>
             <Form.Item
@@ -97,7 +97,7 @@ export function Header() {
               <Input
                 prefix={<LockOutlined className="site-form-item-icon" />}
                 type="password"
-                placeholder="Password"
+                placeholder="密码"
               />
             </Form.Item>
 
@@ -107,7 +107,7 @@ export function Header() {
                 htmlType="submit"
                 className="login-form-button"
               >
-                Log in
+                登录
               </Button>
             </Form.Item>
           </Form>
