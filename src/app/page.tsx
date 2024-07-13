@@ -21,7 +21,7 @@ export default function Home() {
 
   const dealImage = () => {
     if (file) {
-      redesignFile(file)
+      redesignFile(file, window.localStorage.getItem('yqai-token') || '')
     } else {
       message.info('请选择需要处理的图片')
     }
@@ -204,7 +204,7 @@ export default function Home() {
 
   const [svgFile, setSvgFile] = useState<any>(null)
 
-  const redesignFile = (file: any) => {
+  const redesignFile = (file: any, token: any) => {
     setLoading(true)
     let sendValues = {}
     if (active === 0) {
@@ -223,7 +223,7 @@ export default function Home() {
     } else {
       sendValues = { option: 6, out_format: 'svg', function: 2 }
     }
-    fetchRedesignFile(sendValues, file)
+    fetchRedesignFile(sendValues, file, token)
       .then((res) => {
         if (res && res.success) {
           if (res.data && res.data.uid) {

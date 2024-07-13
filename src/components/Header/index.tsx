@@ -12,8 +12,6 @@ export function Header() {
 
   const [account, setAccount] = useState<any>('')
 
-  const [token, setToken] = useState(window.localStorage.getItem('yqai-token') || '')
-
   const logout = () => {
     setAccount('')
     window.localStorage.setItem('yqai-token', '')
@@ -23,7 +21,6 @@ export function Header() {
   const onFinish = (values: any) => {
     fetchLogin(values).then(res => {
       if (res.access_token) {
-        setToken(res.access_token)
         window.localStorage.setItem('yqai-token', `Bearer ${res.access_token}`)
         window.localStorage.setItem('yqai-account', values.username)
         setAccount(values.username)

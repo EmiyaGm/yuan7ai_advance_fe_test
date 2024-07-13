@@ -13,7 +13,7 @@ export const fetchGetModels = async (data: any) => {
   return json
 }
 
-export const fetchRedesignFile = async (data: any, file: any) => {
+export const fetchRedesignFile = async (data: any, file: any, token: any) => {
   const formData = new FormData()
   formData.append('image_in', file)
   for (const [key, value] of Object.entries<any>(data)) {
@@ -24,7 +24,7 @@ export const fetchRedesignFile = async (data: any, file: any) => {
     method: 'POST',
     body: formData,
     headers: {
-      'Authorization': window.localStorage.getItem('yqai-token') || ''
+      'Authorization': token
     }
   })
 
