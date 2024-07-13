@@ -383,7 +383,7 @@ export default function Home() {
         </div>
         <div className=" absolute w-[205px] h-[267px] bg-[#F6F4FE] bottom-0 rounded-[18px] left-3 pt-[15px]">
           <Image
-            src="/images/wechat.png"
+            src="/wechat.png"
             alt="wechat"
             width={187}
             height={192}
@@ -441,7 +441,7 @@ export default function Home() {
           <div className="relative w-full pt-[56px]">
             <div className="bg-[#F4F5F8] w-[39px] h-[38px] rounded-md absolute right-[69px] top-[18px] cursor-pointer flex items-center justify-center">
               <Image
-                src="/images/delete.png"
+                src="/delete.png"
                 alt="delete"
                 width={28}
                 height={30}

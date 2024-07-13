@@ -57,7 +57,7 @@ export function Header() {
         <div className="flex items-center h-[80px]">
           <div className="pl-[55px] pr-[30px]">
             <Image
-              src="images/logo.svg"
+              src="/logo.svg"
               alt="logo"
               width={91.1}
               height={24.7}
