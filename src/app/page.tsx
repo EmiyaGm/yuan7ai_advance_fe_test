@@ -207,7 +207,6 @@ export default function Home() {
     setLoading(true)
     let sendValues = {}
     setResultFile(null)
-    setFile(null)
     setSvgFile(null)
     setPsdFile(null)
     if (active === 0) {
@@ -473,13 +472,14 @@ export default function Home() {
             <div className="flex items-center justify-center">
               {resultFile ? (
                 <div className="w-[593px] h-[617px] relative">
-                  <Image
+                  <img src={resultFile} className=' object-contain w-[593px] h-[617px]' onLoad={resultFileLoad} />
+                  {/* <Image
                     src={resultFile}
                     alt="resultFile"
                     layout="fill"
                     objectFit="contain"
                     onLoad={resultFileLoad}
-                  />
+                  /> */}
                 </div>
               ) : (
                 <></>
