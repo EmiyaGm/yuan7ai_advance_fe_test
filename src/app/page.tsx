@@ -7,7 +7,7 @@ import { fetchGetImage, fetchGetModels, fetchRedesignFile } from '@/api'
 import { baseUrl } from '@/api/config'
 
 export default function Home() {
-  const [active, setActive] = useState(1)
+  const [active, setActive] = useState(0)
 
   const [file, setFile] = useState<any>()
 
@@ -41,15 +41,11 @@ export default function Home() {
   }
 
   const changeActive = (index: number) => {
-    if (index) {
-      setActive(index)
-      setResultFile(null)
-      setFile(null)
-      setSvgFile(null)
-      setPsdFile(null)
-    } else {
-      message.info('Coming soon...')
-    }
+    setActive(index)
+    setResultFile(null)
+    setFile(null)
+    setSvgFile(null)
+    setPsdFile(null)
   }
 
   const nextStep = () => {
@@ -164,7 +160,10 @@ export default function Home() {
               )}
             </div>
             {resultFile && svgFile ? (
-              <div className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer my-0 mx-auto" onClick={downloadSvg}>
+              <div
+                className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer my-0 mx-auto"
+                onClick={downloadSvg}
+              >
                 下载svg文件
               </div>
             ) : (
@@ -207,14 +206,14 @@ export default function Home() {
   const redesignFile = (file: any, token: any) => {
     setLoading(true)
     let sendValues = {}
+    setResultFile(null)
+    setFile(null)
+    setSvgFile(null)
+    setPsdFile(null)
     if (active === 0) {
       sendValues = {
         function: 0,
         option: 4,
-        image_width: 1024,
-        image_height: 1024,
-        dpi: 300,
-        model: 'L01',
       }
     } else if (active === 1) {
       sendValues = { function: 1, option: 2 }
@@ -254,7 +253,7 @@ export default function Home() {
             message.error(res.message)
           } else if (res.msg) {
             if (res.msg === 'Missing Authorization Header') {
-              message.error("请先登录")
+              message.error('请先登录')
             } else {
               message.error(res.msg)
             }
