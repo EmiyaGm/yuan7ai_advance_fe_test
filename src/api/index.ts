@@ -24,7 +24,7 @@ export const fetchRedesignFile = async (data: any, file: any) => {
     method: 'POST',
     body: formData,
     headers: {
-      'Authorization': localStorage.getItem('yqai-token') || ''
+      'Authorization': window.localStorage.getItem('yqai-token') || ''
     }
   })
 

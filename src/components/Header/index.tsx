@@ -12,20 +12,20 @@ export function Header() {
 
   const [account, setAccount] = useState<any>('')
 
-  const [token, setToken] = useState(localStorage.getItem('yqai-token') || '')
+  const [token, setToken] = useState(window.localStorage.getItem('yqai-token') || '')
 
   const logout = () => {
     setAccount('')
-    localStorage.setItem('yqai-token', '')
-    localStorage.setItem('yqai-account', '')
+    window.localStorage.setItem('yqai-token', '')
+    window.localStorage.setItem('yqai-account', '')
   }
 
   const onFinish = (values: any) => {
     fetchLogin(values).then(res => {
       if (res.access_token) {
         setToken(res.access_token)
-        localStorage.setItem('yqai-token', `Bearer ${res.access_token}`)
-        localStorage.setItem('yqai-account', values.username)
+        window.localStorage.setItem('yqai-token', `Bearer ${res.access_token}`)
+        window.localStorage.setItem('yqai-account', values.username)
         setAccount(values.username)
         message.success('登录成功')
         setIsModalOpen(false)
@@ -34,9 +34,7 @@ export function Header() {
       } else {
         message.error('登录失败')
       }
-      console.log(res)
     })
-    console.log('Received values of form: ', values)
   }
 
   const items: MenuProps['items'] = [
@@ -47,8 +45,8 @@ export function Header() {
   ]
 
   useEffect(() => {
-    if (localStorage.getItem('yqai-account')) {
-      setAccount(localStorage.getItem('yqai-account'))
+    if (window.localStorage.getItem('yqai-account')) {
+      setAccount(window.localStorage.getItem('yqai-account'))
     } else {
       setAccount('')
     }
