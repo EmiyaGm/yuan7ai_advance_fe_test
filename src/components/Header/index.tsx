@@ -1,22 +1,41 @@
 'use client'
 
-import { Button, Dropdown, Form, Input, Modal, Space } from 'antd'
+import { Button, Dropdown, Form, Input, message, Modal, Space } from 'antd'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { LockOutlined, UserOutlined, DownOutlined } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
+import { fetchLogin } from '@/api'
 
 export function Header() {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const [account, setAccount] = useState<any>('')
 
+  const [token, setToken] = useState(localStorage.getItem('yqai-token') || '')
+
   const logout = () => {
     setAccount('')
+    localStorage.setItem('yqai-token', '')
+    localStorage.setItem('yqai-account', '')
   }
 
   const onFinish = (values: any) => {
-    // TODO
+    fetchLogin(values).then(res => {
+      if (res.access_token) {
+        setToken(res.access_token)
+        localStorage.setItem('yqai-token', `Bearer ${res.access_token}`)
+        localStorage.setItem('yqai-account', values.username)
+        setAccount(values.username)
+        message.success('登录成功')
+        setIsModalOpen(false)
+      } else if (res.msg) {
+        message.error(res.msg)
+      } else {
+        message.error('登录失败')
+      }
+      console.log(res)
+    })
     console.log('Received values of form: ', values)
   }
 

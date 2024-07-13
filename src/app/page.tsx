@@ -252,6 +252,12 @@ export default function Home() {
           setLoading(false)
           if (res.message) {
             message.error(res.message)
+          } else if (res.msg) {
+            if (res.msg === 'Missing Authorization Header') {
+              message.error("请先登录")
+            } else {
+              message.error(res.msg)
+            }
           } else {
             message.error('生成失败')
           }
