@@ -382,13 +382,14 @@ export default function Home() {
           生成
         </div>
         <div className=" absolute w-[205px] h-[267px] bg-[#F6F4FE] bottom-0 rounded-[18px] left-3 pt-[15px]">
-          <Image
+          <img src="/wechat.png" className='w-[187px] h-[192px] rounded-[13px] wechatShadow' />
+          {/* <Image
             src="/wechat.png"
             alt="wechat"
             width={187}
             height={192}
             className=" rounded-[13px] wechatShadow"
-          />
+          /> */}
           <div className="text-[13px] font-extrabold pt-[22px] pl-2">
             元七AI｜纺织业AI图案专家👆
           </div>
@@ -440,7 +441,14 @@ export default function Home() {
           </div>
           <div className="relative w-full pt-[56px]">
             <div className="bg-[#F4F5F8] w-[39px] h-[38px] rounded-md absolute right-[69px] top-[18px] cursor-pointer flex items-center justify-center">
-              <Image
+              <img
+                src="/delete.png"
+                className="w-[28px] h-[30px]"
+                onClick={() => {
+                  setFile(null)
+                }}
+              />
+              {/* <Image
                 src="/delete.png"
                 alt="delete"
                 width={28}
@@ -448,7 +456,7 @@ export default function Home() {
                 onClick={() => {
                   setFile(null)
                 }}
-              />
+              /> */}
             </div>
             <div
               className="w-[217px] h-[29px] bg-black text-white text-[15px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
