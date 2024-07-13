@@ -396,7 +396,7 @@ export default function Home() {
       </div>
       <div className="flex-1 h-full py-[39px]">
         <div className="h-full border-r border-black/[.2] flex items-center flex-col">
-          {active === 0 ? (
+          {/* {active === 0 ? (
             <div className="flex items-center justify-around mb-[35px]">
               <div className="text-[15px] font-extrabold">放大风格：</div>
               <div className="w-[111px] h-[23px] border border-black rounded-[14px] flex items-center justify-center text-[10px] cursor-pointer">
@@ -411,7 +411,9 @@ export default function Home() {
             </div>
           ) : (
             <div className="h-[58px]"></div>
-          )}
+          )} */}
+
+          <div className="h-[58px]"></div>
 
           <div className="w-[599px] h-[584px] rounded-xl bg-[#F7F7F7] flex items-center justify-center relative">
             {file ? (
