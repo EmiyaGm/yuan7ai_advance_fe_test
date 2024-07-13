@@ -31,6 +31,8 @@ export function Header() {
       } else {
         message.error('登录失败')
       }
+    }).catch(error => {
+      message.error('登录失败')
     })
   }
 
