@@ -13,7 +13,7 @@ export const fetchGetModels = async (data: any) => {
   return json
 }
 
-export const fetchRedesignFile = async (data: any, file: any) => {
+export const fetchRedesignFile = async (data: any, file: any, token: any) => {
   const formData = new FormData()
   formData.append('image_in', file)
   for (const [key, value] of Object.entries<any>(data)) {
@@ -23,6 +23,9 @@ export const fetchRedesignFile = async (data: any, file: any) => {
   const resp = await fetch(`${baseUrl}/api/v1/redesgin/file`, {
     method: 'POST',
     body: formData,
+    headers: {
+      'Authorization': token
+    }
   })
 
   const json = await resp.json()
@@ -47,6 +50,19 @@ export const fetchImageUpload = async (data: any) => {
 export const fetchGetImage = async (uid: any) => {
   const resp = await fetch(`${baseUrl}/api/v1/image/${uid}`, {
     method: 'GET',
+    headers: {
+      'content-type': 'application/json',
+    },
+  })
+
+  const json = await resp.json()
+  return json
+}
+
+export const fetchLogin = async (data: any) => {
+  const resp = await fetch(`${baseUrl}/api/v1/login`, {
+    method: 'POST',
+    body: JSON.stringify(data),
     headers: {
       'content-type': 'application/json',
     },
