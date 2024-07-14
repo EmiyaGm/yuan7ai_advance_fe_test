@@ -5,9 +5,12 @@ import { useEffect, useState } from 'react'
 import { message } from 'antd'
 import { fetchGetImage, fetchGetModels, fetchRedesignFile } from '@/api'
 import { baseUrl } from '@/api/config'
+import useAccount from '@/components/Header/useAccount'
 
 export default function Home() {
   const [active, setActive] = useState(0)
+
+  const { account, setAccount } = useAccount()
 
   const [file, setFile] = useState<any>()
 
@@ -104,12 +107,16 @@ export default function Home() {
               {resultFile ? (
                 <div className="w-[109px] h-[117px] flex items-center justify-around flex-col bg-[#F4F5F8]">
                   <div className="w-[100px] h-[96px] relative">
-                    <Image
+                    <img
+                      src={resultFile}
+                      className=" object-contain w-[100px] h-[96px]"
+                    />
+                    {/* <Image
                       src={resultFile}
                       alt="resultFile"
                       objectFit="contain"
                       layout="fill"
-                    />
+                    /> */}
                   </div>
 
                   <div className="text-[10px] text-black text-center">
@@ -121,23 +128,27 @@ export default function Home() {
               )}
             </div>
             {resultFile && psdFile ? (
-              <div className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer my-0 mx-auto">
-                <a href={psdFile} download="result">
-                  下载psd文件
-                </a>
+              <div
+                className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer my-0 mx-auto"
+                onClick={downloadImage}
+              >
+                {/* <a href={psdFile} download="result">
+                  下载PNG
+                </a> */}
+                <div>下载PNG</div>
               </div>
             ) : (
               <div
                 className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer my-0 mx-auto"
                 onClick={() => {
                   if (file) {
-                    message.info('请生成所需要的psd文件')
+                    message.info('请生成所需要的PNG文件')
                   } else {
                     message.info('请选择需要生成的文件')
                   }
                 }}
               >
-                下载psd文件
+                下载PNG
               </div>
             )}
           </div>
@@ -235,8 +246,9 @@ export default function Home() {
             if (Array.isArray(res.data.uid) && res.data.uid.length > 0) {
               setUid(res.data.uid[0])
               if (active === 2) {
-                setResultFile(originImage)
+                // setResultFile(originImage)
                 setPsdFile(`${baseUrl}/api/v1/image/${res.data.uid[0]}`)
+                setResultFile(`${baseUrl}/api/v1/image/${res.data.uid[0]}`)
               } else if (active === 3) {
                 fetch(`${baseUrl}/api/v1/image/${res.data.uid[0]}`)
                   .then((body) => body.text())
@@ -259,6 +271,11 @@ export default function Home() {
           } else if (res.msg) {
             if (res.msg === 'Missing Authorization Header') {
               message.error('请先登录')
+            } else if (res.msg === 'Token has expired') {
+              message.error('登录已过期，请重新登录')
+              setAccount('')
+              window.localStorage.setItem('yqai-token', '')
+              window.localStorage.setItem('yqai-account', '')
             } else {
               message.error(res.msg)
             }
@@ -337,12 +354,12 @@ export default function Home() {
 
   return (
     <div className="childrenHeight bg-white rounded-[34px] flex items-center justify-between w-screen my-0 mx-auto">
-      <div className="w-[122px] bg-[#F6F4FE] h-full flex items-center flex-col relative rounded-l-[34px]">
+      <div className="w-[122px] bg-[#F6F4FE] h-full flex items-center flex-col relative rounded-l-[34px] justify-between">
         <div
           className={
             active === 0
-              ? 'w-[70px] h-[68px] rounded-md border border-black mt-[134px] mb-[49px] flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer'
-              : 'w-[70px] h-[68px] rounded-md border border-black mt-[134px] mb-[49px] flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button'
+              ? 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer mt-[134px]'
+              : 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button mt-[134px]'
           }
           onClick={() => changeActive(0)}
         >
@@ -353,8 +370,8 @@ export default function Home() {
         <div
           className={
             active === 1
-              ? 'w-[70px] h-[68px] rounded-md border border-black mb-[49px] flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer'
-              : 'w-[70px] h-[68px] rounded-md border border-black mb-[49px] flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button'
+              ? 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer'
+              : 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button'
           }
           onClick={() => changeActive(1)}
         >
@@ -365,8 +382,8 @@ export default function Home() {
         <div
           className={
             active === 2
-              ? 'w-[70px] h-[68px] rounded-md border border-black mb-[49px] flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer'
-              : 'w-[70px] h-[68px] rounded-md border border-black mb-[49px] flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button'
+              ? 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer'
+              : 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button'
           }
           onClick={() => changeActive(2)}
         >
@@ -377,8 +394,8 @@ export default function Home() {
         <div
           className={
             active === 3
-              ? 'w-[70px] h-[68px] rounded-md border border-black mb-[49px] flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer'
-              : 'w-[70px] h-[68px] rounded-md border border-black mb-[49px] flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button'
+              ? 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer mb-[267px]'
+              : 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button mb-[267px]'
           }
           onClick={() => changeActive(3)}
         >
@@ -387,7 +404,10 @@ export default function Home() {
           生成
         </div>
         <div className=" absolute w-[205px] h-[267px] bg-[#F6F4FE] bottom-0 rounded-[18px] left-3 pt-[15px]">
-          <img src="/wechat.png" className='w-[187px] h-[192px] rounded-[13px] wechatShadow' />
+          <img
+            src="/wechat.png"
+            className="w-[187px] h-[192px] rounded-[13px] wechatShadow"
+          />
           {/* <Image
             src="/wechat.png"
             alt="wechat"
@@ -478,7 +498,11 @@ export default function Home() {
             <div className="flex items-center justify-center">
               {resultFile ? (
                 <div className="w-[593px] h-[617px] relative">
-                  <img src={resultFile} className=' object-contain w-[593px] h-[617px]' onLoad={resultFileLoad} />
+                  <img
+                    src={resultFile}
+                    className=" object-contain w-[593px] h-[617px]"
+                    onLoad={resultFileLoad}
+                  />
                   {/* <Image
                     src={resultFile}
                     alt="resultFile"

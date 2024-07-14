@@ -6,11 +6,12 @@ import { useEffect, useState } from 'react'
 import { LockOutlined, UserOutlined, DownOutlined } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
 import { fetchLogin } from '@/api'
+import useAccount from './useAccount'
 
 export function Header() {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const [account, setAccount] = useState<any>('')
+  const { account, setAccount } = useAccount()
 
   const logout = () => {
     setAccount('')
@@ -19,21 +20,26 @@ export function Header() {
   }
 
   const onFinish = (values: any) => {
-    fetchLogin(values).then(res => {
-      if (res.access_token) {
-        window.localStorage.setItem('yqai-token', `Bearer ${res.access_token}`)
-        window.localStorage.setItem('yqai-account', values.username)
-        setAccount(values.username)
-        message.success('登录成功')
-        setIsModalOpen(false)
-      } else if (res.msg) {
-        message.error(res.msg)
-      } else {
+    fetchLogin(values)
+      .then((res) => {
+        if (res.access_token) {
+          window.localStorage.setItem(
+            'yqai-token',
+            `Bearer ${res.access_token}`,
+          )
+          window.localStorage.setItem('yqai-account', values.username)
+          setAccount(values.username)
+          message.success('登录成功')
+          setIsModalOpen(false)
+        } else if (res.msg) {
+          message.error(res.msg)
+        } else {
+          message.error('登录失败')
+        }
+      })
+      .catch((error) => {
         message.error('登录失败')
-      }
-    }).catch(error => {
-      message.error('登录失败')
-    })
+      })
   }
 
   const items: MenuProps['items'] = [
@@ -56,12 +62,7 @@ export function Header() {
       <div className="flex items-center justify-between max-w-[1592px] my-0 mx-auto">
         <div className="flex items-center h-[80px]">
           <div className="pl-[55px] pr-[30px]">
-            <Image
-              src="/logo.svg"
-              alt="logo"
-              width={91.1}
-              height={24.7}
-            />
+            <Image src="/logo.svg" alt="logo" width={91.1} height={24.7} />
           </div>
           <div className="text-[25px] text-white font-extrabold">
             数码印花文件生成工具-免费版
@@ -70,7 +71,10 @@ export function Header() {
         <div>
           {account ? (
             <Dropdown menu={{ items }}>
-              <a onClick={(e) => e.preventDefault()} className="text-[25px] text-white font-extrabold pr-[30px] cursor-pointer">
+              <a
+                onClick={(e) => e.preventDefault()}
+                className="text-[25px] text-white font-extrabold pr-[30px] cursor-pointer"
+              >
                 <Space>
                   {account}
                   <DownOutlined />
@@ -89,8 +93,16 @@ export function Header() {
           )}
         </div>
       </div>
-      <Modal title="登录" open={isModalOpen} footer={null} destroyOnClose={true} onCancel={() => {setIsModalOpen(false)}}>
-        <div className='flex items-center justify-center'>
+      <Modal
+        title="登录"
+        open={isModalOpen}
+        footer={null}
+        destroyOnClose={true}
+        onCancel={() => {
+          setIsModalOpen(false)
+        }}
+      >
+        <div className="flex items-center justify-center">
           <Form
             name="normal_login"
             className="login-form"
