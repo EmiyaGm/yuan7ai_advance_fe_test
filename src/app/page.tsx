@@ -41,15 +41,21 @@ export default function Home() {
   }
 
   const changeActive = (index: number) => {
-    setActive(index)
-    setResultFile(null)
-    setFile(null)
-    setSvgFile(null)
-    setPsdFile(null)
+    if (index === 3) {
+      message.info('Coming soon..')
+    } else {
+      setActive(index)
+      setResultFile(null)
+      setFile(null)
+      setSvgFile(null)
+      setPsdFile(null)
+    }
   }
 
   const nextStep = () => {
-    if (active < 3) {
+    if (active === 2) {
+      message.info('Coming soon..')
+    } else if (active < 3) {
       changeActive(active + 1)
     }
   }
