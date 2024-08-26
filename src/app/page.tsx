@@ -8,7 +8,7 @@ import { baseUrl } from '@/api/config'
 import useAccount from '@/components/Header/useAccount'
 
 export default function Home() {
-  const [active, setActive] = useState(0)
+  const [active, setActive] = useState(1)
 
   const { account, setAccount } = useAccount()
 
@@ -355,7 +355,7 @@ export default function Home() {
   return (
     <div className="childrenHeight bg-white rounded-[34px] flex items-center justify-between w-screen my-0 mx-auto">
       <div className="w-[122px] bg-[#F6F4FE] h-full flex items-center flex-col relative rounded-l-[34px] justify-between">
-        <div
+        {/* <div
           className={
             active === 0
               ? 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer mt-[134px]'
@@ -366,12 +366,12 @@ export default function Home() {
           高清
           <br />
           放大
-        </div>
+        </div> */}
         <div
           className={
             active === 1
-              ? 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer'
-              : 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button'
+              ? 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer mt-[134px]'
+              : 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button mt-[134px]'
           }
           onClick={() => changeActive(1)}
         >
