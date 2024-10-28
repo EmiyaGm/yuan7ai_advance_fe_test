@@ -44,3 +44,7 @@ body {
 .fill-button:hover {
   color: white;
 }
+
+.sideShadow {
+  box-shadow: 1.8px 0px 27.1px rgba(0, 0, 0, 0.05);
+}
