@@ -210,6 +210,10 @@ export default function Home() {
     })
   }
 
+  const downloadZip = () => {
+    window.open('https://github.com/upscayl/upscayl/releases/download/v2.11.5/upscayl-2.11.5-win.exe')
+  }
+
   const [uid, setUid] = useState('')
 
   const resultFileLoad = () => {
@@ -421,7 +425,7 @@ export default function Home() {
                 <div className="font-bold">高清放大功能安装方式：</div>
                 <div>1.下载安装包，支持 windows 系统电脑</div>
                 <div className='mb-[10px]'>2.打开安装包，点击安装</div>
-                <div className="w-[217px] h-[29px] bg-black text-white text-[15px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer">
+                <div className="w-[217px] h-[29px] bg-black text-white text-[15px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer" onClick={downloadZip}>
                   下载安装包
                 </div>
               </div>
