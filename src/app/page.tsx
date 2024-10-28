@@ -211,7 +211,9 @@ export default function Home() {
   }
 
   const downloadZip = () => {
-    window.open('https://github.com/upscayl/upscayl/releases/download/v2.11.5/upscayl-2.11.5-win.exe')
+    window.open(
+      'https://github.com/upscayl/upscayl/releases/download/v2.11.5/upscayl-2.11.5-win.exe',
+    )
   }
 
   const [uid, setUid] = useState('')
@@ -407,29 +409,36 @@ export default function Home() {
           <br />
           生成
         </div>
-        {/* <div className=" absolute w-[205px] h-[267px] bg-[#F6F4FE] bottom-0 rounded-[18px] left-3 pt-[15px]">
-          <img
-            src="/wechat.png"
-            className="w-[187px] h-[192px] rounded-[13px] wechatShadow"
-          />
-          <div className="text-[13px] font-extrabold pt-[22px] pl-2">
-            元七AI｜纺织业AI图案专家👆
+        {active !== 0 ? (
+          <div className=" absolute w-[205px] h-[267px] bg-[#F6F4FE] bottom-0 rounded-[18px] left-3 pt-[15px]">
+            <img
+              src="/wechat.png"
+              className="w-[187px] h-[192px] rounded-[13px] wechatShadow"
+            />
+            <div className="text-[13px] font-extrabold pt-[22px] pl-2">
+              元七AI｜纺织业AI图案专家👆
+            </div>
           </div>
-        </div> */}
+        ) : (
+          <></>
+        )}
       </div>
       {active === 0 ? (
         <>
           <div className="flex-1 h-full py-[39px]">
             <div className="flex items-center justify-between h-[50%]">
-              <div className="p-[60px] text-[24px] leading-loose">
+              <div className="p-[60px] text-[15px] leading-loose">
                 <div className="font-bold">高清放大功能安装方式：</div>
                 <div>1.下载安装包，支持 windows 系统电脑</div>
-                <div className='mb-[10px]'>2.打开安装包，点击安装</div>
-                <div className="w-[217px] h-[29px] bg-black text-white text-[15px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer" onClick={downloadZip}>
+                <div className="mb-[10px]">2.打开安装包，点击安装</div>
+                <div
+                  className="w-[217px] h-[29px] bg-black text-white text-[15px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
+                  onClick={downloadZip}
+                >
                   下载安装包
                 </div>
               </div>
-              <div className="p-[60px] text-[24px] leading-loose border-l">
+              <div className="p-[60px] text-[15px] leading-loose border-l">
                 <div className="font-bold">高清放大功能使用方式：</div>
                 <div>打开软件</div>
                 <div>
@@ -444,11 +453,11 @@ export default function Home() {
               </div>
             </div>
             <div className="flex items-center justify-between h-[50%] mx-[60px] border-t">
-              <div className="text-[36px] leading-loose font-bold">
+              <div className="text-[23px] leading-loose font-bold">
                 <div>免费版效果不理想？</div>
                 <div>扫码联系，体验元七AI高级版</div>
               </div>
-              <div className="pr-[60px] text-[32px] leading-loose font-light text-center flex items-center justify-center flex-col">
+              <div className="pr-[60px] text-[23px] leading-loose font-light text-center flex items-center justify-center flex-col">
                 <img
                   src="/wechat.png"
                   className="w-[187px] h-[192px] rounded-[13px] wechatShadow"
