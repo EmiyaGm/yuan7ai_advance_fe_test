@@ -62,18 +62,139 @@ export function Header() {
       <div className="flex items-center justify-between max-w-[1592px] my-0 mx-auto">
         <div className="flex items-center h-[80px]">
           <div className="pl-[55px] pr-[30px]">
-            <Image src="/logo.svg" alt="logo" width={91.1} height={24.7} />
+            <img src="/logo.jpg" alt="logo" className="w-[91.1px] h-auto" />
           </div>
-          <div className="text-[25px] text-white font-extrabold">
+          <div className="text-[25px] text-black font-extrabold">
             数码印花文件生成工具-免费版
           </div>
+          <div className="flex items-center justify-center ml-[90px]">
+            <div className="dropdown dropdown-hover">
+              <div
+                tabIndex={0}
+                role="button"
+                className="btn m-1 bg-transparent shadow-none border-none hover:bg-transparent hover:underline underline-offset-8"
+              >
+                产品服务
+              </div>
+              <ul
+                tabIndex={0}
+                className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+              >
+                <li>
+                  <a
+                    href="https://yuan7ai-homepage-fe-test.vercel.app/#service"
+                    target="_blank"
+                  >
+                    AI花型服务
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://yuan7ai-homepage-fe-test.vercel.app/#service2"
+                    target="_blank"
+                  >
+                    AI面料效果服务
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://yuan7ai-homepage-fe-test.vercel.app/#tool"
+                    target="_blank"
+                  >
+                    设计师免费AI工具
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://yuan7ai-homepage-fe-test.vercel.app"
+                    target="_blank"
+                  >
+                    海量公版图库
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://yuan7ai-homepage-fe-test.vercel.app/#service3"
+                    target="_blank"
+                  >
+                    AI算法定制
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div className="dropdown dropdown-hover mx-[56px]">
+              <div
+                tabIndex={0}
+                role="button"
+                className="btn m-1 bg-transparent shadow-none border-none hover:bg-transparent hover:underline underline-offset-8"
+              >
+                关于我们
+              </div>
+              <ul
+                tabIndex={0}
+                className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+              >
+                <li>
+                  <a
+                    href="https://yuan7ai-homepage-fe-test.vercel.app/#team"
+                    target="_blank"
+                  >
+                    关于我们 - 清北团队
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://yuan7ai-homepage-fe-test.vercel.app/#company2"
+                    target="_blank"
+                  >
+                    投资方
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://yuan7ai-homepage-fe-test.vercel.app/#company"
+                    target="_blank"
+                  >
+                    合作伙伴
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div className="dropdown dropdown-hover">
+              <div
+                tabIndex={0}
+                role="button"
+                className="btn m-1 bg-transparent shadow-none border-none hover:bg-transparent hover:underline underline-offset-8"
+              >
+                联系我们
+              </div>
+              <ul
+                tabIndex={0}
+                className="dropdown-content menu bg-base-100 rounded-box z-[1] w-[404px] p-2 shadow"
+              >
+                <li className='hover:bg-white'>
+                  <div className="flex items-center justify-center hover:bg-white">
+                    <img
+                      src="/wechat.png"
+                      className="w-[187px] h-[192px] rounded-[13px]"
+                    />
+                    <img
+                      src="/wcx.png"
+                      className="w-[187px] h-[192px] rounded-[13px]"
+                    />
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
+
         <div>
           {account ? (
             <Dropdown menu={{ items }}>
               <a
                 onClick={(e) => e.preventDefault()}
-                className="text-[25px] text-white font-extrabold pr-[30px] cursor-pointer"
+                className="text-[25px] text-black font-extrabold pr-[30px] cursor-pointer"
               >
                 <Space>
                   {account}
@@ -83,7 +204,7 @@ export function Header() {
             </Dropdown>
           ) : (
             <div
-              className="pr-[30px] text-[25px] text-white font-extrabold cursor-pointer"
+              className="pr-[30px] text-[25px] text-black font-extrabold cursor-pointer"
               onClick={() => {
                 setIsModalOpen(true)
               }}
