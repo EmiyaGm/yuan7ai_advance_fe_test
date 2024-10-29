@@ -11,6 +11,8 @@ import useAccount from './useAccount'
 export function Header() {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
+  const [isRegisterOpen, setIsRegisterOpen] = useState(false)
+
   const { account, setAccount } = useAccount()
 
   const logout = () => {
@@ -172,7 +174,7 @@ export function Header() {
                 tabIndex={0}
                 className="dropdown-content menu bg-base-100 rounded-box z-[1] w-[404px] p-2 shadow"
               >
-                <li className='hover:bg-white'>
+                <li className="hover:bg-white">
                   <div className="flex items-center justify-center hover:bg-white">
                     <img
                       src="/wechat.png"
@@ -203,13 +205,24 @@ export function Header() {
               </a>
             </Dropdown>
           ) : (
-            <div
-              className="pr-[30px] text-[25px] text-black font-extrabold cursor-pointer"
-              onClick={() => {
-                setIsModalOpen(true)
-              }}
-            >
-              登录
+            <div className='flex items-center justify-center'>
+              <div
+                className="text-[25px] text-black font-extrabold cursor-pointer"
+                onClick={() => {
+                  setIsModalOpen(true)
+                }}
+              >
+                登录
+              </div>
+              <div className='text-[25px] text-black font-extrabold'>/</div>
+              <div
+                className="pr-[30px] text-[25px] text-black font-extrabold cursor-pointer"
+                onClick={() => {
+                  setIsModalOpen(true)
+                }}
+              >
+                注册
+              </div>
             </div>
           )}
         </div>
@@ -257,6 +270,89 @@ export function Header() {
                 className="login-form-button"
               >
                 登录
+              </Button>
+            </Form.Item>
+          </Form>
+        </div>
+      </Modal>
+      <Modal
+        title="注册"
+        open={isRegisterOpen}
+        footer={null}
+        destroyOnClose={true}
+        onCancel={() => {
+          setIsRegisterOpen(false)
+        }}
+      >
+        <div className="flex items-center justify-center">
+          <Form
+            name="normal_login"
+            className="login-form"
+            initialValues={{ remember: true }}
+            onFinish={onFinish}
+          >
+            <Form.Item
+              name="name"
+              rules={[{ required: true, message: '请输入你的姓名!' }]}
+            >
+              <Input
+                prefix={<UserOutlined className="site-form-item-icon" />}
+                placeholder="姓名"
+              />
+            </Form.Item>
+            <Form.Item
+              name="industry"
+              rules={[{ required: true, message: '请输入你的行业!' }]}
+            >
+              <Input
+                prefix={<LockOutlined className="site-form-item-icon" />}
+                placeholder="行业"
+              />
+            </Form.Item>
+            <Form.Item
+              name="company"
+              rules={[{ required: false, message: '请输入你的公司名称!' }]}
+            >
+              <Input
+                prefix={<LockOutlined className="site-form-item-icon" />}
+                placeholder="公司名称"
+              />
+            </Form.Item>
+            <Form.Item
+              name="job"
+              rules={[{ required: false, message: '请输入你的公司名称!' }]}
+            >
+              <Input
+                prefix={<LockOutlined className="site-form-item-icon" />}
+                placeholder="职位"
+              />
+            </Form.Item>
+            <Form.Item
+              name="phone"
+              rules={[{ required: true, message: '请输入你的注册手机!' }]}
+            >
+              <Input
+                prefix={<LockOutlined className="site-form-item-icon" />}
+                placeholder="注册手机"
+              />
+            </Form.Item>
+            <Form.Item
+              name="code"
+              rules={[{ required: true, message: '请输入你的验证码!' }]}
+            >
+              <Input
+                prefix={<LockOutlined className="site-form-item-icon" />}
+                placeholder="验证码"
+              />
+            </Form.Item>
+
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                className="login-form-button"
+              >
+                注册
               </Button>
             </Form.Item>
           </Form>
