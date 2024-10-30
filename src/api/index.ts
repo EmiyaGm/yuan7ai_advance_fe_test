@@ -1,4 +1,4 @@
-import { baseUrl } from './config'
+import { baseAccountUrl, baseUrl } from './config'
 
 export const fetchGetModels = async (data: any) => {
   const resp = await fetch(`${baseUrl}/api/v1/models`, {
@@ -61,6 +61,32 @@ export const fetchGetImage = async (uid: any) => {
 
 export const fetchLogin = async (data: any) => {
   const resp = await fetch(`${baseUrl}/api/v1/login`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: {
+      'content-type': 'application/json',
+    },
+  })
+
+  const json = await resp.json()
+  return json
+}
+
+export const fetchRegister = async (data: any) => {
+  const resp = await fetch(`${baseAccountUrl}/api/custom/manager/create`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: {
+      'content-type': 'application/json',
+    },
+  })
+
+  const json = await resp.json()
+  return json
+}
+
+export const fetchSendSms = async (data: any) => {
+  const resp = await fetch(`${baseAccountUrl}/api/tools/send_sms`, {
     method: 'POST',
     body: JSON.stringify(data),
     headers: {

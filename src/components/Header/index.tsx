@@ -3,15 +3,27 @@
 import { Button, Dropdown, Form, Input, message, Modal, Space } from 'antd'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
-import { LockOutlined, UserOutlined, DownOutlined } from '@ant-design/icons'
+import {
+  LockOutlined,
+  UserOutlined,
+  DownOutlined,
+  MobileOutlined,
+} from '@ant-design/icons'
 import type { MenuProps } from 'antd'
-import { fetchLogin } from '@/api'
+import { fetchLogin, fetchSendSms } from '@/api'
 import useAccount from './useAccount'
+import {
+  LoginForm,
+  ProFormCaptcha,
+  ProFormText,
+} from '@ant-design/pro-components'
 
 export function Header() {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const [isRegisterOpen, setIsRegisterOpen] = useState(false)
+
+  const [countDown, setCountDown] = useState(0)
 
   const { account, setAccount } = useAccount()
 
@@ -83,42 +95,27 @@ export function Header() {
                 className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
               >
                 <li>
-                  <a
-                    href="https://yuanqiai.xyz/#service"
-                    target="_blank"
-                  >
+                  <a href="https://yuanqiai.xyz/#service" target="_blank">
                     AI花型服务
                   </a>
                 </li>
                 <li>
-                  <a
-                    href="https://yuanqiai.xyz/#service2"
-                    target="_blank"
-                  >
+                  <a href="https://yuanqiai.xyz/#service2" target="_blank">
                     AI面料效果服务
                   </a>
                 </li>
                 <li>
-                  <a
-                    href="https://yuanqiai.xyz/#tool"
-                    target="_blank"
-                  >
+                  <a href="https://yuanqiai.xyz/#tool" target="_blank">
                     设计师免费AI工具
                   </a>
                 </li>
                 <li>
-                  <a
-                    href="https://yuanqiai.xyz"
-                    target="_blank"
-                  >
+                  <a href="https://yuanqiai.xyz" target="_blank">
                     海量公版图库
                   </a>
                 </li>
                 <li>
-                  <a
-                    href="https://yuanqiai.xyz/#service3"
-                    target="_blank"
-                  >
+                  <a href="https://yuanqiai.xyz/#service3" target="_blank">
                     AI算法定制
                   </a>
                 </li>
@@ -137,26 +134,17 @@ export function Header() {
                 className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
               >
                 <li>
-                  <a
-                    href="https://yuanqiai.xyz/#team"
-                    target="_blank"
-                  >
+                  <a href="https://yuanqiai.xyz/#team" target="_blank">
                     关于我们 - 清北团队
                   </a>
                 </li>
                 <li>
-                  <a
-                    href="https://yuanqiai.xyz/#company2"
-                    target="_blank"
-                  >
+                  <a href="https://yuanqiai.xyz/#company2" target="_blank">
                     投资方
                   </a>
                 </li>
                 <li>
-                  <a
-                    href="https://yuanqiai.xyz/#company"
-                    target="_blank"
-                  >
+                  <a href="https://yuanqiai.xyz/#company" target="_blank">
                     合作伙伴
                   </a>
                 </li>
@@ -205,7 +193,7 @@ export function Header() {
               </a>
             </Dropdown>
           ) : (
-            <div className='flex items-center justify-center'>
+            <div className="flex items-center justify-center">
               <div
                 className="text-[25px] text-black font-extrabold cursor-pointer"
                 onClick={() => {
@@ -214,7 +202,7 @@ export function Header() {
               >
                 登录
               </div>
-              <div className='text-[25px] text-black font-extrabold'>/</div>
+              <div className="text-[25px] text-black font-extrabold">/</div>
               <div
                 className="pr-[30px] text-[25px] text-black font-extrabold cursor-pointer"
                 onClick={() => {
@@ -236,43 +224,64 @@ export function Header() {
           setIsModalOpen(false)
         }}
       >
-        <div className="flex items-center justify-center">
-          <Form
-            name="normal_login"
-            className="login-form"
-            initialValues={{ remember: true }}
-            onFinish={onFinish}
-          >
-            <Form.Item
-              name="username"
-              rules={[{ required: true, message: '请输入你的账号!' }]}
-            >
-              <Input
-                prefix={<UserOutlined className="site-form-item-icon" />}
-                placeholder="用户名"
+        <div>
+          <LoginForm logo="" title="元七AI" subTitle="面料企业的超级AI花型服务">
+            <>
+              <ProFormText
+                fieldProps={{
+                  size: 'large',
+                  prefix: <MobileOutlined className={'prefixIcon'} />,
+                }}
+                name="phone"
+                placeholder={'手机号'}
+                rules={[
+                  {
+                    required: true,
+                    message: '请输入手机号！',
+                  },
+                  {
+                    pattern: /^1\d{10}$/,
+                    message: '手机号格式错误！',
+                  },
+                ]}
               />
-            </Form.Item>
-            <Form.Item
-              name="password"
-              rules={[{ required: true, message: '请输入你的密码!' }]}
-            >
-              <Input
-                prefix={<LockOutlined className="site-form-item-icon" />}
-                type="password"
-                placeholder="密码"
+              <ProFormCaptcha
+                fieldProps={{
+                  size: 'large',
+                  prefix: <LockOutlined className={'prefixIcon'} />,
+                }}
+                captchaProps={{
+                  size: 'large',
+                }}
+                placeholder={'请输入验证码'}
+                captchaTextRender={(timing, count) => {
+                  if (timing) {
+                    return `${count} ${'获取验证码'}`
+                  }
+                  return '获取验证码'
+                }}
+                phoneName="phone"
+                name="smsCode"
+                rules={[
+                  {
+                    required: true,
+                    message: '请输入验证码！',
+                  },
+                ]}
+                countDown={countDown}
+                onGetCaptcha={async (phone) => {
+                  const res =  await fetchSendSms({phone, type: '1' })
+                  if (res.data == 60) {
+                    message.success(`手机号 ${phone} 验证码发送成功!`);
+                    setCountDown(60)
+                  } else {
+                    message.info(`验证码发送太频繁，请等待${res.data}秒后再试`);
+                    setCountDown(res.data)
+                  }
+                }}
               />
-            </Form.Item>
-
-            <Form.Item>
-              <Button
-                type="primary"
-                htmlType="submit"
-                className="login-form-button"
-              >
-                登录
-              </Button>
-            </Form.Item>
-          </Form>
+            </>
+          </LoginForm>
         </div>
       </Modal>
       <Modal
