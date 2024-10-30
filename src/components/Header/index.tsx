@@ -84,7 +84,7 @@ export function Header() {
               >
                 <li>
                   <a
-                    href="https://yuan7ai-homepage-fe-test.vercel.app/#service"
+                    href="https://yuanqiai.xyz/#service"
                     target="_blank"
                   >
                     AI花型服务
@@ -92,7 +92,7 @@ export function Header() {
                 </li>
                 <li>
                   <a
-                    href="https://yuan7ai-homepage-fe-test.vercel.app/#service2"
+                    href="https://yuanqiai.xyz/#service2"
                     target="_blank"
                   >
                     AI面料效果服务
@@ -100,7 +100,7 @@ export function Header() {
                 </li>
                 <li>
                   <a
-                    href="https://yuan7ai-homepage-fe-test.vercel.app/#tool"
+                    href="https://yuanqiai.xyz/#tool"
                     target="_blank"
                   >
                     设计师免费AI工具
@@ -108,7 +108,7 @@ export function Header() {
                 </li>
                 <li>
                   <a
-                    href="https://yuan7ai-homepage-fe-test.vercel.app"
+                    href="https://yuanqiai.xyz"
                     target="_blank"
                   >
                     海量公版图库
@@ -116,7 +116,7 @@ export function Header() {
                 </li>
                 <li>
                   <a
-                    href="https://yuan7ai-homepage-fe-test.vercel.app/#service3"
+                    href="https://yuanqiai.xyz/#service3"
                     target="_blank"
                   >
                     AI算法定制
@@ -138,7 +138,7 @@ export function Header() {
               >
                 <li>
                   <a
-                    href="https://yuan7ai-homepage-fe-test.vercel.app/#team"
+                    href="https://yuanqiai.xyz/#team"
                     target="_blank"
                   >
                     关于我们 - 清北团队
@@ -146,7 +146,7 @@ export function Header() {
                 </li>
                 <li>
                   <a
-                    href="https://yuan7ai-homepage-fe-test.vercel.app/#company2"
+                    href="https://yuanqiai.xyz/#company2"
                     target="_blank"
                   >
                     投资方
@@ -154,7 +154,7 @@ export function Header() {
                 </li>
                 <li>
                   <a
-                    href="https://yuan7ai-homepage-fe-test.vercel.app/#company"
+                    href="https://yuanqiai.xyz/#company"
                     target="_blank"
                   >
                     合作伙伴
