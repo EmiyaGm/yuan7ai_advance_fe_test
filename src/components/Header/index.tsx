@@ -195,22 +195,22 @@ export function Header() {
           ) : (
             <div className="flex items-center justify-center">
               <div
-                className="text-[25px] text-black font-extrabold cursor-pointer"
+                className="text-[25px] text-black font-extrabold cursor-pointer pr-[30px]"
                 onClick={() => {
                   setIsModalOpen(true)
                 }}
               >
                 登录
               </div>
-              <div className="text-[25px] text-black font-extrabold">/</div>
+              {/* <div className="text-[25px] text-black font-extrabold">/</div>
               <div
                 className="pr-[30px] text-[25px] text-black font-extrabold cursor-pointer"
                 onClick={() => {
-                  setIsModalOpen(true)
+                  setIsRegisterOpen(true)
                 }}
               >
                 注册
-              </div>
+              </div> */}
             </div>
           )}
         </div>
@@ -225,8 +225,38 @@ export function Header() {
         }}
       >
         <div>
-          <LoginForm logo="" title="元七AI" subTitle="面料企业的超级AI花型服务">
-            <>
+          <LoginForm logo="" title="元七AI" subTitle="面料企业的超级AI花型服务" onFinish={onFinish}>
+          <>
+              <ProFormText
+                name="username"
+                fieldProps={{
+                  size: 'large',
+                  prefix: <UserOutlined className={'prefixIcon'} />,
+                }}
+                placeholder={'请输入用户名'}
+                rules={[
+                  {
+                    required: true,
+                    message: '请输入用户名!',
+                  },
+                ]}
+              />
+              <ProFormText.Password
+                name="password"
+                fieldProps={{
+                  size: 'large',
+                  prefix: <LockOutlined className={'prefixIcon'} />,
+                }}
+                placeholder={'请输入密码'}
+                rules={[
+                  {
+                    required: true,
+                    message: '请输入密码！',
+                  },
+                ]}
+              />
+            </>
+            {/* <>
               <ProFormText
                 fieldProps={{
                   size: 'large',
@@ -275,12 +305,12 @@ export function Header() {
                     message.success(`手机号 ${phone} 验证码发送成功!`);
                     setCountDown(60)
                   } else {
-                    message.info(`验证码发送太频繁，请等待${res.data}秒后再试`);
+                    message.info(`验证码发送太频繁，请稍后再试`);
                     setCountDown(res.data)
                   }
                 }}
               />
-            </>
+            </> */}
           </LoginForm>
         </div>
       </Modal>
