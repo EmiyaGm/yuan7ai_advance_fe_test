@@ -8,9 +8,12 @@ import {
   UserOutlined,
   DownOutlined,
   MobileOutlined,
+  MailOutlined,
+  BankOutlined,
+  PhoneOutlined,
 } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
-import { fetchLogin, fetchSendSms } from '@/api'
+import { fetchLogin, fetchNewLogin, fetchRegister, fetchSendSms } from '@/api'
 import useAccount from './useAccount'
 import {
   LoginForm,
@@ -34,15 +37,15 @@ export function Header() {
   }
 
   const onFinish = (values: any) => {
-    fetchLogin(values)
+    fetchNewLogin(values)
       .then((res) => {
-        if (res.access_token) {
-          window.localStorage.setItem(
-            'yqai-token',
-            `Bearer ${res.access_token}`,
-          )
-          window.localStorage.setItem('yqai-account', values.username)
-          setAccount(values.username)
+        if (res.data && res.msg == 'success') {
+          // window.localStorage.setItem(
+          //   'yqai-token',
+          //   `Bearer ${res.access_token}`,
+          // )
+          window.localStorage.setItem('yqai-account', res.data.phone)
+          setAccount(res.data.phone)
           message.success('登录成功')
           setIsModalOpen(false)
         } else if (res.msg) {
@@ -53,6 +56,24 @@ export function Header() {
       })
       .catch((error) => {
         message.error('登录失败')
+      })
+  }
+
+  const onRegisterFinish = (values: any) => {
+    fetchRegister(values)
+      .then(res => {
+        if (res.data && res.msg == 'success') {
+          message.success('注册成功，请使用该手机号进行登录')
+          setIsRegisterOpen(false)
+          setIsModalOpen(true)
+        } else if (res.msg) {
+          message.error(res.msg)
+        } else {
+          message.error('注册失败')
+        }
+      })
+      .catch((error) => {
+        message.error('注册失败')
       })
   }
 
@@ -195,14 +216,14 @@ export function Header() {
           ) : (
             <div className="flex items-center justify-center">
               <div
-                className="text-[25px] text-black font-extrabold cursor-pointer pr-[30px]"
+                className="text-[25px] text-black font-extrabold cursor-pointer"
                 onClick={() => {
                   setIsModalOpen(true)
                 }}
               >
                 登录
               </div>
-              {/* <div className="text-[25px] text-black font-extrabold">/</div>
+              <div className="text-[25px] text-black font-extrabold">/</div>
               <div
                 className="pr-[30px] text-[25px] text-black font-extrabold cursor-pointer"
                 onClick={() => {
@@ -210,7 +231,7 @@ export function Header() {
                 }}
               >
                 注册
-              </div> */}
+              </div>
             </div>
           )}
         </div>
@@ -225,8 +246,13 @@ export function Header() {
         }}
       >
         <div>
-          <LoginForm logo="" title="元七AI" subTitle="面料企业的超级AI花型服务" onFinish={onFinish}>
-          <>
+          <LoginForm
+            logo=""
+            title="元七AI"
+            subTitle="面料企业的超级AI花型服务"
+            onFinish={onFinish}
+          >
+            {/* <>
               <ProFormText
                 name="username"
                 fieldProps={{
@@ -255,8 +281,8 @@ export function Header() {
                   },
                 ]}
               />
-            </>
-            {/* <>
+            </> */}
+            <>
               <ProFormText
                 fieldProps={{
                   size: 'large',
@@ -300,17 +326,17 @@ export function Header() {
                 ]}
                 countDown={countDown}
                 onGetCaptcha={async (phone) => {
-                  const res =  await fetchSendSms({phone, type: '1' })
+                  const res = await fetchSendSms({ phone, type: '1' })
                   if (res.data == 60) {
-                    message.success(`手机号 ${phone} 验证码发送成功!`);
+                    message.success(`手机号 ${phone} 验证码发送成功!`)
                     setCountDown(60)
                   } else {
-                    message.info(`验证码发送太频繁，请稍后再试`);
+                    message.info(`验证码发送太频繁，请稍后再试`)
                     setCountDown(res.data)
                   }
                 }}
               />
-            </> */}
+            </>
           </LoginForm>
         </div>
       </Modal>
@@ -328,7 +354,7 @@ export function Header() {
             name="normal_login"
             className="login-form"
             initialValues={{ remember: true }}
-            onFinish={onFinish}
+            onFinish={onRegisterFinish}
           >
             <Form.Item
               name="name"
@@ -340,30 +366,21 @@ export function Header() {
               />
             </Form.Item>
             <Form.Item
-              name="industry"
-              rules={[{ required: true, message: '请输入你的行业!' }]}
+              name="email"
+              rules={[{ required: true, message: '请输入你的联系邮箱!' }]}
             >
               <Input
-                prefix={<LockOutlined className="site-form-item-icon" />}
-                placeholder="行业"
+                prefix={<MailOutlined className="site-form-item-icon" />}
+                placeholder="邮箱"
               />
             </Form.Item>
             <Form.Item
               name="company"
-              rules={[{ required: false, message: '请输入你的公司名称!' }]}
+              rules={[{ required: true, message: '请输入你的公司名称!' }]}
             >
               <Input
-                prefix={<LockOutlined className="site-form-item-icon" />}
+                prefix={<BankOutlined className="site-form-item-icon" />}
                 placeholder="公司名称"
-              />
-            </Form.Item>
-            <Form.Item
-              name="job"
-              rules={[{ required: false, message: '请输入你的公司名称!' }]}
-            >
-              <Input
-                prefix={<LockOutlined className="site-form-item-icon" />}
-                placeholder="职位"
               />
             </Form.Item>
             <Form.Item
@@ -371,17 +388,8 @@ export function Header() {
               rules={[{ required: true, message: '请输入你的注册手机!' }]}
             >
               <Input
-                prefix={<LockOutlined className="site-form-item-icon" />}
+                prefix={<PhoneOutlined className="site-form-item-icon" />}
                 placeholder="注册手机"
-              />
-            </Form.Item>
-            <Form.Item
-              name="code"
-              rules={[{ required: true, message: '请输入你的验证码!' }]}
-            >
-              <Input
-                prefix={<LockOutlined className="site-form-item-icon" />}
-                placeholder="验证码"
               />
             </Form.Item>
 

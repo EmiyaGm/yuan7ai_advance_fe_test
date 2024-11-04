@@ -72,6 +72,19 @@ export const fetchLogin = async (data: any) => {
   return json
 }
 
+export const fetchNewLogin = async (data: any) => {
+  const resp = await fetch(`${baseAccountUrl}/api/custom/manager/login`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: {
+      'content-type': 'application/json',
+    },
+  })
+
+  const json = await resp.json()
+  return json
+}
+
 export const fetchRegister = async (data: any) => {
   const resp = await fetch(`${baseAccountUrl}/api/custom/manager/create`, {
     method: 'POST',
