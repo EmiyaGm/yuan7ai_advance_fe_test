@@ -23,7 +23,7 @@ export default function Home() {
   const [fileLoading, setFileLoading] = useState(false)
 
   const dealImage = () => {
-    if (account) {
+    if (account || localStorage.getItem('yqai-account')) {
       if (file) {
         redesignFile(file, window.localStorage.getItem('yqai-token') || '')
       } else {
