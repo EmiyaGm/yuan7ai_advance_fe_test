@@ -60,7 +60,10 @@ export function Header() {
   }
 
   const onRegisterFinish = (values: any) => {
-    fetchRegister(values)
+    fetchRegister({
+      ...values,
+      saleId: 1
+    })
       .then(res => {
         if (res.data && res.msg == 'success') {
           message.success('注册成功，请使用该手机号进行登录')

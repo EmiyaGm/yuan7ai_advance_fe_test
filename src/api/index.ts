@@ -23,9 +23,9 @@ export const fetchRedesignFile = async (data: any, file: any, token: any) => {
   const resp = await fetch(`${baseUrl}/api/v1/redesgin/file`, {
     method: 'POST',
     body: formData,
-    headers: {
-      'Authorization': token
-    }
+    // headers: {
+    //   'Authorization': token
+    // }
   })
 
   const json = await resp.json()
@@ -86,7 +86,7 @@ export const fetchNewLogin = async (data: any) => {
 }
 
 export const fetchRegister = async (data: any) => {
-  const resp = await fetch(`${baseAccountUrl}/api/custom/manager/create`, {
+  const resp = await fetch(`${baseAccountUrl}/api/custom/manager/add`, {
     method: 'POST',
     body: JSON.stringify(data),
     headers: {

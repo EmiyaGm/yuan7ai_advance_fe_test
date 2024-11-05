@@ -23,10 +23,14 @@ export default function Home() {
   const [fileLoading, setFileLoading] = useState(false)
 
   const dealImage = () => {
-    if (file) {
-      redesignFile(file, window.localStorage.getItem('yqai-token') || '')
+    if (account) {
+      if (file) {
+        redesignFile(file, window.localStorage.getItem('yqai-token') || '')
+      } else {
+        message.info('请选择需要处理的图片')
+      }
     } else {
-      message.info('请选择需要处理的图片')
+      message.info('请先登录')
     }
   }
 
