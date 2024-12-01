@@ -15,7 +15,11 @@ export const fetchGetModels = async (data: any) => {
 
 export const fetchRedesignFile = async (data: any, file: any, token: any) => {
   const formData = new FormData()
-  formData.append('image_in', file)
+  if (typeof file == 'object') {
+    formData.append('image_in', file)
+  } else {
+    formData.append('uid', file)
+  }
   for (const [key, value] of Object.entries<any>(data)) {
     formData.append(key, value)
   }

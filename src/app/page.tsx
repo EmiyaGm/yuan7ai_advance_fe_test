@@ -25,7 +25,12 @@ export default function Home() {
   const dealImage = () => {
     if (account || localStorage.getItem('yqai-account')) {
       if (file) {
-        redesignFile(file, window.localStorage.getItem('yqai-token') || '')
+        if (typeof file == 'string') {
+          const fileArrays = file.split('/')
+          redesignFile(fileArrays[fileArrays.length - 1], window.localStorage.getItem('yqai-token') || '')
+        } else {
+          redesignFile(file, window.localStorage.getItem('yqai-token') || '')
+        }
       } else {
         message.info('请选择需要处理的图片')
       }
@@ -49,11 +54,16 @@ export default function Home() {
 
   const changeActive = (index: number) => {
     if (index === 3) {
-      message.info('Coming soon..')
+      message.info('即将上线')
     } else {
       setActive(index)
+      if (resultFile) {
+        setOriginImage(resultFile)
+        setFile(resultFile)
+      } else {
+        setFile(null)
+      }
       setResultFile(null)
-      setFile(null)
       setSvgFile(null)
       setPsdFile(null)
     }
@@ -61,7 +71,7 @@ export default function Home() {
 
   const nextStep = () => {
     if (active === 2) {
-      message.info('Coming soon..')
+      message.info('即将上线')
     } else if (active < 3) {
       changeActive(active + 1)
     }
@@ -316,7 +326,6 @@ export default function Home() {
   const downloadImage = () => {
     setLoading(true)
     getImageBlob(resultFile).then(async (res: any) => {
-      console.log(res)
       // return blobToFile(res, 'resultFile');
       const link = document.createElement('a')
       link.style.display = 'none'
@@ -498,12 +507,13 @@ export default function Home() {
               <div className="w-[599px] h-[584px] rounded-xl bg-[#F7F7F7] flex items-center justify-center relative">
                 {file ? (
                   <div className="w-[395px] h-[404px] relative">
-                    <Image
+                    <img src={originImage} alt='originImage' className=' object-contain w-full h-full' />
+                    {/* <Image
                       src={originImage}
                       alt="originImage"
                       layout="fill"
                       objectFit="contain"
-                    />
+                    /> */}
                   </div>
                 ) : fileLoading ? (
                   <div className=" absolute h-[593px] bg-black/[.23] top-0 left-0 w-full flex items-center justify-center">
