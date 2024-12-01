@@ -226,7 +226,7 @@ export default function Home() {
 
   const downloadZip = () => {
     window.open(
-      'https://github.com/upscayl/upscayl/releases/download/v2.11.5/upscayl-2.11.5-win.exe',
+      'https://image.yuanqiai.xyz/freetool/download/upscayl-2.11.5-win.exe',
     )
   }
 
