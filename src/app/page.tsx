@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
-import { message } from 'antd'
+import { Button, message, Modal, Result } from 'antd'
 import { fetchGetImage, fetchGetModels, fetchRedesignFile } from '@/api'
 import { baseUrl } from '@/api/config'
 import useAccount from '@/components/Header/useAccount'
@@ -22,12 +22,17 @@ export default function Home() {
 
   const [fileLoading, setFileLoading] = useState(false)
 
+  const [isMobile, setIsMobile] = useState<boolean>(false)
+
   const dealImage = () => {
     if (account || localStorage.getItem('yqai-account')) {
       if (file) {
         if (typeof file == 'string') {
           const fileArrays = file.split('/')
-          redesignFile(fileArrays[fileArrays.length - 1], window.localStorage.getItem('yqai-token') || '')
+          redesignFile(
+            fileArrays[fileArrays.length - 1],
+            window.localStorage.getItem('yqai-token') || '',
+          )
         } else {
           redesignFile(file, window.localStorage.getItem('yqai-token') || '')
         }
@@ -367,8 +372,17 @@ export default function Home() {
     window.URL.revokeObjectURL(url) // 释放对象URL资源
   }
 
+
+
   useEffect(() => {
     // getModels()
+    const ua = navigator.userAgent.toLowerCase()
+    const agents = ['iphone', 'ipad', 'ipod', 'android', 'linux', 'windows phone']
+    for (let i = 0; i < agents.length; i++) {
+      if (ua.indexOf(agents[i]) !== -1) {
+        setIsMobile(true)
+      }
+    }
   }, [])
 
   return (
@@ -507,7 +521,11 @@ export default function Home() {
               <div className="w-[599px] h-[584px] rounded-xl bg-[#F7F7F7] flex items-center justify-center relative">
                 {file ? (
                   <div className="w-[395px] h-[404px] relative">
-                    <img src={originImage} alt='originImage' className=' object-contain w-full h-full' />
+                    <img
+                      src={originImage}
+                      alt="originImage"
+                      className=" object-contain w-full h-full"
+                    />
                     {/* <Image
                       src={originImage}
                       alt="originImage"
@@ -626,6 +644,28 @@ export default function Home() {
           </div>
         </>
       )}
+      <Modal
+        title="提示"
+        open={isMobile}
+        footer={(_, { OkBtn, CancelBtn }) => <></>}
+        centered={true}
+        closable={false}
+      >
+        <Result
+          title="使用电脑端浏览器打开，效果更佳"
+          extra={
+            <Button
+              type="primary"
+              key="console"
+              onClick={() => {
+                setIsMobile(false)
+              }}
+            >
+              我知道了
+            </Button>
+          }
+        />
+      </Modal>
     </div>
   )
 }
