@@ -45,21 +45,26 @@ export default function Home() {
   }
 
   const changeFile = (e: any) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const MAX_SIZE = 12 * 1024 * 1024
-      if (e.target.files[0].size > MAX_SIZE) {
-        e.target.value = ''
-        message.error('上传图片大小不能超过12MB')
-        return
+    if (account || localStorage.getItem('yqai-account')) {
+      if (e.target.files && e.target.files.length > 0) {
+        const MAX_SIZE = 12 * 1024 * 1024
+        if (e.target.files[0].size > MAX_SIZE) {
+          e.target.value = ''
+          message.error('上传图片大小不能超过12MB')
+          return
+        }
+        const reader = new FileReader()
+        reader.readAsDataURL(e.target.files[0])
+        setFileLoading(true)
+        reader.onloadend = () => {
+          setOriginImage(reader.result)
+          setFile(e.target.files[0])
+          setFileLoading(false)
+        }
       }
-      const reader = new FileReader()
-      reader.readAsDataURL(e.target.files[0])
-      setFileLoading(true)
-      reader.onloadend = () => {
-        setOriginImage(reader.result)
-        setFile(e.target.files[0])
-        setFileLoading(false)
-      }
+    } else {
+      e.target.value = ''
+      message.info('请先登录')
     }
   }
 
@@ -378,12 +383,17 @@ export default function Home() {
     window.URL.revokeObjectURL(url) // 释放对象URL资源
   }
 
-
-
   useEffect(() => {
     // getModels()
     const ua = navigator.userAgent.toLowerCase()
-    const agents = ['iphone', 'ipad', 'ipod', 'android', 'linux', 'windows phone']
+    const agents = [
+      'iphone',
+      'ipad',
+      'ipod',
+      'android',
+      'linux',
+      'windows phone',
+    ]
     for (let i = 0; i < agents.length; i++) {
       if (ua.indexOf(agents[i]) !== -1) {
         setIsMobile(true)
@@ -551,6 +561,9 @@ export default function Home() {
                     onChange={changeFile}
                   />
                 )}
+              </div>
+              <div className="text-[15px] text-black w-[599px] mt-2">
+                上传图片大小不能超过12MB
               </div>
               <div className="relative w-full pt-[56px]">
                 <div className="bg-[#F4F5F8] w-[39px] h-[38px] rounded-md absolute right-[69px] top-[18px] cursor-pointer flex items-center justify-center">

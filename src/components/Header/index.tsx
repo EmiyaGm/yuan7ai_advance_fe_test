@@ -28,6 +28,8 @@ export function Header() {
 
   const [countDown, setCountDown] = useState(0)
 
+  const [loginInitial, setLoginInitial] = useState<any>({})
+
   const { account, setAccount } = useAccount()
 
   const logout = () => {
@@ -62,11 +64,15 @@ export function Header() {
   const onRegisterFinish = (values: any) => {
     fetchRegister({
       ...values,
-      saleId: 1
+      saleId: 1,
     })
-      .then(res => {
+      .then((res) => {
         if (res.data && res.msg == 'success') {
           message.success('注册成功，请使用该手机号进行登录')
+          // setAccount(values.phone)
+          setLoginInitial({
+            phone: values.phone
+          })
           setIsRegisterOpen(false)
           setIsModalOpen(true)
         } else if (res.msg) {
@@ -245,15 +251,19 @@ export function Header() {
         footer={null}
         destroyOnClose={true}
         onCancel={() => {
+          setLoginInitial({})
           setIsModalOpen(false)
         }}
       >
         <div>
           <LoginForm
             logo=""
-            title="元七AI"
+            title={
+              <img src="/logo.jpg" alt="logo" className="w-[91.1px] h-auto" />
+            }
             subTitle="面料企业的超级AI花型服务"
             onFinish={onFinish}
+            initialValues={loginInitial}
           >
             {/* <>
               <ProFormText
@@ -293,6 +303,7 @@ export function Header() {
                 }}
                 name="phone"
                 placeholder={'手机号'}
+                
                 rules={[
                   {
                     required: true,
@@ -340,6 +351,19 @@ export function Header() {
                 }}
               />
             </>
+            <div className="mb-6 pb-6">
+              <a
+                style={{
+                  float: 'right',
+                }}
+                onClick={() => {
+                  setIsModalOpen(false)
+                  setIsRegisterOpen(true)
+                }}
+              >
+                无账户？前往注册
+              </a>
+            </div>
           </LoginForm>
         </div>
       </Modal>
