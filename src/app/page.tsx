@@ -46,6 +46,12 @@ export default function Home() {
 
   const changeFile = (e: any) => {
     if (e.target.files && e.target.files.length > 0) {
+      const MAX_SIZE = 12 * 1024 * 1024
+      if (e.target.files[0].size > MAX_SIZE) {
+        e.target.value = ''
+        message.error('上传图片大小不能超过12MB')
+        return
+      }
       const reader = new FileReader()
       reader.readAsDataURL(e.target.files[0])
       setFileLoading(true)
