@@ -125,27 +125,27 @@ export function Header() {
                 className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
               >
                 <li>
-                  <a href="https://yuanqiai.xyz/#service" target="_blank">
+                  <a href="https://home.yuanqiai.xyz/#service" target="_blank">
                     AI花型服务
                   </a>
                 </li>
                 <li>
-                  <a href="https://yuanqiai.xyz/#service2" target="_blank">
+                  <a href="https://home.yuanqiai.xyz/#service2" target="_blank">
                     AI面料效果服务
                   </a>
                 </li>
                 <li>
-                  <a href="https://yuanqiai.xyz/#tool" target="_blank">
+                  <a href="https://home.yuanqiai.xyz/#tool" target="_blank">
                     设计师免费AI工具
                   </a>
                 </li>
                 <li>
-                  <a href="https://yuanqiai.xyz" target="_blank">
+                  <a href="https://home.yuanqiai.xyz" target="_blank">
                     海量公版图库
                   </a>
                 </li>
                 <li>
-                  <a href="https://yuanqiai.xyz/#service3" target="_blank">
+                  <a href="https://home.yuanqiai.xyz/#service3" target="_blank">
                     AI算法定制
                   </a>
                 </li>
@@ -164,17 +164,17 @@ export function Header() {
                 className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
               >
                 <li>
-                  <a href="https://yuanqiai.xyz/#team" target="_blank">
+                  <a href="https://home.yuanqiai.xyz/#team" target="_blank">
                     关于我们 - 清北团队
                   </a>
                 </li>
                 <li>
-                  <a href="https://yuanqiai.xyz/#company2" target="_blank">
+                  <a href="https://home.yuanqiai.xyz/#company2" target="_blank">
                     投资方
                   </a>
                 </li>
                 <li>
-                  <a href="https://yuanqiai.xyz/#company" target="_blank">
+                  <a href="https://home.yuanqiai.xyz/#company" target="_blank">
                     合作伙伴
                   </a>
                 </li>
