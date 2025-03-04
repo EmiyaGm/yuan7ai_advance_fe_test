@@ -83,9 +83,13 @@ export const fetchNewLogin = async (data: any) => {
     headers: {
       'content-type': 'application/json',
     },
+    credentials: 'include',
   })
 
+  console.log(document.cookie)
+
   const json = await resp.json()
+  console.log(json)
   return json
 }
 
@@ -111,6 +115,18 @@ export const fetchSendSms = async (data: any) => {
     },
   })
 
+  const json = await resp.json()
+  return json
+}
+
+export const fetchGetPoint = async () => {
+  const resp = await fetch(`${baseAccountUrl}/api/account/query/get?currency=POINTS`, {
+    method: 'GET',
+    headers: {
+      'content-type': 'application/json',
+    },
+    credentials: 'include',
+  })
   const json = await resp.json()
   return json
 }

@@ -69,7 +69,7 @@ export default function Home() {
   }
 
   const changeActive = (index: number) => {
-    if (index === 3) {
+    if (index === 2) {
       message.info('即将上线')
     } else {
       setActive(index)
@@ -431,8 +431,8 @@ export default function Home() {
         <div
           className={
             active === 2
-              ? 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer'
-              : 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button'
+              ? 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer mb-[280px]'
+              : 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button mb-[280px]'
           }
           onClick={() => changeActive(2)}
         >
@@ -440,7 +440,7 @@ export default function Home() {
           <br />
           分层
         </div>
-        <div
+        {/* <div
           className={
             active === 3
               ? 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer mb-[267px]'
@@ -451,8 +451,17 @@ export default function Home() {
           矢量
           <br />
           生成
+        </div> */}
+        <div className=" absolute w-[205px] h-[267px] bg-[#F6F4FE] bottom-0 rounded-[18px] left-3 pt-[15px]">
+          <img
+            src="/wechat.png"
+            className="w-[187px] h-[192px] rounded-[13px] wechatShadow"
+          />
+          <div className="text-[13px] font-extrabold pt-[22px] pl-2">
+            元七AI｜纺织业AI图案专家👆
+          </div>
         </div>
-        {active !== 0 ? (
+        {/* {active !== 0 ? (
           <div className=" absolute w-[205px] h-[267px] bg-[#F6F4FE] bottom-0 rounded-[18px] left-3 pt-[15px]">
             <img
               src="/wechat.png"
@@ -464,9 +473,9 @@ export default function Home() {
           </div>
         ) : (
           <></>
-        )}
+        )} */}
       </div>
-      {active === 0 ? (
+      {active === 4 ? (
         <>
           <div className="flex-1 h-full py-[39px]">
             <div className="flex items-center justify-between h-[50%]">
@@ -624,14 +633,14 @@ export default function Home() {
                   <></>
                 )}
               </div>
-              {active == 0 ? (
+              {/* {active == 0 ? (
                 <div className="flex items-center justify-between mt-[37px]">
                   123
                 </div>
               ) : (
                 <div></div>
-              )}
-              {active === 1 ? (
+              )} */}
+              {active === 1 || active === 0 ? (
                 <div className="flex items-center justify-between mt-[37px]">
                   {resultFile ? (
                     <div

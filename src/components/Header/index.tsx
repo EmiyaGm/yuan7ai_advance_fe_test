@@ -13,7 +13,7 @@ import {
   PhoneOutlined,
 } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
-import { fetchLogin, fetchNewLogin, fetchRegister, fetchSendSms } from '@/api'
+import { fetchGetPoint, fetchLogin, fetchNewLogin, fetchRegister, fetchSendSms } from '@/api'
 import useAccount from './useAccount'
 import {
   LoginForm,
@@ -49,6 +49,7 @@ export function Header() {
           window.localStorage.setItem('yqai-account', res.data.phone)
           setAccount(res.data.phone)
           message.success('登录成功')
+          fetchGetPoint()
           setIsModalOpen(false)
         } else if (res.msg) {
           message.error(res.msg)
@@ -96,6 +97,7 @@ export function Header() {
   useEffect(() => {
     if (window.localStorage.getItem('yqai-account')) {
       setAccount(window.localStorage.getItem('yqai-account'))
+      fetchGetPoint()
     } else {
       setAccount('')
     }
@@ -109,7 +111,7 @@ export function Header() {
             <img src="/logo.jpg" alt="logo" className="w-[91.1px] h-auto" />
           </div>
           <div className="text-[25px] text-black font-extrabold">
-            数码印花文件生成工具-免费版
+            数码印花文件生成工具-高级版
           </div>
           <div className="flex items-center justify-center ml-[90px]">
             <div className="dropdown dropdown-hover">
