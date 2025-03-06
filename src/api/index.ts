@@ -83,7 +83,7 @@ export const fetchNewLogin = async (data: any) => {
     headers: {
       'content-type': 'application/json',
     },
-    credentials: 'include',
+    // credentials: 'include',
   })
 
   console.log(document.cookie)
@@ -125,7 +125,6 @@ export const fetchGetPoint = async () => {
     headers: {
       'content-type': 'application/json',
     },
-    credentials: 'include',
   })
   const json = await resp.json()
   return json

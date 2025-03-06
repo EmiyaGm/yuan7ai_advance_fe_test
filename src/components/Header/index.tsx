@@ -1,7 +1,18 @@
 'use client'
 
-import { Button, Dropdown, Form, Input, message, Modal, Space } from 'antd'
-import Image from 'next/image'
+import {
+  Button,
+  Col,
+  Dropdown,
+  Form,
+  Input,
+  message,
+  Modal,
+  Radio,
+  Result,
+  Row,
+  Space,
+} from 'antd'
 import { useEffect, useState } from 'react'
 import {
   LockOutlined,
@@ -12,8 +23,14 @@ import {
   BankOutlined,
   PhoneOutlined,
 } from '@ant-design/icons'
-import type { MenuProps } from 'antd'
-import { fetchGetPoint, fetchLogin, fetchNewLogin, fetchRegister, fetchSendSms } from '@/api'
+import type { MenuProps, RadioChangeEvent } from 'antd'
+import {
+  fetchGetPoint,
+  fetchLogin,
+  fetchNewLogin,
+  fetchRegister,
+  fetchSendSms,
+} from '@/api'
 import useAccount from './useAccount'
 import {
   LoginForm,
@@ -26,11 +43,58 @@ export function Header() {
 
   const [isRegisterOpen, setIsRegisterOpen] = useState(false)
 
+  const [isPointOpen, setIsPointOpen] = useState(false)
+
+  const [isMyPointOpen, setIsMyPointOpen] = useState(false)
+
+  const [isPayOpen, setIsPayOpen] = useState(false)
+
+  const [isPaySuccessOpen, setIsPaySuccessOpen] = useState(false)
+
   const [countDown, setCountDown] = useState(0)
 
   const [loginInitial, setLoginInitial] = useState<any>({})
 
   const { account, setAccount } = useAccount()
+
+  const [point, setPoint] = useState(0)
+
+  const [selectedPoint, setSelectedPoint] = useState<any>({})
+
+  const [payType, setPayType] = useState(1)
+
+  const [pointList, setPointList] = useState([
+    {
+      id: 1,
+      points: 10000,
+      price: 999.9,
+    },
+    {
+      id: 2,
+      points: 5000,
+      price: 499.9,
+    },
+    {
+      id: 3,
+      points: 1000,
+      price: 199.9,
+    },
+    {
+      id: 4,
+      points: 500,
+      price: 499.9,
+    },
+    {
+      id: 5,
+      points: 100,
+      price: 9.9,
+    },
+    {
+      id: 6,
+      points: 20,
+      price: 2,
+    },
+  ])
 
   const logout = () => {
     setAccount('')
@@ -72,7 +136,7 @@ export function Header() {
           message.success('注册成功，请使用该手机号进行登录')
           // setAccount(values.phone)
           setLoginInitial({
-            phone: values.phone
+            phone: values.phone,
           })
           setIsRegisterOpen(false)
           setIsModalOpen(true)
@@ -90,9 +154,43 @@ export function Header() {
   const items: MenuProps['items'] = [
     {
       key: '1',
+      label: (
+        <div
+          onClick={() => {
+            setIsPointOpen(true)
+          }}
+        >
+          充值积分
+        </div>
+      ),
+    },
+    {
+      key: '2',
+      label: (
+        <div
+          onClick={() => {
+            setIsMyPointOpen(true)
+          }}
+        >
+          积分明细
+        </div>
+      ),
+    },
+    {
+      key: '3',
       label: <div onClick={logout}>退出登录</div>,
     },
   ]
+
+  const recharge = (data: any) => {
+    // TODO 请求生成订单接口
+    setSelectedPoint(data)
+    setIsPayOpen(true)
+  }
+
+  const onChange = (e: RadioChangeEvent) => {
+    setPayType(e.target.value)
+  }
 
   useEffect(() => {
     if (window.localStorage.getItem('yqai-account')) {
@@ -305,7 +403,6 @@ export function Header() {
                 }}
                 name="phone"
                 placeholder={'手机号'}
-                
                 rules={[
                   {
                     required: true,
@@ -432,6 +529,155 @@ export function Header() {
               </Button>
             </Form.Item>
           </Form>
+        </div>
+      </Modal>
+      <Modal
+        title="积分充值"
+        open={isPointOpen}
+        footer={null}
+        destroyOnClose={true}
+        onCancel={() => {
+          setIsPointOpen(false)
+        }}
+        width={'60vw'}
+      >
+        <div>
+          <Row gutter={20}>
+            {pointList.map((item) => (
+              <Col
+                span={6}
+                key={item.id}
+                className="mb-4 cursor-pointer pointCol"
+              >
+                <div className="border border-gray-200 p-4 rounded-t relative border-b-0">
+                  <div className="text-center text-[20px] font-bold">
+                    {item.points}
+                  </div>
+                  <div className="my-4">
+                    <img src="/point.png" className="w-[50px] h-auto mx-auto" />
+                  </div>
+                  <div className=" absolute top-0 left-0 pointAction hidden w-full h-full">
+                    <div className="flex w-full h-full items-center justify-center bg-black bg-opacity-30">
+                      <Button
+                        type="primary"
+                        onClick={() => {
+                          recharge(item)
+                        }}
+                      >
+                        充值
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+                <div className="text-center text-[20px] font-bold bg-black text-white py-1 rounded-b">
+                  ￥{item.price}
+                </div>
+              </Col>
+            ))}
+          </Row>
+          <div className="flex items-center justify-between my-2">
+            <div className="w-14"></div>
+            <div>积分可用于 AI 图像生成，AI 公版图库商品购买等场景</div>
+            <div className="dropdown dropdown-hover">
+              <div
+                tabIndex={0}
+                role="button"
+                className="btn m-1 bg-transparent shadow-none border-none hover:bg-transparent hover:underline underline-offset-8"
+              >
+                联系客服
+              </div>
+              <ul
+                tabIndex={0}
+                className="dropdown-content menu bg-base-100 rounded-box z-[1] w-[240px] shadow"
+              >
+                <li className="hover:bg-white">
+                  <div className="flex items-center justify-center hover:bg-white">
+                    <img
+                      src="/wechat.png"
+                      className="w-[187px] h-[192px] rounded-[13px]"
+                    />
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </Modal>
+      <Modal
+        title="积分明细"
+        open={isMyPointOpen}
+        footer={null}
+        destroyOnClose={true}
+        onCancel={() => {
+          setIsMyPointOpen(false)
+        }}
+      ></Modal>
+      <Modal
+        title="支付订单"
+        open={isPayOpen}
+        footer={null}
+        destroyOnClose={true}
+        onCancel={() => {
+          setIsPayOpen(false)
+        }}
+        maskClosable={false}
+      >
+        <div>
+          <div className="flex items-center justify-around">
+            <div>
+              <img src="/orderSuccess.png" className="w-[200px] h-auto" />
+            </div>
+            <div>
+              <div>您的订单已提交成功，请尽快支付</div>
+              <div>购买详情：积分{selectedPoint.points}</div>
+              <div>实付金额：{selectedPoint.price} ¥</div>
+            </div>
+          </div>
+          <div className="mt-[80px] flex items-center justify-center">
+            <Radio.Group
+              onChange={onChange}
+              value={payType}
+              options={[
+                {
+                  value: 1,
+                  label: <img src="/aliPay.png" className="w-[180px] h-auto" />,
+                },
+                {
+                  value: 2,
+                  label: (
+                    <img src="/wechatPay.png" className="w-[180px] h-auto" />
+                  ),
+                },
+              ]}
+            />
+          </div>
+          <div className="flex items-center justify-around mt-[50px] w-full">
+            <Button type="primary">前往支付</Button>
+            <Button type="default">取消支付</Button>
+          </div>
+        </div>
+      </Modal>
+      <Modal
+        title="支付成功"
+        open={isPaySuccessOpen}
+        footer={null}
+        destroyOnClose={true}
+        onCancel={() => {
+          setIsPaySuccessOpen(false)
+        }}
+      >
+        <div>
+          <Result
+            status="success"
+            title="支付成功"
+            subTitle="Order number: 2017182818828182881 Cloud server configuration takes 1-5 minutes, please wait."
+            extra={[
+              <Button type="primary" key="console">
+                Go Console
+              </Button>,
+              <Button key="buy">Buy Again</Button>,
+            ]}
+          />
         </div>
       </Modal>
     </main>
