@@ -52,3 +52,11 @@ body {
 .pointCol:hover .pointAction {
   display: block;
 }
+
+.bottomArea{
+  width: calc(100vw - 112px);
+  height: 227px;
+  background: #F7F7F7;
+  left: 112px;
+  bottom: 0px;
+}

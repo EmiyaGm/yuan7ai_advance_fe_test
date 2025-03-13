@@ -6,6 +6,8 @@ import { Button, message, Modal, Result } from 'antd'
 import { fetchGetImage, fetchGetModels, fetchRedesignFile } from '@/api'
 import { baseUrl } from '@/api/config'
 import useAccount from '@/components/Header/useAccount'
+import { useDropzone } from 'react-dropzone'
+import { PlusCircleOutlined } from '@ant-design/icons'
 
 export default function Home() {
   const [active, setActive] = useState(0)
@@ -23,6 +25,8 @@ export default function Home() {
   const [fileLoading, setFileLoading] = useState(false)
 
   const [isMobile, setIsMobile] = useState<boolean>(false)
+
+  const { acceptedFiles, getRootProps, getInputProps } = useDropzone()
 
   const dealImage = () => {
     if (account || localStorage.getItem('yqai-account')) {
@@ -69,7 +73,7 @@ export default function Home() {
   }
 
   const changeActive = (index: number) => {
-    if (index === 2) {
+    if (index === 2 || index === 3) {
       message.info('即将上线')
     } else {
       setActive(index)
@@ -119,7 +123,7 @@ export default function Home() {
             className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer"
             onClick={nextStep}
           >
-            进入到矢量生成
+            进入到一键配色
           </div>
         )
       default:
@@ -383,6 +387,22 @@ export default function Home() {
     window.URL.revokeObjectURL(url) // 释放对象URL资源
   }
 
+  const pasteFunc = (pe: any) => {
+    // pe.preventDefault()
+    // pe.stopPropagation()
+    const data = pe.clipboardData!.files[0]
+    if (!data) {
+      return
+    }
+    // originFile.value = data
+    if (data && data.type.indexOf('image/') === -1) {
+      message.info('你所复制的内容不是图片，无法粘贴')
+      return
+    }
+    // TODO 处理复制图片内容
+    // previewImgOrg.value = URL.createObjectURL(data)
+  }
+
   useEffect(() => {
     // getModels()
     const ua = navigator.userAgent.toLowerCase()
@@ -398,6 +418,11 @@ export default function Home() {
       if (ua.indexOf(agents[i]) !== -1) {
         setIsMobile(true)
       }
+    }
+    document.addEventListener('paste', pasteFunc)
+
+    return function cleanUp() {
+      document.removeEventListener('paste', pasteFunc)
     }
   }, [])
 
@@ -431,8 +456,8 @@ export default function Home() {
         <div
           className={
             active === 2
-              ? 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer mb-[280px]'
-              : 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button mb-[280px]'
+              ? 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer'
+              : 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button'
           }
           onClick={() => changeActive(2)}
         >
@@ -440,7 +465,7 @@ export default function Home() {
           <br />
           分层
         </div>
-        {/* <div
+        <div
           className={
             active === 3
               ? 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer mb-[267px]'
@@ -448,11 +473,11 @@ export default function Home() {
           }
           onClick={() => changeActive(3)}
         >
-          矢量
+          一键
           <br />
-          生成
-        </div> */}
-        <div className=" absolute w-[205px] h-[267px] bg-[#F6F4FE] bottom-0 rounded-[18px] left-3 pt-[15px]">
+          配色
+        </div>
+        {/* <div className=" absolute w-[205px] h-[267px] bg-[#F6F4FE] bottom-0 rounded-[18px] left-3 pt-[15px]">
           <img
             src="/wechat.png"
             className="w-[187px] h-[192px] rounded-[13px] wechatShadow"
@@ -460,7 +485,7 @@ export default function Home() {
           <div className="text-[13px] font-extrabold pt-[22px] pl-2">
             元七AI｜纺织业AI图案专家👆
           </div>
-        </div>
+        </div> */}
         {/* {active !== 0 ? (
           <div className=" absolute w-[205px] h-[267px] bg-[#F6F4FE] bottom-0 rounded-[18px] left-3 pt-[15px]">
             <img
@@ -563,17 +588,29 @@ export default function Home() {
                     <span className="loading loading-infinity loading-lg"></span>
                   </div>
                 ) : (
-                  <input
-                    type="file"
-                    className="file-input file-input-bordered file-input-primary w-full max-w-xs"
-                    accept="image/*"
-                    onChange={changeFile}
-                  />
+                  <div
+                    {...getRootProps({ className: 'dropzone' })}
+                    className="w-full h-full flex items-center justify-center flex-col"
+                  >
+                    <input {...getInputProps()} accept="image/*" />
+                    <p className='text-base'>支持拖拽、Ctrl+V 复制上传图片</p>
+                    <p className='text-base'>图片大小不超过12MB，支持PNG、JPG、JPEG、WEBP等格式</p>
+                    <div className="w-[217px] h-[40px] bg-black text-white text-[15px] font-extrabold flex items-center justify-center rounded-[28px] mt-[20px] mx-auto cursor-pointer">
+                      <PlusCircleOutlined />
+                      上传图片
+                    </div>
+                  </div>
+                  // <input
+                  //   type="file"
+                  //   className="file-input file-input-bordered file-input-primary w-full max-w-xs"
+                  //   accept="image/*"
+                  //   onChange={changeFile}
+                  // />
                 )}
               </div>
-              <div className="text-[15px] text-black w-[599px] mt-2">
+              {/* <div className="text-[15px] text-black w-[599px] mt-2">
                 上传图片大小不能超过12MB
-              </div>
+              </div> */}
               <div className="relative w-full pt-[56px]">
                 <div className="bg-[#F4F5F8] w-[39px] h-[38px] rounded-md absolute right-[69px] top-[18px] cursor-pointer flex items-center justify-center">
                   <img
@@ -594,7 +631,7 @@ export default function Home() {
               /> */}
                 </div>
                 <div
-                  className="w-[217px] h-[29px] bg-black text-white text-[15px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
+                  className="w-[217px] h-[40px] bg-black text-white text-[15px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
                   onClick={dealImage}
                 >
                   生成
@@ -670,6 +707,7 @@ export default function Home() {
               )}
             </div>
           </div>
+          <div className=' absolute bottomArea'></div>
         </>
       )}
       <Modal
