@@ -3,7 +3,13 @@
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { Button, message, Modal, Result } from 'antd'
-import { fetchGetImage, fetchGetModels, fetchRedesignFile } from '@/api'
+import {
+  fetchGetActions,
+  fetchGetImage,
+  fetchGetModels,
+  fetchGetPoints,
+  fetchRedesignFile,
+} from '@/api'
 import { baseUrl } from '@/api/config'
 import useAccount from '@/components/Header/useAccount'
 import { useDropzone } from 'react-dropzone'
@@ -403,6 +409,16 @@ export default function Home() {
     // previewImgOrg.value = URL.createObjectURL(data)
   }
 
+  const [actions, setActions] = useState<any[]>([])
+
+  const getActions = () => {
+    fetchGetActions().then((res: any) => {
+      if (res.data && res.msg == 'success') {
+        setActions(res.data)
+      }
+    })
+  }
+
   useEffect(() => {
     // getModels()
     const ua = navigator.userAgent.toLowerCase()
@@ -420,6 +436,7 @@ export default function Home() {
       }
     }
     document.addEventListener('paste', pasteFunc)
+    getActions()
 
     return function cleanUp() {
       document.removeEventListener('paste', pasteFunc)
@@ -428,56 +445,58 @@ export default function Home() {
 
   return (
     <div className="childrenHeight bg-white rounded-[34px] flex items-center justify-between w-screen my-0 mx-auto">
-      <div className="w-[112px] bg-white h-full flex items-center flex-col relative rounded-l-[34px] justify-between sideShadow">
-        <div
-          className={
-            active === 0
-              ? 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer mt-[134px]'
-              : 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button mt-[134px]'
-          }
-          onClick={() => changeActive(0)}
-        >
-          高清
-          <br />
-          放大
-        </div>
-        <div
-          className={
-            active === 1
-              ? 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer'
-              : 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button'
-          }
-          onClick={() => changeActive(1)}
-        >
-          四方
-          <br />
-          连续
-        </div>
-        <div
-          className={
-            active === 2
-              ? 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer'
-              : 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button'
-          }
-          onClick={() => changeActive(2)}
-        >
-          通用
-          <br />
-          分层
-        </div>
-        <div
-          className={
-            active === 3
-              ? 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer mb-[267px]'
-              : 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button mb-[267px]'
-          }
-          onClick={() => changeActive(3)}
-        >
-          一键
-          <br />
-          配色
-        </div>
-        {/* <div className=" absolute w-[205px] h-[267px] bg-[#F6F4FE] bottom-0 rounded-[18px] left-3 pt-[15px]">
+      {actions.length > 0 ? (
+        <>
+          <div className="w-[112px] bg-white h-full flex items-center flex-col relative rounded-l-[34px] justify-between sideShadow">
+            <div
+              className={
+                active === 0
+                  ? 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer mt-[134px]'
+                  : 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button mt-[134px]'
+              }
+              onClick={() => changeActive(0)}
+            >
+              高清
+              <br />
+              放大
+            </div>
+            <div
+              className={
+                active === 1
+                  ? 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer'
+                  : 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button'
+              }
+              onClick={() => changeActive(1)}
+            >
+              四方
+              <br />
+              连续
+            </div>
+            <div
+              className={
+                active === 2
+                  ? 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer'
+                  : 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button'
+              }
+              onClick={() => changeActive(2)}
+            >
+              通用
+              <br />
+              分层
+            </div>
+            <div
+              className={
+                active === 3
+                  ? 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer mb-[267px]'
+                  : 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button mb-[267px]'
+              }
+              onClick={() => changeActive(3)}
+            >
+              一键
+              <br />
+              配色
+            </div>
+            {/* <div className=" absolute w-[205px] h-[267px] bg-[#F6F4FE] bottom-0 rounded-[18px] left-3 pt-[15px]">
           <img
             src="/wechat.png"
             className="w-[187px] h-[192px] rounded-[13px] wechatShadow"
@@ -486,7 +505,7 @@ export default function Home() {
             元七AI｜纺织业AI图案专家👆
           </div>
         </div> */}
-        {/* {active !== 0 ? (
+            {/* {active !== 0 ? (
           <div className=" absolute w-[205px] h-[267px] bg-[#F6F4FE] bottom-0 rounded-[18px] left-3 pt-[15px]">
             <img
               src="/wechat.png"
@@ -499,57 +518,57 @@ export default function Home() {
         ) : (
           <></>
         )} */}
-      </div>
-      {active === 4 ? (
-        <>
-          <div className="flex-1 h-full py-[39px]">
-            <div className="flex items-center justify-between h-[50%]">
-              <div className="p-[60px] text-[15px] leading-loose">
-                <div className="font-bold">高清放大功能安装方式：</div>
-                <div>1.下载安装包，支持 windows 系统电脑</div>
-                <div className="mb-[10px]">2.打开安装包，点击安装</div>
-                <div
-                  className="w-[217px] h-[29px] bg-black text-white text-[15px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
-                  onClick={downloadZip}
-                >
-                  下载安装包
-                </div>
-              </div>
-              <div className="p-[60px] text-[15px] leading-loose border-l">
-                <div className="font-bold">高清放大功能使用方式：</div>
-                <div>打开软件</div>
-                <div>
-                  上传需放大的图片，需注意，免费版软件有局限性，对图案处理效果有限
-                </div>
-                <div>
-                  选择合适的放大算法模型，手绘类风格推荐 【Digital
-                  art】模型，真实照片类风格 ，推荐【Ultrasharp】模型
-                </div>
-                <div>设置结果导出文件夹</div>
-                <div>点击 Upscayl</div>
-              </div>
-            </div>
-            <div className="flex items-center justify-between h-[50%] mx-[60px] border-t">
-              <div className="text-[23px] leading-loose font-bold">
-                <div>免费版效果不理想？</div>
-                <div>扫码联系，体验元七AI高级版</div>
-              </div>
-              <div className="pr-[60px] text-[23px] leading-loose font-light text-center flex items-center justify-center flex-col">
-                <img
-                  src="/wechat.png"
-                  className="w-[187px] h-[192px] rounded-[13px] wechatShadow"
-                />
-                <div>微信扫码联系AI专家</div>
-                <div>体验元七AI高级版</div>
-              </div>
-            </div>
           </div>
-        </>
-      ) : (
-        <>
-          <div className="flex-1 h-full py-[39px]">
-            <div className="h-full border-r border-black/[.2] flex items-center flex-col">
-              {/* {active === 0 ? (
+          {active === 4 ? (
+            <>
+              <div className="flex-1 h-full py-[39px]">
+                <div className="flex items-center justify-between h-[50%]">
+                  <div className="p-[60px] text-[15px] leading-loose">
+                    <div className="font-bold">高清放大功能安装方式：</div>
+                    <div>1.下载安装包，支持 windows 系统电脑</div>
+                    <div className="mb-[10px]">2.打开安装包，点击安装</div>
+                    <div
+                      className="w-[217px] h-[29px] bg-black text-white text-[15px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
+                      onClick={downloadZip}
+                    >
+                      下载安装包
+                    </div>
+                  </div>
+                  <div className="p-[60px] text-[15px] leading-loose border-l">
+                    <div className="font-bold">高清放大功能使用方式：</div>
+                    <div>打开软件</div>
+                    <div>
+                      上传需放大的图片，需注意，免费版软件有局限性，对图案处理效果有限
+                    </div>
+                    <div>
+                      选择合适的放大算法模型，手绘类风格推荐 【Digital
+                      art】模型，真实照片类风格 ，推荐【Ultrasharp】模型
+                    </div>
+                    <div>设置结果导出文件夹</div>
+                    <div>点击 Upscayl</div>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between h-[50%] mx-[60px] border-t">
+                  <div className="text-[23px] leading-loose font-bold">
+                    <div>免费版效果不理想？</div>
+                    <div>扫码联系，体验元七AI高级版</div>
+                  </div>
+                  <div className="pr-[60px] text-[23px] leading-loose font-light text-center flex items-center justify-center flex-col">
+                    <img
+                      src="/wechat.png"
+                      className="w-[187px] h-[192px] rounded-[13px] wechatShadow"
+                    />
+                    <div>微信扫码联系AI专家</div>
+                    <div>体验元七AI高级版</div>
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex-1 h-full py-[39px]">
+                <div className="h-full border-r border-black/[.2] flex items-center flex-col">
+                  {/* {active === 0 ? (
             <div className="flex items-center justify-around mb-[35px]">
               <div className="text-[15px] font-extrabold">放大风格：</div>
               <div className="w-[111px] h-[23px] border border-black rounded-[14px] flex items-center justify-center text-[10px] cursor-pointer">
@@ -566,61 +585,65 @@ export default function Home() {
             <div className="h-[58px]"></div>
           )} */}
 
-              <div className="h-[58px]"></div>
+                  <div className="h-[58px]"></div>
 
-              <div className="w-[599px] h-[584px] rounded-xl bg-[#F7F7F7] flex items-center justify-center relative">
-                {file ? (
-                  <div className="w-[395px] h-[404px] relative">
-                    <img
-                      src={originImage}
-                      alt="originImage"
-                      className=" object-contain w-full h-full"
-                    />
-                    {/* <Image
+                  <div className="w-[599px] h-[584px] rounded-xl bg-[#F7F7F7] flex items-center justify-center relative">
+                    {file ? (
+                      <div className="w-[395px] h-[404px] relative">
+                        <img
+                          src={originImage}
+                          alt="originImage"
+                          className=" object-contain w-full h-full"
+                        />
+                        {/* <Image
                       src={originImage}
                       alt="originImage"
                       layout="fill"
                       objectFit="contain"
                     /> */}
+                      </div>
+                    ) : fileLoading ? (
+                      <div className=" absolute h-[593px] bg-black/[.23] top-0 left-0 w-full flex items-center justify-center">
+                        <span className="loading loading-infinity loading-lg"></span>
+                      </div>
+                    ) : (
+                      <div
+                        {...getRootProps({ className: 'dropzone' })}
+                        className="w-full h-full flex items-center justify-center flex-col"
+                      >
+                        <input {...getInputProps()} accept="image/*" />
+                        <p className="text-base">
+                          支持拖拽、Ctrl+V 复制上传图片
+                        </p>
+                        <p className="text-base">
+                          图片大小不超过12MB，支持PNG、JPG、JPEG、WEBP等格式
+                        </p>
+                        <div className="w-[217px] h-[40px] bg-black text-white text-[15px] font-extrabold flex items-center justify-center rounded-[28px] mt-[20px] mx-auto cursor-pointer">
+                          <PlusCircleOutlined />
+                          上传图片
+                        </div>
+                      </div>
+                      // <input
+                      //   type="file"
+                      //   className="file-input file-input-bordered file-input-primary w-full max-w-xs"
+                      //   accept="image/*"
+                      //   onChange={changeFile}
+                      // />
+                    )}
                   </div>
-                ) : fileLoading ? (
-                  <div className=" absolute h-[593px] bg-black/[.23] top-0 left-0 w-full flex items-center justify-center">
-                    <span className="loading loading-infinity loading-lg"></span>
-                  </div>
-                ) : (
-                  <div
-                    {...getRootProps({ className: 'dropzone' })}
-                    className="w-full h-full flex items-center justify-center flex-col"
-                  >
-                    <input {...getInputProps()} accept="image/*" />
-                    <p className='text-base'>支持拖拽、Ctrl+V 复制上传图片</p>
-                    <p className='text-base'>图片大小不超过12MB，支持PNG、JPG、JPEG、WEBP等格式</p>
-                    <div className="w-[217px] h-[40px] bg-black text-white text-[15px] font-extrabold flex items-center justify-center rounded-[28px] mt-[20px] mx-auto cursor-pointer">
-                      <PlusCircleOutlined />
-                      上传图片
-                    </div>
-                  </div>
-                  // <input
-                  //   type="file"
-                  //   className="file-input file-input-bordered file-input-primary w-full max-w-xs"
-                  //   accept="image/*"
-                  //   onChange={changeFile}
-                  // />
-                )}
-              </div>
-              {/* <div className="text-[15px] text-black w-[599px] mt-2">
+                  {/* <div className="text-[15px] text-black w-[599px] mt-2">
                 上传图片大小不能超过12MB
               </div> */}
-              <div className="relative w-full pt-[56px]">
-                <div className="bg-[#F4F5F8] w-[39px] h-[38px] rounded-md absolute right-[69px] top-[18px] cursor-pointer flex items-center justify-center">
-                  <img
-                    src="/delete.png"
-                    className="w-[28px] h-[30px]"
-                    onClick={() => {
-                      setFile(null)
-                    }}
-                  />
-                  {/* <Image
+                  <div className="relative w-full pt-[56px]">
+                    <div className="bg-[#F4F5F8] w-[39px] h-[38px] rounded-md absolute right-[69px] top-[18px] cursor-pointer flex items-center justify-center">
+                      <img
+                        src="/delete.png"
+                        className="w-[28px] h-[30px]"
+                        onClick={() => {
+                          setFile(null)
+                        }}
+                      />
+                      {/* <Image
                 src="/delete.png"
                 alt="delete"
                 width={28}
@@ -629,87 +652,115 @@ export default function Home() {
                   setFile(null)
                 }}
               /> */}
-                </div>
-                <div
-                  className="w-[217px] h-[40px] bg-black text-white text-[15px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
-                  onClick={dealImage}
-                >
-                  生成
+                    </div>
+                    <div
+                      className="w-[217px] h-[40px] bg-black text-white text-[15px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
+                      onClick={dealImage}
+                    >
+                      生成
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-          <div className="flex-1 h-full py-[39px]">
-            <div className="h-full pl-[62px] pr-[57px] pt-[58px]">
-              <div className="h-[617px] relative">
-                <div className="flex items-center justify-center">
-                  {resultFile ? (
-                    <div className="w-[593px] h-[617px] relative">
-                      <img
-                        src={resultFile}
-                        className=" object-contain w-[593px] h-[617px]"
-                        onLoad={resultFileLoad}
-                      />
-                      {/* <Image
+              <div className="flex-1 h-full py-[39px]">
+                <div className="h-full pl-[62px] pr-[57px] pt-[58px]">
+                  <div className="h-[617px] relative">
+                    <div className="flex items-center justify-center">
+                      {resultFile ? (
+                        <div className="w-[593px] h-[617px] relative">
+                          <img
+                            src={resultFile}
+                            className=" object-contain w-[593px] h-[617px]"
+                            onLoad={resultFileLoad}
+                          />
+                          {/* <Image
                     src={resultFile}
                     alt="resultFile"
                     layout="fill"
                     objectFit="contain"
                     onLoad={resultFileLoad}
                   /> */}
+                        </div>
+                      ) : (
+                        <></>
+                      )}
                     </div>
-                  ) : (
-                    <></>
-                  )}
-                </div>
-                {loading ? (
-                  <div className=" absolute h-[617px] bg-black/[.23] top-0 left-0 w-full flex items-center justify-center">
-                    <span className="loading loading-infinity loading-lg"></span>
+                    {loading ? (
+                      <div className=" absolute h-[617px] bg-black/[.23] top-0 left-0 w-full flex items-center justify-center">
+                        <span className="loading loading-infinity loading-lg"></span>
+                      </div>
+                    ) : (
+                      <></>
+                    )}
                   </div>
-                ) : (
-                  <></>
-                )}
-              </div>
-              {/* {active == 0 ? (
+                  {/* {active == 0 ? (
                 <div className="flex items-center justify-between mt-[37px]">
                   123
                 </div>
               ) : (
                 <div></div>
               )} */}
-              {active === 1 || active === 0 ? (
-                <div className="flex items-center justify-between mt-[37px]">
-                  {resultFile ? (
-                    <div
-                      className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer"
-                      onClick={downloadImage}
-                    >
-                      下载文件
+                  {active === 1 || active === 0 ? (
+                    <div className="flex items-center justify-between mt-[37px]">
+                      {resultFile ? (
+                        <div
+                          className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer"
+                          onClick={downloadImage}
+                        >
+                          下载文件
+                        </div>
+                      ) : (
+                        <div
+                          className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer"
+                          onClick={() => {
+                            if (file) {
+                              message.info('请生成所需要的图片文件')
+                            } else {
+                              message.info('请选择需要生成的文件')
+                            }
+                          }}
+                        >
+                          下载文件
+                        </div>
+                      )}
+                      {getNextButton()}
                     </div>
                   ) : (
-                    <div
-                      className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer"
-                      onClick={() => {
-                        if (file) {
-                          message.info('请生成所需要的图片文件')
-                        } else {
-                          message.info('请选择需要生成的文件')
-                        }
-                      }}
-                    >
-                      下载文件
-                    </div>
+                    getDeal()
                   )}
-                  {getNextButton()}
                 </div>
-              ) : (
-                getDeal()
-              )}
-            </div>
+              </div>
+              <div className=" absolute bottomArea"></div>
+            </>
+          )}
+        </>
+      ) : (
+        <>
+          <div className="w-screen h-full">
+            <Result
+              status="500"
+              title="正在维护中"
+              subTitle="对不起，高级版数码印花文件生成工具正在维护中"
+              extra={
+                <div>
+                  <div>联系我们</div>
+                  <div className="flex items-center justify-center hover:bg-white">
+                    <img
+                      src="/wechat.png"
+                      className="w-[187px] h-[192px] rounded-[13px]"
+                    />
+                    <img
+                      src="/wcx.png"
+                      className="w-[187px] h-[192px] rounded-[13px]"
+                    />
+                  </div>
+                </div>
+              }
+            />
           </div>
-          <div className=' absolute bottomArea'></div>
         </>
       )}
+
       <Modal
         title="提示"
         open={isMobile}

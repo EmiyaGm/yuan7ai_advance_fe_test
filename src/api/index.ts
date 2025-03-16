@@ -120,8 +120,50 @@ export const fetchSendSms = async (data: any) => {
 }
 
 export const fetchGetPoint = async () => {
-  const resp = await fetch(`${baseAccountUrl}/api/account/query/get?currency=POINTS`, {
-    method: 'GET',
+  const resp = await fetch(
+    `${baseAccountUrl}/api/account/query/get?currency=POINTS`,
+    {
+      method: 'GET',
+      headers: {
+        'content-type': 'application/json',
+      },
+    },
+  )
+  const json = await resp.json()
+  return json
+}
+
+export const fetchGetPoints = async () => {
+  const resp = await fetch(`${baseAccountUrl}/api/product/pageQuery`, {
+    method: 'POST',
+    body: JSON.stringify({ size: 99, page: 1, productCategoryIdList: [5] }),
+    headers: {
+      'content-type': 'application/json',
+    },
+  })
+  const json = await resp.json()
+  return json
+}
+
+export const fetchCreateOrder = async (data: any) => {
+  const resp = await fetch(
+    `${baseAccountUrl}/api/order/v2/create-integral-order`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ commodityItemList: [{ id: data, quantity: 1 }] }),
+      headers: {
+        'content-type': 'application/json',
+      },
+    },
+  )
+  const json = await resp.json()
+  return json
+}
+
+export const fetchGetActions = async () => {
+  const resp = await fetch(`${baseAccountUrl}/api/product/pageQuery`, {
+    method: 'POST',
+    body: JSON.stringify({ size: 99, page: 1, productCategoryIdList: [6] }),
     headers: {
       'content-type': 'application/json',
     },

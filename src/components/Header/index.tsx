@@ -26,6 +26,7 @@ import {
 import type { MenuProps, RadioChangeEvent } from 'antd'
 import {
   fetchGetPoint,
+  fetchGetPoints,
   fetchLogin,
   fetchNewLogin,
   fetchRegister,
@@ -63,38 +64,7 @@ export function Header() {
 
   const [payType, setPayType] = useState(1)
 
-  const [pointList, setPointList] = useState([
-    {
-      id: 1,
-      points: 10000,
-      price: 999.9,
-    },
-    {
-      id: 2,
-      points: 5000,
-      price: 499.9,
-    },
-    {
-      id: 3,
-      points: 1000,
-      price: 199.9,
-    },
-    {
-      id: 4,
-      points: 500,
-      price: 499.9,
-    },
-    {
-      id: 5,
-      points: 100,
-      price: 9.9,
-    },
-    {
-      id: 6,
-      points: 20,
-      price: 2,
-    },
-  ])
+  const [pointList, setPointList] = useState<any[]>([])
 
   const logout = () => {
     setAccount('')
@@ -192,6 +162,22 @@ export function Header() {
     setPayType(e.target.value)
   }
 
+  const getPoinst = () => {
+    fetchGetPoints().then((res: any) => {
+      console.log(res)
+      if (res.data && res.message == 'success') {
+        setPointList(
+          res.data.map((item: any) => ({
+            id: item.id,
+            gift: item.description || '',
+            price: item.price || 0,
+            point: item.integral || 0,
+          })),
+        )
+      }
+    })
+  }
+
   useEffect(() => {
     if (window.localStorage.getItem('yqai-account')) {
       setAccount(window.localStorage.getItem('yqai-account'))
@@ -199,6 +185,7 @@ export function Header() {
     } else {
       setAccount('')
     }
+    getPoinst()
   }, [])
 
   return (
