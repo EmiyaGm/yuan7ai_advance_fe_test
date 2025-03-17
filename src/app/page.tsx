@@ -106,32 +106,32 @@ export default function Home() {
   const getNextButton = () => {
     switch (active) {
       case 0:
-        return (
+        return  actions.length > 1 ? (
           <div
             className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer"
             onClick={nextStep}
           >
             进入到四方连续
           </div>
-        )
+        ) : (<></>)
       case 1:
-        return (
+        return actions.length > 2 ? (
           <div
             className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer"
             onClick={nextStep}
           >
             进入到通用分层
           </div>
-        )
+        ) : (<></>)
       case 2:
-        return (
+        return actions.length > 3 ? (
           <div
             className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer"
             onClick={nextStep}
           >
             进入到一键配色
           </div>
-        )
+        ) : (<></>)
       default:
         return <div></div>
     }
@@ -447,8 +447,23 @@ export default function Home() {
     <div className="childrenHeight bg-white rounded-[34px] flex items-center justify-between w-screen my-0 mx-auto">
       {actions.length > 0 ? (
         <>
-          <div className="w-[112px] bg-white h-full flex items-center flex-col relative rounded-l-[34px] justify-between sideShadow">
-            <div
+          <div className="w-[112px] bg-white h-full flex items-center flex-col relative rounded-l-[34px] justify-around sideShadow">
+            {actions.map((item, index) => (
+              <div
+                className={
+                  active === index
+                    ? 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer'
+                    : 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button'
+                }
+                onClick={() => changeActive(index)}
+                key={item.id}
+              >
+                {item.name.substring(0, 2)}
+                <br />
+                {item.name.substring(2)}
+              </div>
+            ))}
+            {/* <div
               className={
                 active === 0
                   ? 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer mt-[134px]'
@@ -495,7 +510,7 @@ export default function Home() {
               一键
               <br />
               配色
-            </div>
+            </div> */}
             {/* <div className=" absolute w-[205px] h-[267px] bg-[#F6F4FE] bottom-0 rounded-[18px] left-3 pt-[15px]">
           <img
             src="/wechat.png"

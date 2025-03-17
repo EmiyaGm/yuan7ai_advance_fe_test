@@ -25,6 +25,7 @@ import {
 } from '@ant-design/icons'
 import type { MenuProps, RadioChangeEvent } from 'antd'
 import {
+  fetchCreateOrder,
   fetchGetPoint,
   fetchGetPoints,
   fetchLogin,
@@ -153,25 +154,39 @@ export function Header() {
   ]
 
   const recharge = (data: any) => {
-    // TODO 请求生成订单接口
-    setSelectedPoint(data)
-    setIsPayOpen(true)
+    if (data.id) {
+      fetchCreateOrder(data.id).then((res: any) => {
+        if (res.data && res.msg == 'success') {
+          if (res.data.id) {
+            // TODO 调用支付
+            setSelectedPoint(data)
+            setIsPayOpen(true)
+          } else {
+            message.error('生成订单失败，请联系客服')
+          }
+        } else {
+          message.error('生成订单失败，请联系客服')
+        }
+      }).catch((err: any) => {
+        message.error('生成订单失败，请联系客服')
+      })
+    }
   }
 
   const onChange = (e: RadioChangeEvent) => {
     setPayType(e.target.value)
   }
 
-  const getPoinst = () => {
+  const getPoints = () => {
     fetchGetPoints().then((res: any) => {
       console.log(res)
-      if (res.data && res.message == 'success') {
+      if (res.data && res.msg == 'success') {
         setPointList(
           res.data.map((item: any) => ({
             id: item.id,
             gift: item.description || '',
             price: item.price || 0,
-            point: item.integral || 0,
+            points: item.integral || 0,
           })),
         )
       }
@@ -185,7 +200,7 @@ export function Header() {
     } else {
       setAccount('')
     }
-    getPoinst()
+    getPoints()
   }, [])
 
   return (
