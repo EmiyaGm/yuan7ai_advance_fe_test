@@ -2,9 +2,9 @@ import { baseAccountUrl, baseUrl } from './config'
 
 enum OrderType {
   HD_AMPLIFICATION = 'HD_AMPLIFICATION', // 高清放大
-  FOUR_SQUARE= 'FOUR_SQUARE', // 四方连续
+  FOUR_SQUARE = 'FOUR_SQUARE', // 四方连续
   GENERAL_LAYERING = 'GENERAL_LAYERING', // 通用分层
-  VECTOR_GENERATION = 'VECTOR_GENERATION' // 矢量生成
+  VECTOR_GENERATION = 'VECTOR_GENERATION', // 矢量生成
 }
 
 export const fetchGetModels = async (data: any) => {
@@ -93,11 +93,17 @@ export const fetchNewLogin = async (data: any) => {
     // credentials: 'include',
   })
 
-  console.log(document.cookie)
+  // console.log(resp.headers.getSetCookie())
+
+  // const cookieStore = cookies();
+
+  // console.log(cookieStore)
 
   const json = await resp.json()
-  console.log(json)
-  return json
+  return {
+    ...json,
+    cookie: resp.headers.getSetCookie()
+  }
 }
 
 export const fetchRegister = async (data: any) => {
@@ -157,7 +163,12 @@ export const fetchCreateActionOrder = async (data: any) => {
     `${baseAccountUrl}/api/order/v2/create-image-order`,
     {
       method: 'POST',
-      body: JSON.stringify({ commodityItemList: [{ id: data.id, quantity: 1, originalImage: data.originalImage }], orderType: data.orderType }),
+      body: JSON.stringify({
+        commodityItemList: [
+          { id: data.id, quantity: 1, originalImage: data.originalImage },
+        ],
+        orderType: data.orderType,
+      }),
       headers: {
         'content-type': 'application/json',
       },

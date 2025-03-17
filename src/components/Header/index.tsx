@@ -1,5 +1,4 @@
 'use client'
-
 import {
   Button,
   Col,
@@ -12,6 +11,7 @@ import {
   Result,
   Row,
   Space,
+  Statistic,
 } from 'antd'
 import { useEffect, useState } from 'react'
 import {
@@ -23,7 +23,7 @@ import {
   BankOutlined,
   PhoneOutlined,
 } from '@ant-design/icons'
-import type { MenuProps, RadioChangeEvent } from 'antd'
+import type { CountdownProps, MenuProps, RadioChangeEvent } from 'antd'
 import {
   fetchCreateOrder,
   fetchGetPoint,
@@ -39,6 +39,10 @@ import {
   ProFormCaptcha,
   ProFormText,
 } from '@ant-design/pro-components'
+
+const { Countdown } = Statistic
+
+const deadline = Date.now() + 1000 * 60 * 15 // Dayjs is also OK
 
 export function Header() {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -73,28 +77,26 @@ export function Header() {
     window.localStorage.setItem('yqai-account', '')
   }
 
-  const onFinish = (values: any) => {
-    fetchNewLogin(values)
-      .then((res) => {
-        if (res.data && res.msg == 'success') {
-          // window.localStorage.setItem(
-          //   'yqai-token',
-          //   `Bearer ${res.access_token}`,
-          // )
-          window.localStorage.setItem('yqai-account', res.data.phone)
-          setAccount(res.data.phone)
-          message.success('登录成功')
-          fetchGetPoint()
-          setIsModalOpen(false)
-        } else if (res.msg) {
-          message.error(res.msg)
-        } else {
-          message.error('登录失败')
-        }
-      })
-      .catch((error) => {
-        message.error('登录失败')
-      })
+  const onFinish = async (values: any) => {
+    const resp = await fetch('/api/login', {
+      method: 'post',
+      body: JSON.stringify(values),
+    })
+    const res = await resp.json()
+    console.log(res)
+    if (res.data && res.msg == 'success') {
+      const token = res.cookie[0]
+      window.localStorage.setItem('yqai-account', res.data.phone)
+      window.localStorage.setItem('yqai-token', `${token}`)
+      setAccount(res.data.phone)
+      message.success('登录成功')
+      getUserPoint()
+      setIsModalOpen(false)
+    } else if (res.msg) {
+      message.error(res.msg)
+    } else {
+      message.error('登录失败')
+    }
   }
 
   const onRegisterFinish = (values: any) => {
@@ -153,23 +155,34 @@ export function Header() {
     },
   ]
 
-  const recharge = (data: any) => {
+  const [payOrder, setPayOrder] = useState<any>({})
+
+  const recharge = async (data: any) => {
     if (data.id) {
-      fetchCreateOrder(data.id).then((res: any) => {
-        if (res.data && res.msg == 'success') {
-          if (res.data.id) {
-            // TODO 调用支付
-            setSelectedPoint(data)
-            setIsPayOpen(true)
-          } else {
-            message.error('生成订单失败，请联系客服')
-          }
+      const resp = await fetch('/api/management', {
+        method: 'post',
+        body: JSON.stringify({
+          url: '/api/order/v2/create-integral-order',
+          method: 'post',
+          data: { commodityItemList: [{ id: data.id, quantity: 1 }] },
+        }),
+        headers: {
+          token: localStorage.getItem('yqai-token') || '',
+        },
+      })
+      const res = await resp.json()
+      if (res.data && res.msg == 'success') {
+        if (res.data.id) {
+          // TODO 调用支付
+          setSelectedPoint(data)
+          setPayOrder(res.data)
+          setIsPayOpen(true)
         } else {
           message.error('生成订单失败，请联系客服')
         }
-      }).catch((err: any) => {
+      } else {
         message.error('生成订单失败，请联系客服')
-      })
+      }
     }
   }
 
@@ -193,10 +206,67 @@ export function Header() {
     })
   }
 
+  const onTimeFinish: CountdownProps['onFinish'] = () => {
+    console.log('finished!')
+  }
+
+  const goToPay = async () => {
+    if (payOrder.id) {
+      if (payType == 1) {
+        const resp = await fetch('/api/management', {
+          method: 'post',
+          body: JSON.stringify({
+            url: '/api/payment/prepay',
+            method: 'post',
+            data: {
+              orderId: payOrder.id,
+              payChannel: 'ALIPAY',
+              payProduct: 'NATIVE',
+              payDesc: `积分充值下单，订单号（${payOrder.id}）`
+            }
+          })
+        })
+        const res = await resp.json()
+        console.log(res)
+      }
+    }
+  }
+
+  const cancelPay = () => {
+    setIsPayOpen(false)
+  }
+
+  const getUserPoint = async () => {
+    const resp2 = await fetch('/api/management', {
+      method: 'post',
+      body: JSON.stringify({
+        url: '/api/account/query/get?currency=POINTS',
+        method: 'GET',
+      }),
+      headers: {
+        token: localStorage.getItem('yqai-token') || '',
+      },
+    })
+    console.log(resp2)
+    const resp2json = await resp2.json()
+    if (resp2json.data && resp2json.msg == 'success') {
+      setPoint(resp2json.data.amount || 0)
+    } else if (resp2json.msg) {
+      if (resp2json.code == 402) {
+        message.error('登录失效，请重新登录')
+        logout()
+      } else {
+        message.error(resp2json.msg)
+      }
+    } else {
+      message.error('请求错误')
+    }
+  }
+
   useEffect(() => {
     if (window.localStorage.getItem('yqai-account')) {
       setAccount(window.localStorage.getItem('yqai-account'))
-      fetchGetPoint()
+      getUserPoint()
     } else {
       setAccount('')
     }
@@ -630,7 +700,16 @@ export function Header() {
               <img src="/orderSuccess.png" className="w-[200px] h-auto" />
             </div>
             <div>
+              <div>
+                <Countdown
+                  title="剩余支付时间"
+                  value={deadline}
+                  onFinish={onTimeFinish}
+                />
+              </div>
               <div>您的订单已提交成功，请尽快支付</div>
+              <div>订单号：{payOrder.id}</div>
+
               <div>购买详情：积分{selectedPoint.points}</div>
               <div>实付金额：{selectedPoint.price} ¥</div>
             </div>
@@ -654,8 +733,8 @@ export function Header() {
             />
           </div>
           <div className="flex items-center justify-around mt-[50px] w-full">
-            <Button type="primary">前往支付</Button>
-            <Button type="default">取消支付</Button>
+            <Button type="primary" onClick={goToPay}>前往支付</Button>
+            <Button type="default" onClick={cancelPay}>取消支付</Button>
           </div>
         </div>
       </Modal>
