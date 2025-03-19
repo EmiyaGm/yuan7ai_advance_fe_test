@@ -272,11 +272,16 @@ export function Header() {
         }).then((res: any) => {
           if (res.data && res.msg == 'success') {
             if (res.data.payUrl) {
-              document.getElementById('pay').innerHTML = res.data.payUrl
-              document.forms[0].setAttribute('target', '_blank')
-              document.forms[0].submit()
-              startAskOrder(payOrder.id)
-              setIsPayAliOpen(true)
+              const payEle = document.getElementById('pay') 
+              if (payEle) {
+                payEle.innerHTML = res.data.payUrl
+                document.forms[0].setAttribute('target', '_blank')
+                document.forms[0].submit()
+                startAskOrder(payOrder.id)
+                setIsPayAliOpen(true)
+              } else {
+                message.error('生成支付宝订单失败，刷新页面之后重试')
+              }
             } else {
               message.error('生成支付宝订单失败，请联系客服')
             }
