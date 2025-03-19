@@ -12,8 +12,9 @@ import {
   Row,
   Space,
   Statistic,
+  Table,
 } from 'antd'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   LockOutlined,
   UserOutlined,
@@ -26,7 +27,9 @@ import {
 import type { CountdownProps, MenuProps, RadioChangeEvent } from 'antd'
 import {
   fetchCreateOrder,
+  fetchGetOrderById,
   fetchGetPoint,
+  fetchGetPointRecords,
   fetchGetPoints,
   fetchLogin,
   fetchNewLogin,
@@ -40,6 +43,7 @@ import {
   ProFormCaptcha,
   ProFormText,
 } from '@ant-design/pro-components'
+import { QRCodeCanvas } from 'qrcode.react'
 
 const { Countdown } = Statistic
 
@@ -64,7 +68,7 @@ export function Header() {
 
   const { account, setAccount } = useAccount()
 
-  const [point, setPoint] = useState(0)
+  const [pointInfo, setPointInfo] = useState<any>({})
 
   const [selectedPoint, setSelectedPoint] = useState<any>({})
 
@@ -72,10 +76,14 @@ export function Header() {
 
   const [pointList, setPointList] = useState<any[]>([])
 
+  const [accountInfo, setAccountInfo] = useState<any>({})
+
   const logout = () => {
     setAccount('')
+    setAccountInfo({})
     window.localStorage.setItem('yqai-token', '')
     window.localStorage.setItem('yqai-account', '')
+    window.localStorage.setItem('yqai-accountInfo', '{}')
   }
 
   const onFinish = async (values: any) => {
@@ -84,9 +92,14 @@ export function Header() {
         if (res.data && res.msg == 'success') {
           window.localStorage.setItem('yqai-token', `${res.data.token}`)
           window.localStorage.setItem('yqai-account', res.data.name)
-          setAccount(res.data.phone)
+          window.localStorage.setItem(
+            'yqai-accountInfo',
+            JSON.stringify(res.data),
+          )
+          setAccount(res.data.name)
+          setAccountInfo(res.data)
           message.success('登录成功')
-          fetchGetPoint()
+          getUserPoint()
           setIsModalOpen(false)
         } else if (res.msg) {
           message.error(res.msg)
@@ -142,6 +155,9 @@ export function Header() {
       label: (
         <div
           onClick={() => {
+            setPage(1)
+            setPageSize(10)
+            getRecordList(1, 10)
             setIsMyPointOpen(true)
           }}
         >
@@ -159,18 +175,22 @@ export function Header() {
 
   const recharge = async (data: any) => {
     if (data.id) {
-      fetchCreateOrder({ commodityItemList: [{ id: data.id, quantity: 1 }] }).then((res: any) => {
+      fetchCreateOrder({
+        commodityItemList: [{ id: data.id, quantity: 1 }],
+      }).then((res: any) => {
         if (res.data && res.msg == 'success') {
           if (res.data.id) {
-            // TODO 调用支付
             setSelectedPoint(data)
             setPayOrder(res.data)
             setIsPayOpen(true)
           } else {
             message.error('生成订单失败，请联系客服')
           }
+        } else if (res.code == 402) {
+          message.error('登录失效，请重新登录')
+          logout()
         } else {
-          message.error('生成订单失败，请联系客服')
+          message.error(res.msg)
         }
       })
     }
@@ -200,6 +220,47 @@ export function Header() {
     console.log('finished!')
   }
 
+  // const [askOrder, setAskOrder] = useState<any>(null)
+
+  const intervalRef = useRef<NodeJS.Timeout | null>(null)
+
+  const [isPayAliOpen, setIsPayAliOpen] = useState(false)
+
+  const clearPayInfo = () => {
+    setIsPayWechatOpen(false)
+    setIsPayAliOpen(false)
+    setWechatPayCode('')
+    setIsPayOpen(false)
+    getUserPoint()
+  }
+
+  const startAskOrder = (id: any) => {
+    if (intervalRef.current) clearInterval(intervalRef.current)
+    intervalRef.current = setInterval(() => {
+      fetchGetOrderById(id)
+        .then((res: any) => {
+          console.log(res)
+          if (res.data && res.msg == 'success') {
+            if (res.data.payStatus == 'PAID') {
+              if (intervalRef.current) clearInterval(intervalRef.current)
+              clearPayInfo()
+              setIsPaySuccessOpen(true)
+              getUserPoint()
+            }
+          } else {
+            if (intervalRef.current) clearInterval(intervalRef.current)
+          }
+        })
+        .catch(() => {
+          if (intervalRef.current) clearInterval(intervalRef.current)
+        })
+    }, 1000)
+  }
+
+  const [isPayWechatOpen, setIsPayWechatOpen] = useState(false)
+
+  const [wechatPayCode, setWechatPayCode] = useState('')
+
   const goToPay = async () => {
     if (payOrder.id) {
       if (payType == 1) {
@@ -209,7 +270,45 @@ export function Header() {
           payProduct: 'NATIVE',
           payDesc: `积分充值下单，订单号（${payOrder.id}）`,
         }).then((res: any) => {
-          console.log(res)
+          if (res.data && res.msg == 'success') {
+            if (res.data.payUrl) {
+              document.getElementById('pay').innerHTML = res.data.payUrl
+              document.forms[0].setAttribute('target', '_blank')
+              document.forms[0].submit()
+              startAskOrder(payOrder.id)
+              setIsPayAliOpen(true)
+            } else {
+              message.error('生成支付宝订单失败，请联系客服')
+            }
+          } else if (res.code == 402) {
+            message.error('登录失效，请重新登录')
+            logout()
+          } else {
+            message.error(res.msg)
+          }
+        })
+      } else {
+        fetchPrePay({
+          orderId: payOrder.id,
+          payChannel: 'WXPAY',
+          payProduct: 'NATIVE',
+          payDesc: `积分充值下单，订单号（${payOrder.id}）`,
+        }).then((res: any) => {
+          if (res.data && res.msg == 'success') {
+            console.log(res)
+            if (res.data.payUrl) {
+              setWechatPayCode(res.data.payUrl)
+              setIsPayWechatOpen(true)
+              startAskOrder(payOrder.id)
+            } else {
+              message.error('生成微信支付订单错误，请联系客服')
+            }
+          } else if (res.code == 402) {
+            message.error('登录失效，请重新登录')
+            logout()
+          } else {
+            message.error(res.msg)
+          }
         })
       }
     }
@@ -220,29 +319,78 @@ export function Header() {
   }
 
   const getUserPoint = async () => {
-    fetchGetPoint().then((res: any) => {
+    fetchGetPoint()
+      .then((res: any) => {
+        if (res.data && res.msg == 'success') {
+          setPointInfo(res.data || {})
+        } else if (res.code == 402) {
+          message.error('登录失效，请重新登录')
+          logout()
+        } else {
+          message.error(res.msg)
+        }
+      })
+      .catch((error: any) => {
+        message.error(error)
+      })
+  }
+
+  const [recordList, setRecordList] = useState<any[]>([])
+
+  const [selectRecordType, setSelectRecordType] = useState('all')
+
+  const [page, setPage] = useState(1)
+
+  const [pageSize, setPageSize] = useState(10)
+
+  const [total, setTotal] = useState(0)
+
+  const getRecordList = (page: any, pageSize: any) => {
+    fetchGetPointRecords({
+      page,
+      size: pageSize,
+      pointListRecordTypeIncome:
+        selectRecordType == 'all'
+          ? null
+          : selectRecordType == 'income'
+          ? true
+          : false,
+    }).then((res: any) => {
       if (res.data && res.msg == 'success') {
-        setPoint(res.data.amount || 0)
-      }
-      if (res.code == 402) {
+        setRecordList(res.data)
+      } else if (res.code == 402) {
         message.error('登录失效，请重新登录')
         logout()
       } else {
         message.error(res.msg)
       }
-    }).catch((error: any) => {
-      message.error(error)
+      if (res.pagination) {
+        setTotal(res.pagination.total || 0)
+      }
     })
+  }
+
+  const handleRecordTypeChange = (e: RadioChangeEvent) => {
+    setSelectRecordType(e.target.value)
+    setPage(1)
+    getRecordList(1, pageSize)
   }
 
   useEffect(() => {
     if (window.localStorage.getItem('yqai-account')) {
       setAccount(window.localStorage.getItem('yqai-account'))
+      setAccountInfo(
+        JSON.parse(window.localStorage.getItem('yqai-accountInfo') || '{}'),
+      )
       getUserPoint()
     } else {
       setAccount('')
+      setAccountInfo({})
     }
     getPoints()
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current)
+    }
   }, [])
 
   return (
@@ -255,7 +403,7 @@ export function Header() {
           <div className="text-[25px] text-black font-extrabold">
             数码印花文件生成工具-高级版
           </div>
-          <div className="flex items-center justify-center ml-[90px]">
+          <div className="flex items-center justify-center ml-[10px]">
             <div className="dropdown dropdown-hover">
               <div
                 tabIndex={0}
@@ -295,7 +443,7 @@ export function Header() {
                 </li>
               </ul>
             </div>
-            <div className="dropdown dropdown-hover mx-[56px]">
+            <div className="dropdown dropdown-hover mx-[48px]">
               <div
                 tabIndex={0}
                 role="button"
@@ -361,7 +509,17 @@ export function Header() {
                 className="text-[25px] text-black font-extrabold pr-[30px] cursor-pointer"
               >
                 <Space>
+                  <div className="w-[50px] h-[50px]">
+                    <img
+                      src={accountInfo.profile}
+                      className="w-full h-full object-contain rounded-full"
+                    />
+                  </div>
                   {account}
+                  <div>
+                    剩余积分：
+                    {(pointInfo.amount || 0) - (pointInfo.freezeAmount || 0)}
+                  </div>
                   <DownOutlined />
                 </Space>
               </a>
@@ -594,6 +752,11 @@ export function Header() {
                 className="mb-4 cursor-pointer pointCol"
               >
                 <div className="border border-gray-200 p-4 rounded-t relative border-b-0">
+                  {item.gift && (
+                    <div className="bg-red-500 absolute p-1 top-[-14px] left-0 text-sm text-white rounded leading-none">
+                      {item.gift}
+                    </div>
+                  )}
                   <div className="text-center text-[20px] font-bold">
                     {item.points}
                   </div>
@@ -655,7 +818,73 @@ export function Header() {
         onCancel={() => {
           setIsMyPointOpen(false)
         }}
-      ></Modal>
+        width="70%"
+      >
+        <div>
+          <div className="text-sm">
+            当前可用积分：
+            {(pointInfo.amount || 0) - (pointInfo.freezeAmount || 0)}
+          </div>
+          <div className='py-2'>
+            <Radio.Group
+              value={selectRecordType}
+              onChange={handleRecordTypeChange}
+              size="small"
+            >
+              <Radio.Button value="all">全部</Radio.Button>
+              <Radio.Button value="income">收入</Radio.Button>
+              <Radio.Button value="expand">支出</Radio.Button>
+            </Radio.Group>
+          </div>
+          <Table
+            dataSource={recordList}
+            scroll={{
+              y: '50vh',
+            }}
+            columns={[
+              {
+                title: '摘要',
+                dataIndex: 'remark',
+                key: 'remark',
+              },
+              {
+                title: '日期',
+                dataIndex: 'updateTime',
+                key: 'updateTime',
+              },
+              {
+                title: '积分变动',
+                dataIndex: 'amount',
+                key: 'amount',
+                render: (value, record) => (
+                  <>{record.type == 'INCOME' ? `+${value}` : `-${value}`}</>
+                ),
+              },
+              {
+                title: '积分余额',
+                dataIndex: 'afterAmount',
+                key: 'afterAmount',
+                render: (_, record: any) => (
+                  <>
+                    {(record.afterAmount || 0) -
+                      (record.afterFreezeAmount || 0)}
+                  </>
+                ),
+              },
+            ]}
+            pagination={{
+              current: page,
+              pageSize: pageSize,
+              total,
+              onChange: (page, pageSize) => {
+                setPage(page)
+                setPageSize(pageSize)
+                getRecordList(page, pageSize)
+              },
+            }}
+          />
+        </div>
+      </Modal>
       <Modal
         title="支付订单"
         open={isPayOpen}
@@ -727,16 +956,87 @@ export function Header() {
           <Result
             status="success"
             title="支付成功"
-            subTitle="Order number: 2017182818828182881 Cloud server configuration takes 1-5 minutes, please wait."
-            extra={[
-              <Button type="primary" key="console">
-                Go Console
-              </Button>,
-              <Button key="buy">Buy Again</Button>,
-            ]}
+            subTitle={`订单：${payOrder.id} 支付成功，已成功购买积分${selectedPoint.points}`}
           />
         </div>
       </Modal>
+      <Modal
+        title="微信扫码支付"
+        open={isPayWechatOpen}
+        footer={null}
+        destroyOnClose={true}
+        onCancel={async () => {
+          Modal.confirm({
+            title: '取消支付',
+            content: <>是否确定取消此次支付？</>,
+            onOk: () => {
+              clearPayInfo()
+              if (intervalRef.current) clearInterval(intervalRef.current)
+            },
+            okText: '确定',
+            cancelText: '取消',
+          })
+        }}
+        maskClosable={false}
+        afterClose={() => {
+          setWechatPayCode('')
+        }}
+      >
+        {wechatPayCode && (
+          <div>
+            <QRCodeCanvas
+              id="qrCode"
+              value={wechatPayCode}
+              size={200} // 二维码的大小
+              fgColor="#000000" // 二维码的颜色
+              style={{ margin: 'auto' }}
+            />
+          </div>
+        )}
+      </Modal>
+      <Modal
+        title="支付宝支付中"
+        open={isPayAliOpen}
+        footer={null}
+        destroyOnClose={true}
+        onCancel={() => {
+          Modal.confirm({
+            title: '取消支付',
+            content: <>是否确定取消此次支付？</>,
+            onOk: () => {
+              clearPayInfo()
+              if (intervalRef.current) clearInterval(intervalRef.current)
+            },
+            okText: '确定',
+            cancelText: '取消',
+          })
+        }}
+        maskClosable={false}
+      >
+        <Result
+          title="正在支付中，请稍后"
+          extra={
+            <Button
+              type="primary"
+              onClick={() => {
+                Modal.confirm({
+                  title: '取消支付',
+                  content: <>是否确定取消此次支付？</>,
+                  onOk: () => {
+                    clearPayInfo()
+                    if (intervalRef.current) clearInterval(intervalRef.current)
+                  },
+                  okText: '确定',
+                  cancelText: '取消',
+                })
+              }}
+            >
+              取消支付
+            </Button>
+          }
+        />
+      </Modal>
+      <div id="pay" className="hidden"></div>
     </main>
   )
 }

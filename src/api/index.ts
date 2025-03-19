@@ -176,7 +176,7 @@ export const fetchCreateOrder = async (data: any) => {
     `${baseAccountUrl}/api/order/v2/create-integral-order`,
     {
       method: 'POST',
-      body: JSON.stringify({ commodityItemList: [{ id: data, quantity: 1 }] }),
+      body: JSON.stringify(data),
       headers: {
         'content-type': 'application/json',
         'CustomerToken': localStorage.getItem('yqai-token') || ''
@@ -214,6 +214,34 @@ export const fetchGetOrders = async (data: any) => {
 
 export const fetchPrePay = async (data: any) => {
   const resp = await fetch(`${baseAccountUrl}/api/payment/prepay`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: {
+      'content-type': 'application/json',
+      'CustomerToken': localStorage.getItem('yqai-token') || ''
+    },
+  })
+  const json = await resp.json()
+  return json
+}
+
+export const fetchGetOrderById = async (id: any) => {
+  const resp = await fetch(
+    `${baseAccountUrl}/api/order/v2/getOrderById?orderId=${id}`,
+    {
+      method: 'GET',
+      headers: {
+        'content-type': 'application/json',
+        'CustomerToken': localStorage.getItem('yqai-token') || ''
+      },
+    },
+  )
+  const json = await resp.json()
+  return json
+}
+
+export const fetchGetPointRecords = async (data: any) => {
+  const resp = await fetch(`${baseAccountUrl}/api/account/query/records`, {
     method: 'POST',
     body: JSON.stringify(data),
     headers: {
