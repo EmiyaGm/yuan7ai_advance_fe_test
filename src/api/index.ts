@@ -84,26 +84,16 @@ export const fetchLogin = async (data: any) => {
 }
 
 export const fetchNewLogin = async (data: any) => {
-  const resp = await fetch(`${baseAccountUrl}/api/custom/manager/login`, {
+  const resp = await fetch(`${baseAccountUrl}/api/login/phone-login`, {
     method: 'POST',
     body: JSON.stringify(data),
     headers: {
       'content-type': 'application/json',
     },
-    // credentials: 'include',
   })
 
-  // console.log(resp.headers.getSetCookie())
-
-  // const cookieStore = cookies();
-
-  // console.log(cookieStore)
-
   const json = await resp.json()
-  return {
-    ...json,
-    cookie: resp.headers.getSetCookie()
-  }
+  return json
 }
 
 export const fetchRegister = async (data: any) => {
@@ -112,6 +102,7 @@ export const fetchRegister = async (data: any) => {
     body: JSON.stringify(data),
     headers: {
       'content-type': 'application/json',
+      'CustomerToken': localStorage.getItem('yqai-token') || ''
     },
   })
 
@@ -139,6 +130,7 @@ export const fetchGetPoint = async () => {
       method: 'GET',
       headers: {
         'content-type': 'application/json',
+        'CustomerToken': localStorage.getItem('yqai-token') || ''
       },
     },
   )
@@ -171,6 +163,7 @@ export const fetchCreateActionOrder = async (data: any) => {
       }),
       headers: {
         'content-type': 'application/json',
+        'CustomerToken': localStorage.getItem('yqai-token') || ''
       },
     },
   )
@@ -186,6 +179,7 @@ export const fetchCreateOrder = async (data: any) => {
       body: JSON.stringify({ commodityItemList: [{ id: data, quantity: 1 }] }),
       headers: {
         'content-type': 'application/json',
+        'CustomerToken': localStorage.getItem('yqai-token') || ''
       },
     },
   )
@@ -211,6 +205,20 @@ export const fetchGetOrders = async (data: any) => {
     body: JSON.stringify(data),
     headers: {
       'content-type': 'application/json',
+      'CustomerToken': localStorage.getItem('yqai-token') || ''
+    },
+  })
+  const json = await resp.json()
+  return json
+}
+
+export const fetchPrePay = async (data: any) => {
+  const resp = await fetch(`${baseAccountUrl}/api/payment/prepay`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: {
+      'content-type': 'application/json',
+      'CustomerToken': localStorage.getItem('yqai-token') || ''
     },
   })
   const json = await resp.json()

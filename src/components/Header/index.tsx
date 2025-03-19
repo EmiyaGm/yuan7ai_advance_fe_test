@@ -30,6 +30,7 @@ import {
   fetchGetPoints,
   fetchLogin,
   fetchNewLogin,
+  fetchPrePay,
   fetchRegister,
   fetchSendSms,
 } from '@/api'
@@ -78,25 +79,24 @@ export function Header() {
   }
 
   const onFinish = async (values: any) => {
-    const resp = await fetch('/api/login', {
-      method: 'post',
-      body: JSON.stringify(values),
-    })
-    const res = await resp.json()
-    console.log(res)
-    if (res.data && res.msg == 'success') {
-      const token = res.cookie[0]
-      window.localStorage.setItem('yqai-account', res.data.phone)
-      window.localStorage.setItem('yqai-token', `${token}`)
-      setAccount(res.data.phone)
-      message.success('登录成功')
-      getUserPoint()
-      setIsModalOpen(false)
-    } else if (res.msg) {
-      message.error(res.msg)
-    } else {
-      message.error('登录失败')
-    }
+    fetchNewLogin(values)
+      .then((res) => {
+        if (res.data && res.msg == 'success') {
+          window.localStorage.setItem('yqai-token', `${res.data.token}`)
+          window.localStorage.setItem('yqai-account', res.data.name)
+          setAccount(res.data.phone)
+          message.success('登录成功')
+          fetchGetPoint()
+          setIsModalOpen(false)
+        } else if (res.msg) {
+          message.error(res.msg)
+        } else {
+          message.error('登录失败')
+        }
+      })
+      .catch((error) => {
+        message.error('登录失败')
+      })
   }
 
   const onRegisterFinish = (values: any) => {
@@ -159,30 +159,20 @@ export function Header() {
 
   const recharge = async (data: any) => {
     if (data.id) {
-      const resp = await fetch('/api/management', {
-        method: 'post',
-        body: JSON.stringify({
-          url: '/api/order/v2/create-integral-order',
-          method: 'post',
-          data: { commodityItemList: [{ id: data.id, quantity: 1 }] },
-        }),
-        headers: {
-          token: localStorage.getItem('yqai-token') || '',
-        },
-      })
-      const res = await resp.json()
-      if (res.data && res.msg == 'success') {
-        if (res.data.id) {
-          // TODO 调用支付
-          setSelectedPoint(data)
-          setPayOrder(res.data)
-          setIsPayOpen(true)
+      fetchCreateOrder({ commodityItemList: [{ id: data.id, quantity: 1 }] }).then((res: any) => {
+        if (res.data && res.msg == 'success') {
+          if (res.data.id) {
+            // TODO 调用支付
+            setSelectedPoint(data)
+            setPayOrder(res.data)
+            setIsPayOpen(true)
+          } else {
+            message.error('生成订单失败，请联系客服')
+          }
         } else {
           message.error('生成订单失败，请联系客服')
         }
-      } else {
-        message.error('生成订单失败，请联系客服')
-      }
+      })
     }
   }
 
@@ -213,21 +203,14 @@ export function Header() {
   const goToPay = async () => {
     if (payOrder.id) {
       if (payType == 1) {
-        const resp = await fetch('/api/management', {
-          method: 'post',
-          body: JSON.stringify({
-            url: '/api/payment/prepay',
-            method: 'post',
-            data: {
-              orderId: payOrder.id,
-              payChannel: 'ALIPAY',
-              payProduct: 'NATIVE',
-              payDesc: `积分充值下单，订单号（${payOrder.id}）`
-            }
-          })
+        fetchPrePay({
+          orderId: payOrder.id,
+          payChannel: 'ALIPAY',
+          payProduct: 'NATIVE',
+          payDesc: `积分充值下单，订单号（${payOrder.id}）`,
+        }).then((res: any) => {
+          console.log(res)
         })
-        const res = await resp.json()
-        console.log(res)
       }
     }
   }
@@ -237,30 +220,19 @@ export function Header() {
   }
 
   const getUserPoint = async () => {
-    const resp2 = await fetch('/api/management', {
-      method: 'post',
-      body: JSON.stringify({
-        url: '/api/account/query/get?currency=POINTS',
-        method: 'GET',
-      }),
-      headers: {
-        token: localStorage.getItem('yqai-token') || '',
-      },
-    })
-    console.log(resp2)
-    const resp2json = await resp2.json()
-    if (resp2json.data && resp2json.msg == 'success') {
-      setPoint(resp2json.data.amount || 0)
-    } else if (resp2json.msg) {
-      if (resp2json.code == 402) {
+    fetchGetPoint().then((res: any) => {
+      if (res.data && res.msg == 'success') {
+        setPoint(res.data.amount || 0)
+      }
+      if (res.code == 402) {
         message.error('登录失效，请重新登录')
         logout()
       } else {
-        message.error(resp2json.msg)
+        message.error(res.msg)
       }
-    } else {
-      message.error('请求错误')
-    }
+    }).catch((error: any) => {
+      message.error(error)
+    })
   }
 
   useEffect(() => {
@@ -733,8 +705,12 @@ export function Header() {
             />
           </div>
           <div className="flex items-center justify-around mt-[50px] w-full">
-            <Button type="primary" onClick={goToPay}>前往支付</Button>
-            <Button type="default" onClick={cancelPay}>取消支付</Button>
+            <Button type="primary" onClick={goToPay}>
+              前往支付
+            </Button>
+            <Button type="default" onClick={cancelPay}>
+              取消支付
+            </Button>
           </div>
         </div>
       </Modal>
