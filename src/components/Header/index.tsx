@@ -532,14 +532,14 @@ export function Header() {
           ) : (
             <div className="flex items-center justify-center">
               <div
-                className="text-[25px] text-black font-extrabold cursor-pointer"
+                className="text-[25px] text-black font-extrabold cursor-pointer pr-[30px]"
                 onClick={() => {
                   setIsModalOpen(true)
                 }}
               >
                 登录
               </div>
-              <div className="text-[25px] text-black font-extrabold">/</div>
+              {/* <div className="text-[25px] text-black font-extrabold">/</div>
               <div
                 className="pr-[30px] text-[25px] text-black font-extrabold cursor-pointer"
                 onClick={() => {
@@ -547,7 +547,7 @@ export function Header() {
                 }}
               >
                 注册
-              </div>
+              </div> */}
             </div>
           )}
         </div>
@@ -657,7 +657,7 @@ export function Header() {
                 }}
               />
             </>
-            <div className="mb-6 pb-6">
+            {/* <div className="mb-6 pb-6">
               <a
                 style={{
                   float: 'right',
@@ -669,7 +669,7 @@ export function Header() {
               >
                 无账户？前往注册
               </a>
-            </div>
+            </div> */}
           </LoginForm>
         </div>
       </Modal>
