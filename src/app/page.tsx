@@ -491,6 +491,18 @@ export default function Home() {
     }
   }, [])
 
+  useEffect(() => {
+    if (account) {
+      const category: any = {
+        6: 'HD_AMPLIFICATION',
+        7: 'FOUR_SQUARE',
+        8: 'GENERAL_LAYERING',
+        9: 'VECTOR_GENERATION('
+      }
+      getOrders(category[actions[active]])
+    }
+  }, [account, active])
+
   return (
     <div className="childrenHeight bg-white rounded-[34px] flex items-center justify-between w-screen my-0 mx-auto">
       {actions.length > 0 ? (
