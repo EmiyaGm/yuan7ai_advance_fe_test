@@ -47,8 +47,6 @@ import { QRCodeCanvas } from 'qrcode.react'
 
 const { Countdown } = Statistic
 
-const deadline = Date.now() + 1000 * 60 * 15 // Dayjs is also OK
-
 export function Header() {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -77,6 +75,10 @@ export function Header() {
   const [pointList, setPointList] = useState<any[]>([])
 
   const [accountInfo, setAccountInfo] = useState<any>({})
+
+  const [deadline, setDeadLine] = useState(Date.now() + 1000 * 60 * 15)
+
+  // const deadline = Date.now() + 1000 * 60 * 15 // Dayjs is also OK
 
   const logout = () => {
     setAccount('')
@@ -182,6 +184,7 @@ export function Header() {
           if (res.data.id) {
             setSelectedPoint(data)
             setPayOrder(res.data)
+            setDeadLine(Date.now() + 1000 * 60 * 15)
             setIsPayOpen(true)
           } else {
             message.error('生成订单失败，请联系客服')
@@ -217,6 +220,9 @@ export function Header() {
   }
 
   const onTimeFinish: CountdownProps['onFinish'] = () => {
+    if (isPayOpen) {
+      setIsPayOpen(false)
+    }
     console.log('finished!')
   }
 
@@ -272,7 +278,7 @@ export function Header() {
         }).then((res: any) => {
           if (res.data && res.msg == 'success') {
             if (res.data.payUrl) {
-              const payEle = document.getElementById('pay') 
+              const payEle = document.getElementById('pay')
               if (payEle) {
                 payEle.innerHTML = res.data.payUrl
                 document.forms[0].setAttribute('target', '_blank')
@@ -511,7 +517,7 @@ export function Header() {
             <Dropdown menu={{ items }}>
               <a
                 onClick={(e) => e.preventDefault()}
-                className="text-[25px] text-black font-extrabold pr-[30px] cursor-pointer"
+                className=" text-sm text-black font-extrabold pr-[30px] cursor-pointer"
               >
                 <Space>
                   <div className="w-[50px] h-[50px]">
@@ -532,7 +538,7 @@ export function Header() {
           ) : (
             <div className="flex items-center justify-center">
               <div
-                className="text-[25px] text-black font-extrabold cursor-pointer pr-[30px]"
+                className="text-sm text-black font-extrabold cursor-pointer pr-[30px]"
                 onClick={() => {
                   setIsModalOpen(true)
                 }}
@@ -553,7 +559,7 @@ export function Header() {
         </div>
       </div>
       <Modal
-        title="登录"
+        title="登录/注册"
         open={isModalOpen}
         footer={null}
         destroyOnClose={true}
@@ -748,41 +754,46 @@ export function Header() {
         }}
         width={'60vw'}
       >
-        <div>
+        <div className="mt-8">
           <Row gutter={20}>
             {pointList.map((item) => (
               <Col
                 span={6}
                 key={item.id}
-                className="mb-4 cursor-pointer pointCol"
+                className="mb-4 cursor-pointer pointCol relative"
               >
-                <div className="border border-gray-200 p-4 rounded-t relative border-b-0">
-                  {item.gift && (
-                    <div className="bg-red-500 absolute p-1 top-[-14px] left-0 text-sm text-white rounded leading-none">
-                      {item.gift}
+                <div className="border border-gray-200 p-4 rounded-t w-full pt-[100%] relative">
+                  <div className=" top-0 left-0 absolute w-full h-full flex flex-col items-center justify-between">
+                    {item.gift && (
+                      <div className="bg-red-500 absolute p-1 top-[-14px] left-0 text-sm text-white rounded leading-none">
+                        {item.gift}
+                      </div>
+                    )}
+                    <div className="text-center text-xl font-bold">
+                      {item.points}
                     </div>
-                  )}
-                  <div className="text-center text-[20px] font-bold">
-                    {item.points}
-                  </div>
-                  <div className="my-4">
-                    <img src="/point.png" className="w-[50px] h-auto mx-auto" />
-                  </div>
-                  <div className=" absolute top-0 left-0 pointAction hidden w-full h-full">
-                    <div className="flex w-full h-full items-center justify-center bg-black bg-opacity-30">
-                      <Button
-                        type="primary"
-                        onClick={() => {
-                          recharge(item)
-                        }}
-                      >
-                        充值
-                      </Button>
+                    <div className="my-4">
+                      <img
+                        src="/point.png"
+                        className="w-[80px] h-auto mx-auto"
+                      />
+                    </div>
+                    <div className=" absolute top-0 left-0 pointAction hidden w-full h-full">
+                      <div className="flex w-full h-full items-center justify-center bg-black bg-opacity-30">
+                        <Button
+                          type="primary"
+                          onClick={() => {
+                            recharge(item)
+                          }}
+                        >
+                          充值
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="text-center text-xl font-bold bg-black text-white rounded-b w-full">
+                      ￥{item.price}
                     </div>
                   </div>
-                </div>
-                <div className="text-center text-[20px] font-bold bg-black text-white py-1 rounded-b">
-                  ￥{item.price}
                 </div>
               </Col>
             ))}
@@ -826,15 +837,14 @@ export function Header() {
         width="70%"
       >
         <div>
-          <div className="text-sm">
+          <div className="text-base font-bold">
             当前可用积分：
             {(pointInfo.amount || 0) - (pointInfo.freezeAmount || 0)}
           </div>
-          <div className='py-2'>
+          <div className="py-2">
             <Radio.Group
               value={selectRecordType}
               onChange={handleRecordTypeChange}
-              size="small"
             >
               <Radio.Button value="all">全部</Radio.Button>
               <Radio.Button value="income">收入</Radio.Button>
@@ -917,7 +927,7 @@ export function Header() {
               <div>订单号：{payOrder.id}</div>
 
               <div>购买详情：积分{selectedPoint.points}</div>
-              <div>实付金额：{selectedPoint.price} ¥</div>
+              <div>实付金额：¥ {selectedPoint.price}</div>
             </div>
           </div>
           <div className="mt-[80px] flex items-center justify-center">

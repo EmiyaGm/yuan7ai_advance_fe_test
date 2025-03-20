@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import { AntdRegistry } from '@ant-design/nextjs-registry'
 import './globals.css'
 import { Header } from '@/components/Header'
+import { ConfigProvider } from 'antd'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -20,8 +21,16 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <AntdRegistry>
-          <Header></Header>
-          {children}
+          <ConfigProvider
+            theme={{
+              token: {
+                colorPrimary: '#222222',
+              },
+            }}
+          >
+            <Header></Header>
+            {children}
+          </ConfigProvider>
         </AntdRegistry>
       </body>
     </html>
