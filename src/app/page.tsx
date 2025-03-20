@@ -7,18 +7,19 @@ import {
   fetchGetActions,
   fetchGetImage,
   fetchGetModels,
+  fetchGetOrders,
   fetchGetPoints,
   fetchRedesignFile,
 } from '@/api'
 import { baseUrl } from '@/api/config'
 import useAccount from '@/components/Header/useAccount'
 import { useDropzone } from 'react-dropzone'
-import { PlusCircleOutlined } from '@ant-design/icons'
+import { PlusCircleOutlined, PlusOutlined } from '@ant-design/icons'
 
 export default function Home() {
   const [active, setActive] = useState(0)
 
-  const { account, setAccount } = useAccount()
+  const { account, setAccount, setAccountInfo } = useAccount()
 
   const [file, setFile] = useState<any>()
 
@@ -106,14 +107,16 @@ export default function Home() {
   const getNextButton = () => {
     switch (active) {
       case 0:
-        return  actions.length > 1 ? (
+        return actions.length > 1 ? (
           <div
             className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer"
             onClick={nextStep}
           >
             进入到四方连续
           </div>
-        ) : (<></>)
+        ) : (
+          <></>
+        )
       case 1:
         return actions.length > 2 ? (
           <div
@@ -122,7 +125,9 @@ export default function Home() {
           >
             进入到通用分层
           </div>
-        ) : (<></>)
+        ) : (
+          <></>
+        )
       case 2:
         return actions.length > 3 ? (
           <div
@@ -131,7 +136,9 @@ export default function Home() {
           >
             进入到一键配色
           </div>
-        ) : (<></>)
+        ) : (
+          <></>
+        )
       default:
         return <div></div>
     }
@@ -415,9 +422,50 @@ export default function Home() {
     fetchGetActions().then((res: any) => {
       if (res.data && res.msg == 'success') {
         setActions(res.data)
+        if (res.data.length > 0 && res.data[active].categoryId) {
+          const category: any = {
+            6: 'HD_AMPLIFICATION',
+            7: 'FOUR_SQUARE',
+            8: 'GENERAL_LAYERING',
+            9: 'VECTOR_GENERATION('
+          }
+          getOrders(category[res.data[active].categoryId])
+        }
       }
     })
   }
+
+  const [page, setPage] = useState(1)
+
+  const [isEnd, setIsEnd] = useState(false)
+
+  const logout = () => {
+    setAccount('')
+    setAccountInfo({})
+    window.localStorage.setItem('yqai-token', '')
+    window.localStorage.setItem('yqai-account', '')
+    window.localStorage.setItem('yqai-accountInfo', '{}')
+  }
+
+  const getOrders = (type: any) => {
+    fetchGetOrders({page, size: 5, type}).then((res: any) => {
+      if (res.data && res.msg == 'success') {
+        setOrderList(orderList.concat(res.data))
+        if (res.data.length < 5) {
+          setIsEnd(true)
+        } else {
+          setPage(page + 1)
+        }
+      } else if (res.code == 402) {
+        message.error('登录失效，请重新登录')
+        logout()
+      } else {
+        message.error(res.msg)
+      }
+    })
+  }
+
+  const [orderList, setOrderList] = useState<any[]>([])
 
   useEffect(() => {
     // getModels()
@@ -745,7 +793,20 @@ export default function Home() {
                   )}
                 </div>
               </div>
-              <div className=" absolute bottomArea"></div>
+              <div className=" absolute bottomArea py-2 px-4 flex">
+                <div className="w-[200px] h-[200px] border-dashed rounded-sm bg-white border-[3px] cursor-pointer flex items-center justify-center mr-4">
+                  <PlusOutlined className="text-[50px]" />
+                </div>
+                {orderList.length > 0 ? (
+                  <></>
+                ) : (
+                  <>
+                    <div className="flex-1 flex items-center justify-center">
+                      <div>暂无生图订单</div>
+                    </div>
+                  </>
+                )}
+              </div>
             </>
           )}
         </>

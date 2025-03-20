@@ -64,7 +64,7 @@ export function Header() {
 
   const [loginInitial, setLoginInitial] = useState<any>({})
 
-  const { account, setAccount } = useAccount()
+  const { account, setAccount, accountInfo, setAccountInfo } = useAccount()
 
   const [pointInfo, setPointInfo] = useState<any>({})
 
@@ -73,8 +73,6 @@ export function Header() {
   const [payType, setPayType] = useState(1)
 
   const [pointList, setPointList] = useState<any[]>([])
-
-  const [accountInfo, setAccountInfo] = useState<any>({})
 
   const [deadline, setDeadLine] = useState(Date.now() + 1000 * 60 * 15)
 
