@@ -118,6 +118,7 @@ export default function Home() {
                               }).then((payRes: any) => {
                                 if (payRes.data && payRes.msg == 'success') {
                                   console.log(payRes.data)
+                                  // TODO 获取用户最新积分
                                   // TODO 处理返回的支付信息
                                   fetchGetOrderById(r.data.id).then((orderRes) => {
                                     if (orderRes.data && orderRes.msg == 'success') {
