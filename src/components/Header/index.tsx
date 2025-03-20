@@ -44,15 +44,14 @@ import {
   ProFormText,
 } from '@ant-design/pro-components'
 import { QRCodeCanvas } from 'qrcode.react'
+import { useModal } from '@/contexts/ModalContext'
 
 const { Countdown } = Statistic
 
 export function Header() {
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const {isModalOpen, openModal, isPointOpen, openPointModal, closeModal, closePointModal} = useModal()
 
   const [isRegisterOpen, setIsRegisterOpen] = useState(false)
-
-  const [isPointOpen, setIsPointOpen] = useState(false)
 
   const [isMyPointOpen, setIsMyPointOpen] = useState(false)
 
@@ -100,7 +99,7 @@ export function Header() {
           setAccountInfo(res.data)
           message.success('登录成功')
           getUserPoint()
-          setIsModalOpen(false)
+          closeModal()
         } else if (res.msg) {
           message.error(res.msg)
         } else {
@@ -125,7 +124,7 @@ export function Header() {
             phone: values.phone,
           })
           setIsRegisterOpen(false)
-          setIsModalOpen(true)
+          openModal
         } else if (res.msg) {
           message.error(res.msg)
         } else {
@@ -143,7 +142,7 @@ export function Header() {
       label: (
         <div
           onClick={() => {
-            setIsPointOpen(true)
+            openPointModal()
           }}
         >
           充值积分
@@ -203,7 +202,6 @@ export function Header() {
 
   const getPoints = () => {
     fetchGetPoints().then((res: any) => {
-      console.log(res)
       if (res.data && res.msg == 'success') {
         setPointList(
           res.data.map((item: any) => ({
@@ -402,6 +400,7 @@ export function Header() {
     }
   }, [])
 
+
   return (
     <main className="h-[80px]">
       <div className="flex items-center justify-between max-w-[1592px] my-0 mx-auto">
@@ -538,7 +537,7 @@ export function Header() {
               <div
                 className="text-sm text-black font-extrabold cursor-pointer pr-[30px]"
                 onClick={() => {
-                  setIsModalOpen(true)
+                  openModal()
                 }}
               >
                 登录
@@ -563,7 +562,7 @@ export function Header() {
         destroyOnClose={true}
         onCancel={() => {
           setLoginInitial({})
-          setIsModalOpen(false)
+          closeModal()
         }}
       >
         <div>
@@ -748,7 +747,7 @@ export function Header() {
         footer={null}
         destroyOnClose={true}
         onCancel={() => {
-          setIsPointOpen(false)
+          closePointModal()
         }}
         width={'60vw'}
       >

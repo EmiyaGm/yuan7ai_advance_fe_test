@@ -4,17 +4,30 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { Button, message, Modal, Result } from 'antd'
 import {
+  fetchCreateActionOrder,
+  fetchGenerateOssPolicy,
   fetchGetActions,
   fetchGetImage,
   fetchGetModels,
+  fetchGetOrderById,
   fetchGetOrders,
+  fetchGetPoint,
   fetchGetPoints,
+  fetchPrePay,
   fetchRedesignFile,
 } from '@/api'
 import { baseUrl } from '@/api/config'
 import useAccount from '@/components/Header/useAccount'
 import { useDropzone } from 'react-dropzone'
 import { PlusCircleOutlined, PlusOutlined } from '@ant-design/icons'
+import { useModal } from '@/contexts/ModalContext'
+
+const category: any = {
+  6: 'HD_AMPLIFICATION',
+  7: 'FOUR_SQUARE',
+  8: 'GENERAL_LAYERING',
+  9: 'VECTOR_GENERATION(',
+}
 
 export default function Home() {
   const [active, setActive] = useState(0)
@@ -33,24 +46,138 @@ export default function Home() {
 
   const [isMobile, setIsMobile] = useState<boolean>(false)
 
-  const { acceptedFiles, getRootProps, getInputProps } = useDropzone()
+  const { openModal, openPointModal } = useModal()
 
-  const dealImage = () => {
+  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
+    maxFiles: 1,
+    maxSize: 12000000,
+    multiple: false,
+  })
+
+  const dealImage = async () => {
     if (account || localStorage.getItem('yqai-account')) {
+      const pointRes = await fetchGetPoint()
+      let userPoint = 0
+      if (pointRes.data && pointRes.msg == 'success') {
+        userPoint =
+          (pointRes.data.amount || 0) - (pointRes.data.freezeAmount || 0)
+      }
+      if (userPoint < actions[active].integral) {
+        message.info('积分不足，请充值')
+        openPointModal()
+        return
+      }
       if (file) {
         if (typeof file == 'string') {
-          const fileArrays = file.split('/')
-          redesignFile(
-            fileArrays[fileArrays.length - 1],
-            window.localStorage.getItem('yqai-token') || '',
-          )
         } else {
-          redesignFile(file, window.localStorage.getItem('yqai-token') || '')
+          const path = `${
+            actions[active].generateImageType
+          }${new Date().getTime()}`
+          setLoading(true)
+          fetchGenerateOssPolicy({
+            ext: file.type.split('/')[1],
+            name: file.name.split('.')[0],
+            path,
+          })
+            .then((res: any) => {
+              if (res.data && res.msg == 'success') {
+                const formData = new FormData()
+                formData.append('name', file.name.split('.')[0])
+                formData.append('policy', res.data.policy)
+                formData.append('OSSAccessKeyId', res.data.accessId)
+                formData.append('success_action_status', '200')
+                formData.append('signature', res.data.signature)
+                formData.append(
+                  'key',
+                  `${path}/${file.name.split('.')[0]}.${
+                    file.type.split('/')[1]
+                  }`,
+                )
+                formData.append('file', file)
+                fetch(res.data.uploadUrl, {
+                  method: 'POST',
+                  body: formData,
+                })
+                  .then((result) => {
+                    if (result.status == 200) {
+                      const originalImage = res.data.url
+                      fetchCreateActionOrder({
+                        id: actions[active].id,
+                        originalImage,
+                        orderType: actions[active].generateImageType,
+                      })
+                        .then((r) => {
+                          setLoading(false)
+                          if (r.data && r.msg == 'success') {
+                            if (r.data.id) {
+                              fetchPrePay({
+                                orderId: r.data.id,
+                                payChannel: 'YUANQI',
+                                payProduct: 'POINTS_FREEZE_TRANS',
+                                payDesc: `${actions[active].name}服务下单，订单号（${r.data.id}）`,
+                              }).then((payRes: any) => {
+                                if (payRes.data && payRes.msg == 'success') {
+                                  console.log(payRes.data)
+                                  // TODO 处理返回的支付信息
+                                  fetchGetOrderById(r.data.id).then((orderRes) => {
+                                    if (orderRes.data && orderRes.msg == 'success') {
+                                      console.log(orderRes)
+                                    }  else if (orderRes.code == 402) {
+                                      message.error('登录失效，请重新登录')
+                                      logout()
+                                    } else {
+                                      message.error(orderRes.msg)
+                                    }
+                                  })
+                                } else if (payRes.code == 402) {
+                                  message.error('登录失效，请重新登录')
+                                  logout()
+                                } else {
+                                  message.error(payRes.msg)
+                                }
+                              })
+                            }
+                          } else if (r.code == 402) {
+                            message.error('登录失效，请重新登录')
+                            logout()
+                          } else {
+                            message.error(r.msg)
+                          }
+                        })
+                        .catch(() => {
+                          setLoading(false)
+                          message.error(
+                            `${actions[active].name}服务暂时不可用，请稍后再试`,
+                          )
+                        })
+                    } else {
+                      setLoading(false)
+                      message.error('图片上传 oss 出错，请联系客服')
+                    }
+                  })
+                  .catch(() => {
+                    setLoading(false)
+                    message.error('图片上传 oss 出错，请联系客服')
+                  })
+              } else if (res.code == 402) {
+                setLoading(false)
+                message.error('登录失效，请重新登录')
+                logout()
+              } else {
+                setLoading(false)
+                message.error(res.msg)
+              }
+            })
+            .catch(() => {
+              setLoading(false)
+              message.error('oss 上传接口出错，请联系客服')
+            })
         }
       } else {
         message.info('请选择需要处理的图片')
       }
     } else {
+      openModal()
       message.info('请先登录')
     }
   }
@@ -273,77 +400,6 @@ export default function Home() {
 
   const [svgFile, setSvgFile] = useState<any>(null)
 
-  const redesignFile = (file: any, token: any) => {
-    setLoading(true)
-    let sendValues = {}
-    setResultFile(null)
-    setSvgFile(null)
-    setPsdFile(null)
-    if (active === 0) {
-      sendValues = {
-        function: 0,
-        option: 4,
-      }
-    } else if (active === 1) {
-      sendValues = { function: 1, option: 2 }
-    } else if (active === 2) {
-      sendValues = { function: 2, option: 4, out_format: 'psd' }
-    } else {
-      sendValues = { option: 6, out_format: 'svg', function: 2 }
-    }
-    fetchRedesignFile(sendValues, file, token)
-      .then((res) => {
-        if (res && res.success) {
-          if (res.data && res.data.uid) {
-            setLoading(false)
-            if (Array.isArray(res.data.uid) && res.data.uid.length > 0) {
-              setUid(res.data.uid[0])
-              if (active === 2) {
-                // setResultFile(originImage)
-                setPsdFile(`${baseUrl}/api/v1/image/${res.data.uid[0]}`)
-                setResultFile(`${baseUrl}/api/v1/image/${res.data.uid[0]}`)
-              } else if (active === 3) {
-                fetch(`${baseUrl}/api/v1/image/${res.data.uid[0]}`)
-                  .then((body) => body.text())
-                  .then((svg) =>
-                    new DOMParser().parseFromString(svg, 'image/svg+xml'),
-                  )
-                  .then((actualSVG) => {
-                    setResultFile(originImage)
-                    setSvgFile(actualSVG)
-                  })
-              } else {
-                setResultFile(`${baseUrl}/api/v1/image/${res.data.uid[0]}`)
-              }
-            }
-          }
-        } else {
-          setLoading(false)
-          if (res.message) {
-            message.error(res.message)
-          } else if (res.msg) {
-            if (res.msg === 'Missing Authorization Header') {
-              message.error('请先登录')
-            } else if (res.msg === 'Token has expired') {
-              message.error('登录已过期，请重新登录')
-              setAccount('')
-              window.localStorage.setItem('yqai-token', '')
-              window.localStorage.setItem('yqai-account', '')
-            } else {
-              message.error(res.msg)
-            }
-          } else {
-            message.error('生成失败')
-          }
-        }
-      })
-      .catch((error) => {
-        console.log(error)
-        setLoading(false)
-        message.error('生成失败')
-      })
-  }
-
   const getImage = (id: any) => {
     if (id) {
       fetchGetImage(id)
@@ -412,8 +468,14 @@ export default function Home() {
       message.info('你所复制的内容不是图片，无法粘贴')
       return
     }
-    // TODO 处理复制图片内容
-    // previewImgOrg.value = URL.createObjectURL(data)
+    const reader = new FileReader()
+    reader.readAsDataURL(data)
+    setFileLoading(true)
+    reader.onloadend = () => {
+      setOriginImage(reader.result)
+      setFile(data)
+      setFileLoading(false)
+    }
   }
 
   const [actions, setActions] = useState<any[]>([])
@@ -423,13 +485,7 @@ export default function Home() {
       if (res.data && res.msg == 'success') {
         setActions(res.data)
         if (res.data.length > 0 && res.data[active].categoryId) {
-          const category: any = {
-            6: 'HD_AMPLIFICATION',
-            7: 'FOUR_SQUARE',
-            8: 'GENERAL_LAYERING',
-            9: 'VECTOR_GENERATION('
-          }
-          getOrders(category[res.data[active].categoryId])
+          getOrders(res.data[active].generateImageType)
         }
       }
     })
@@ -448,7 +504,7 @@ export default function Home() {
   }
 
   const getOrders = (type: any) => {
-    fetchGetOrders({page, size: 5, type}).then((res: any) => {
+    fetchGetOrders({ page, size: 5, type }).then((res: any) => {
       if (res.data && res.msg == 'success') {
         setOrderList(orderList.concat(res.data))
         if (res.data.length < 5) {
@@ -493,15 +549,22 @@ export default function Home() {
 
   useEffect(() => {
     if (account) {
-      const category: any = {
-        6: 'HD_AMPLIFICATION',
-        7: 'FOUR_SQUARE',
-        8: 'GENERAL_LAYERING',
-        9: 'VECTOR_GENERATION('
-      }
-      getOrders(category[actions[active]])
+      getOrders(actions[active].generateImageType)
     }
   }, [account, active])
+
+  useEffect(() => {
+    if (acceptedFiles.length > 0) {
+      const reader = new FileReader()
+      reader.readAsDataURL(acceptedFiles[0])
+      setFileLoading(true)
+      reader.onloadend = () => {
+        setOriginImage(reader.result)
+        setFile(acceptedFiles[0])
+        setFileLoading(false)
+      }
+    }
+  }, [acceptedFiles])
 
   return (
     <div className="childrenHeight bg-white rounded-[34px] flex items-center justify-between w-screen my-0 mx-auto">
@@ -690,7 +753,7 @@ export default function Home() {
                         <p className="text-base">
                           支持拖拽、Ctrl+V 复制上传图片
                         </p>
-                        <p className="text-base">
+                        <p className="text-base text-center">
                           图片大小不超过12MB，支持PNG、JPG、JPEG、WEBP等格式
                         </p>
                         <div className="w-[217px] h-[40px] bg-black text-white text-[15px] font-extrabold flex items-center justify-center rounded-[28px] mt-[20px] mx-auto cursor-pointer">
@@ -728,12 +791,23 @@ export default function Home() {
                 }}
               /> */}
                     </div>
-                    <div
-                      className="w-[217px] h-[40px] bg-black text-white text-[15px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
-                      onClick={dealImage}
-                    >
-                      生成
-                    </div>
+                    {file ? (
+                      <div
+                        className="w-[217px] h-[54px] text-[16px] bg-black text-white text-base font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
+                        onClick={dealImage}
+                      >
+                        <div className="flex items-baseline">
+                          立即生成
+                          <span className="text-[12px]">
+                            消耗{actions[active].integral}积分
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="w-[217px] h-[54px] bg-gray-400 text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-not-allowed">
+                        生成
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

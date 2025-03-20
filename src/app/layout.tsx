@@ -4,6 +4,7 @@ import { AntdRegistry } from '@ant-design/nextjs-registry'
 import './globals.css'
 import { Header } from '@/components/Header'
 import { ConfigProvider } from 'antd'
+import { ModalProvider } from '@/contexts/ModalContext'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -28,8 +29,10 @@ export default function RootLayout({
               },
             }}
           >
-            <Header></Header>
-            {children}
+            <ModalProvider>
+              <Header></Header>
+              {children}
+            </ModalProvider>
           </ConfigProvider>
         </AntdRegistry>
       </body>

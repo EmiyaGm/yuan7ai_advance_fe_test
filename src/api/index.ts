@@ -157,7 +157,7 @@ export const fetchCreateActionOrder = async (data: any) => {
       method: 'POST',
       body: JSON.stringify({
         commodityItemList: [
-          { id: data.id, quantity: 1, originalImage: data.originalImage },
+          { id: data.id, quantity: 1, originalImage: data.originalImage, orderType: data.orderType },
         ],
         orderType: data.orderType,
       }),
@@ -242,6 +242,19 @@ export const fetchGetOrderById = async (id: any) => {
 
 export const fetchGetPointRecords = async (data: any) => {
   const resp = await fetch(`${baseAccountUrl}/api/account/query/records`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: {
+      'content-type': 'application/json',
+      'CustomerToken': localStorage.getItem('yqai-token') || ''
+    },
+  })
+  const json = await resp.json()
+  return json
+}
+
+export const fetchGenerateOssPolicy = async (data: any) => {
+  const resp = await fetch(`${baseAccountUrl}/api/file/generateOssPolicy`, {
     method: 'POST',
     body: JSON.stringify(data),
     headers: {
