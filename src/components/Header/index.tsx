@@ -377,9 +377,12 @@ export function Header() {
 
   const handleRecordTypeChange = (e: RadioChangeEvent) => {
     setSelectRecordType(e.target.value)
+  }
+
+  useEffect(() => {
     setPage(1)
     getRecordList(1, pageSize)
-  }
+  }, [selectRecordType])
 
   useEffect(() => {
     if (window.localStorage.getItem('yqai-account')) {
