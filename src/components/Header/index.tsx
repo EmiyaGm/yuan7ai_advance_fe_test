@@ -37,7 +37,6 @@ import {
   fetchRegister,
   fetchSendSms,
 } from '@/api'
-import useAccount from './useAccount'
 import {
   LoginForm,
   ProFormCaptcha,
@@ -45,11 +44,14 @@ import {
 } from '@ant-design/pro-components'
 import { QRCodeCanvas } from 'qrcode.react'
 import { useModal } from '@/contexts/ModalContext'
+import { useAccount } from '@/contexts/AccountContext'
 
 const { Countdown } = Statistic
 
 export function Header() {
   const {isModalOpen, openModal, isPointOpen, openPointModal, closeModal, closePointModal} = useModal()
+
+  const {account, setAccountData, accountInfo, setAccountInfoData, pointInfo, setPointInfoData} = useAccount()
 
   const [isRegisterOpen, setIsRegisterOpen] = useState(false)
 
@@ -63,10 +65,6 @@ export function Header() {
 
   const [loginInitial, setLoginInitial] = useState<any>({})
 
-  const { account, setAccount, accountInfo, setAccountInfo } = useAccount()
-
-  const [pointInfo, setPointInfo] = useState<any>({})
-
   const [selectedPoint, setSelectedPoint] = useState<any>({})
 
   const [payType, setPayType] = useState(1)
@@ -78,8 +76,8 @@ export function Header() {
   // const deadline = Date.now() + 1000 * 60 * 15 // Dayjs is also OK
 
   const logout = () => {
-    setAccount('')
-    setAccountInfo({})
+    setAccountData('')
+    setAccountInfoData({})
     window.localStorage.setItem('yqai-token', '')
     window.localStorage.setItem('yqai-account', '')
     window.localStorage.setItem('yqai-accountInfo', '{}')
@@ -95,8 +93,8 @@ export function Header() {
             'yqai-accountInfo',
             JSON.stringify(res.data),
           )
-          setAccount(res.data.name)
-          setAccountInfo(res.data)
+          setAccountData(res.data.name)
+          setAccountInfoData(res.data)
           message.success('登录成功')
           getUserPoint()
           closeModal()
@@ -329,7 +327,7 @@ export function Header() {
     fetchGetPoint()
       .then((res: any) => {
         if (res.data && res.msg == 'success') {
-          setPointInfo(res.data || {})
+          setPointInfoData(res.data || {})
         } else if (res.code == 402) {
           message.error('登录失效，请重新登录')
           logout()
@@ -385,14 +383,14 @@ export function Header() {
 
   useEffect(() => {
     if (window.localStorage.getItem('yqai-account')) {
-      setAccount(window.localStorage.getItem('yqai-account'))
-      setAccountInfo(
+      setAccountData(window.localStorage.getItem('yqai-account'))
+      setAccountInfoData(
         JSON.parse(window.localStorage.getItem('yqai-accountInfo') || '{}'),
       )
       getUserPoint()
     } else {
-      setAccount('')
-      setAccountInfo({})
+      setAccountData('')
+      setAccountInfoData({})
     }
     getPoints()
     return () => {

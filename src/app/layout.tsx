@@ -5,6 +5,8 @@ import './globals.css'
 import { Header } from '@/components/Header'
 import { ConfigProvider } from 'antd'
 import { ModalProvider } from '@/contexts/ModalContext'
+import { AccountProvider } from '@/contexts/AccountContext'
+import { LoadingProvider } from '@/contexts/LoadingContext'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -29,10 +31,14 @@ export default function RootLayout({
               },
             }}
           >
-            <ModalProvider>
-              <Header></Header>
-              {children}
-            </ModalProvider>
+            <LoadingProvider>
+              <AccountProvider>
+                <ModalProvider>
+                  <Header></Header>
+                  {children}
+                </ModalProvider>
+              </AccountProvider>
+            </LoadingProvider>
           </ConfigProvider>
         </AntdRegistry>
       </body>
