@@ -774,7 +774,7 @@ export default function Home() {
 
   useEffect(() => {
     if (account) {
-      console.log(account)
+      clearOrder()
       if (actions.length > 0) {
         getOrders(actions[active].generateImageType)
       }
