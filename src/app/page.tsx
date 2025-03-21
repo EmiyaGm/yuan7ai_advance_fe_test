@@ -276,51 +276,20 @@ export default function Home() {
   }
 
   const nextStep = () => {
-    if (active === 2) {
-      message.info('即将上线')
-    } else if (active < 3) {
-      changeActive(active + 1)
-    }
+    changeActive(active + 1)
   }
 
   const getNextButton = () => {
-    switch (active) {
-      case 0:
-        return actions.length > 1 ? (
-          <div
-            className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer"
-            onClick={nextStep}
-          >
-            进入到四方连续
-          </div>
-        ) : (
-          <></>
-        )
-      case 1:
-        return actions.length > 2 ? (
-          <div
-            className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer"
-            onClick={nextStep}
-          >
-            进入到通用分层
-          </div>
-        ) : (
-          <></>
-        )
-      case 2:
-        return actions.length > 3 ? (
-          <div
-            className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer"
-            onClick={nextStep}
-          >
-            进入到一键配色
-          </div>
-        ) : (
-          <></>
-        )
-      default:
-        return <div></div>
-    }
+    return actions.length > active + 1 ? (
+      <div
+        className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer"
+        onClick={nextStep}
+      >
+        进入到{actions[active + 1].name}
+      </div>
+    ) : (
+      <></>
+    )
   }
 
   const getDeal = () => {
@@ -1125,23 +1094,19 @@ export default function Home() {
               ) : (
                 <div></div>
               )} */}
-                    {active === 1 || active === 0 ? (
-                      <div className="flex items-center justify-between mt-[37px]">
-                        {resultFile ? (
-                          <div
-                            className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer"
-                            onClick={downloadImage}
-                          >
-                            下载文件
-                          </div>
-                        ) : (
-                          <></>
-                        )}
-                        {getNextButton()}
-                      </div>
-                    ) : (
-                      getDeal()
-                    )}
+                    <div className="flex items-center justify-between mt-[37px]">
+                      {resultFile ? (
+                        <div
+                          className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer"
+                          onClick={downloadImage}
+                        >
+                          下载文件
+                        </div>
+                      ) : (
+                        <></>
+                      )}
+                      {getNextButton()}
+                    </div>
                   </div>
                 </div>
                 <div className=" absolute bottomArea py-2 px-4 flex overflow-x-auto">
