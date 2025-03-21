@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button, message, Modal, Pagination, Result, Spin, Image } from 'antd'
 import {
   fetchCreateActionOrder,
@@ -56,6 +56,31 @@ export default function Home() {
     const pointRes = await fetchGetPoint()
     if (pointRes.data && pointRes.msg == 'success') {
       setPointInfoData(pointRes.data)
+    }
+  }
+
+  const fileInputRef = useRef<any>(null)
+
+  const handleIconClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click()
+    }
+  }
+
+  const handleFileChange = (event: any) => {
+    const files = event.target.files
+    if (files && files.length > 0) {
+      const selectedFile = files[0]
+      const reader = new FileReader()
+      reader.readAsDataURL(selectedFile)
+      setFileLoading(true)
+      reader.onloadend = () => {
+        setOriginImage(reader.result)
+        setFile(selectedFile)
+        setFileLoading(false)
+      }
+      console.log('Selected file:', selectedFile)
+      // 在这里处理文件，比如上传或预览
     }
   }
 
@@ -429,12 +454,6 @@ export default function Home() {
     } else {
       return <></>
     }
-  }
-
-  const getModels = () => {
-    fetchGetModels({ catrgory: 1 }).then((res) => {
-      console.log(res)
-    })
   }
 
   const downloadZip = () => {
@@ -982,7 +1001,7 @@ export default function Home() {
                 上传图片大小不能超过12MB
               </div> */}
                     <div className="relative w-full pt-[56px]">
-                      <div className="bg-[#F4F5F8] w-[39px] h-[38px] rounded-md absolute right-[69px] top-[18px] cursor-pointer flex items-center justify-center">
+                      <div className="bg-[#F4F5F8] w-[39px] h-[38px] rounded-md absolute right-[116px] top-[18px] cursor-pointer flex items-center justify-center">
                         <img
                           src="/delete.png"
                           className="w-[28px] h-[30px]"
@@ -994,20 +1013,30 @@ export default function Home() {
                             }
                           }}
                         />
-                        {/* <Image
-                src="/delete.png"
-                alt="delete"
-                width={28}
-                height={30}
-                onClick={() => {
-                  setFile(null)
-                }}
-              /> */}
+                      </div>
+                      <div className="bg-[#F4F5F8] w-[39px] h-[38px] rounded-md absolute right-[69px] top-[18px] cursor-pointer flex items-center justify-center">
+                        <img
+                          src="/upload.png"
+                          className="w-[28px] h-[30px]"
+                          onClick={() => {
+                            if (selectedOrder.orderStatus) {
+                            } else {
+                              handleIconClick()
+                            }
+                          }}
+                        />
                       </div>
                       {file ? (
                         loading ? (
                           <div className="w-[217px] h-[54px] bg-gray-400 text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer">
                             正在生成中，请稍后
+                          </div>
+                        ) : !account ? (
+                          <div
+                            className="w-[217px] h-[54px] bg-black text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
+                            onClick={openModal}
+                          >
+                            登录
                           </div>
                         ) : selectedOrder.orderStatus == 'SUCCESS' ? (
                           <div
@@ -1287,6 +1316,14 @@ export default function Home() {
             )}
           </div>
         </Modal>
+        <input
+          type="file"
+          accept="image/.jpg,.png,.jpeg,.webp"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          style={{ display: 'none' }}
+          multiple={false}
+        />
       </div>
     </Spin>
   )
