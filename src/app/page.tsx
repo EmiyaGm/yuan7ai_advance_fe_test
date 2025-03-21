@@ -22,13 +22,6 @@ import { PlusCircleOutlined, PlusOutlined } from '@ant-design/icons'
 import { useModal } from '@/contexts/ModalContext'
 import { useLoading } from '@/contexts/LoadingContext'
 
-const category: any = {
-  6: 'HD_AMPLIFICATION',
-  7: 'FOUR_SQUARE',
-  8: 'GENERAL_LAYERING',
-  9: 'VECTOR_GENERATION(',
-}
-
 export default function Home() {
   const [active, setActive] = useState(0)
 
@@ -766,6 +759,9 @@ export default function Home() {
       if (actions.length > 0) {
         getOrders(actions[active].generateImageType)
       }
+    } else {
+      clearOrder()
+      setOrderList([])
     }
   }, [account, active, actions])
 
