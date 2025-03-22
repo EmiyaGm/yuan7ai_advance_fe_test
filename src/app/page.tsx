@@ -247,11 +247,12 @@ export default function Home() {
   const changeActive = (index: number) => {
     setActive(index)
     if (resultFile) {
-      setOriginImage(resultFile)
-      setFile(resultFile)
+      setOriginImage(resultFile + '?x-oss-process=image/resize,m_lfit,w_2048,limit_1')
+      setFile(resultFile + '?x-oss-process=image/resize,m_lfit,w_2048,limit_1')
     } else {
       setFile(null)
     }
+    setSelectedOrder({})
     setResultFile(null)
   }
 
@@ -677,7 +678,7 @@ export default function Home() {
                       {...getRootProps({ className: 'dropzone' })}
                       className="w-full h-full flex items-center justify-center flex-col"
                     >
-                      <input {...getInputProps()} accept="image/*" />
+                      <input {...getInputProps()} accept="image/.jpg,.png,.jpeg,.webp" />
                       <p className="text-[16px]">
                         支持拖拽、Ctrl+V 复制上传图片
                       </p>
