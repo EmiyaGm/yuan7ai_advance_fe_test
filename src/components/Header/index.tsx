@@ -49,9 +49,23 @@ import { useAccount } from '@/contexts/AccountContext'
 const { Countdown } = Statistic
 
 export function Header() {
-  const {isModalOpen, openModal, isPointOpen, openPointModal, closeModal, closePointModal} = useModal()
+  const {
+    isModalOpen,
+    openModal,
+    isPointOpen,
+    openPointModal,
+    closeModal,
+    closePointModal,
+  } = useModal()
 
-  const {account, setAccountData, accountInfo, setAccountInfoData, pointInfo, setPointInfoData} = useAccount()
+  const {
+    account,
+    setAccountData,
+    accountInfo,
+    setAccountInfoData,
+    pointInfo,
+    setPointInfoData,
+  } = useAccount()
 
   const [isRegisterOpen, setIsRegisterOpen] = useState(false)
 
@@ -84,7 +98,7 @@ export function Header() {
   }
 
   const onFinish = async (values: any) => {
-    fetchNewLogin({...values, platformCode: 'YUAN7_PC'})
+    fetchNewLogin({ ...values, platformCode: 'YUAN7_PC' })
       .then((res) => {
         if (res.data && res.msg == 'success') {
           window.localStorage.setItem('yqai-token', `${res.data.token}`)
@@ -380,8 +394,10 @@ export function Header() {
   }
 
   useEffect(() => {
-    setPage(1)
-    getRecordList(1, pageSize)
+    if (account) {
+      setPage(1)
+      getRecordList(1, pageSize)
+    }
   }, [selectRecordType])
 
   useEffect(() => {
@@ -400,7 +416,6 @@ export function Header() {
       if (intervalRef.current) clearInterval(intervalRef.current)
     }
   }, [])
-
 
   return (
     <main className="h-[80px]">

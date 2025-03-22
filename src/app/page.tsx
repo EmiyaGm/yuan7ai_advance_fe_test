@@ -245,20 +245,14 @@ export default function Home() {
   // });
 
   const changeActive = (index: number) => {
-    if (index === 2 || index === 3) {
-      message.info('即将上线')
+    setActive(index)
+    if (resultFile) {
+      setOriginImage(resultFile)
+      setFile(resultFile)
     } else {
-      setActive(index)
-      if (resultFile) {
-        setOriginImage(resultFile)
-        setFile(resultFile)
-      } else {
-        setFile(null)
-      }
-      setResultFile(null)
-      setSvgFile(null)
-      setPsdFile(null)
+      setFile(null)
     }
+    setResultFile(null)
   }
 
   const nextStep = () => {
@@ -378,6 +372,7 @@ export default function Home() {
     setAccountInfoData({})
     setOrderList([])
     setSelectedOrder({})
+    setResultFile(null)
     window.localStorage.setItem('yqai-token', '')
     window.localStorage.setItem('yqai-account', '')
     window.localStorage.setItem('yqai-accountInfo', '{}')
@@ -463,6 +458,7 @@ export default function Home() {
 
   const clearOrder = () => {
     setFile(null)
+    setResultFile(null)
     setOriginImage(null)
     setSelectedOrder({})
     setLoading(false)
