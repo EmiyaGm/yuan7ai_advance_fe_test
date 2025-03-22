@@ -84,7 +84,7 @@ export function Header() {
   }
 
   const onFinish = async (values: any) => {
-    fetchNewLogin(values)
+    fetchNewLogin({...values, platformCode: 'YUAN7_PC'})
       .then((res) => {
         if (res.data && res.msg == 'success') {
           window.localStorage.setItem('yqai-token', `${res.data.token}`)

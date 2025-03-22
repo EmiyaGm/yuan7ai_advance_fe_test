@@ -1,21 +1,25 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Button, message, Modal, Pagination, Result, Spin, Image } from 'antd'
+import {
+  Button,
+  message,
+  Modal,
+  Pagination,
+  Result,
+  Spin,
+  Image,
+  Tooltip,
+} from 'antd'
 import {
   fetchCreateActionOrder,
   fetchGenerateOssPolicy,
   fetchGetActions,
-  fetchGetImage,
-  fetchGetModels,
   fetchGetOrderById,
   fetchGetOrders,
   fetchGetPoint,
-  fetchGetPoints,
   fetchPrePay,
-  fetchRedesignFile,
 } from '@/api'
-import { baseUrl } from '@/api/config'
 import { useAccount } from '@/contexts/AccountContext'
 import { useDropzone } from 'react-dropzone'
 import { PlusCircleOutlined, PlusOutlined } from '@ant-design/icons'
@@ -85,7 +89,7 @@ export default function Home() {
   }
 
   const dealImage = async () => {
-    if (account || localStorage.getItem('yqai-account')) {
+    if ((account || localStorage.getItem('yqai-account')) && !loading) {
       const pointRes = await fetchGetPoint()
       let userPoint = 0
       if (pointRes.data && pointRes.msg == 'success') {
@@ -103,6 +107,7 @@ export default function Home() {
       }
       if (file) {
         if (typeof file == 'string') {
+          // TODO 另外一种情况
         } else {
           const path = `${
             actions[active].generateImageType
@@ -234,29 +239,10 @@ export default function Home() {
     }
   }
 
-  const changeFile = (e: any) => {
-    if (account || localStorage.getItem('yqai-account')) {
-      if (e.target.files && e.target.files.length > 0) {
-        const MAX_SIZE = 12 * 1024 * 1024
-        if (e.target.files[0].size > MAX_SIZE) {
-          e.target.value = ''
-          message.error('上传图片大小不能超过12MB')
-          return
-        }
-        const reader = new FileReader()
-        reader.readAsDataURL(e.target.files[0])
-        setFileLoading(true)
-        reader.onloadend = () => {
-          setOriginImage(reader.result)
-          setFile(e.target.files[0])
-          setFileLoading(false)
-        }
-      }
-    } else {
-      e.target.value = ''
-      message.info('请先登录')
-    }
-  }
+  // const { data, loading, run } = useRequest(dealImage, {
+  //   debounceWait: 1000,
+  //   manual: true,
+  // });
 
   const changeActive = (index: number) => {
     if (index === 2 || index === 3) {
@@ -290,112 +276,6 @@ export default function Home() {
     ) : (
       <></>
     )
-  }
-
-  const getDeal = () => {
-    switch (active) {
-      case 2:
-        return (
-          <div className="pt-[24px]">
-            <div className="text-[10px] text-black font-extrabold">图层：</div>
-            <div>
-              {resultFile ? (
-                <div className="w-[109px] h-[117px] flex items-center justify-around flex-col bg-[#F4F5F8]">
-                  <div className="w-[100px] h-[96px] relative">
-                    <img
-                      src={resultFile}
-                      className=" object-contain w-[100px] h-[96px]"
-                    />
-                    {/* <Image
-                      src={resultFile}
-                      alt="resultFile"
-                      objectFit="contain"
-                      layout="fill"
-                    /> */}
-                  </div>
-
-                  <div className="text-[10px] text-black text-center">
-                    图层1
-                  </div>
-                </div>
-              ) : (
-                <></>
-              )}
-            </div>
-            {resultFile && psdFile ? (
-              <div
-                className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer my-0 mx-auto"
-                onClick={downloadImage}
-              >
-                {/* <a href={psdFile} download="result">
-                  下载PNG
-                </a> */}
-                <div>下载PNG</div>
-              </div>
-            ) : (
-              <div
-                className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer my-0 mx-auto"
-                onClick={() => {
-                  if (file) {
-                    message.info('请生成所需要的PNG文件')
-                  } else {
-                    message.info('请选择需要生成的文件')
-                  }
-                }}
-              >
-                下载PNG
-              </div>
-            )}
-          </div>
-        )
-      case 3:
-        return (
-          <div className="pt-[24px]">
-            <div className="text-[10px] text-black font-extrabold">颜色：</div>
-            <div>
-              {resultFile ? (
-                <div className="w-[50px] h-[54px] flex items-center justify-around flex-col bg-[#F4F5F8]">
-                  <Image
-                    src={resultFile}
-                    alt="resultFile"
-                    width={39}
-                    height={39}
-                    className="object-cover"
-                  />
-                  <div className="text-[10px] text-black text-center">
-                    颜色1
-                  </div>
-                </div>
-              ) : (
-                <></>
-              )}
-            </div>
-            {resultFile && svgFile ? (
-              <div
-                className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer my-0 mx-auto"
-                onClick={downloadSvg}
-              >
-                下载svg文件
-              </div>
-            ) : (
-              <div
-                className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer my-0 mx-auto"
-                onClick={() => {
-                  if (file) {
-                    message.info('请生成所需要的svg文件')
-                  } else {
-                    message.info('请选择需要生成的文件')
-                  }
-                }}
-              >
-                下载svg文件
-              </div>
-            )}
-          </div>
-        )
-      default:
-        return <div></div>
-    }
   }
 
   const getOrderResultShow = (order: any) => {
@@ -450,20 +330,6 @@ export default function Home() {
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
-  }
-
-  const downloadSvg = () => {
-    const svgContent = new XMLSerializer().serializeToString(svgFile)
-
-    const blob = new Blob([svgContent], { type: 'image/svg+xml' })
-    const url = URL.createObjectURL(blob)
-
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${uid}.svg`
-    document.body.appendChild(a)
-    a.click()
-    window.URL.revokeObjectURL(url) // 释放对象URL资源
   }
 
   const pasteFunc = (pe: any) => {
@@ -768,9 +634,9 @@ export default function Home() {
 
   return (
     <Spin spinning={pageLoading}>
-      <div className="childrenHeight bg-white rounded-[34px] flex items-center justify-between w-screen my-0 mx-auto">
+      <div className="childrenHeight bg-white rounded-[34px]  w-screen my-0 mx-auto">
         {actions.length > 0 ? (
-          <>
+          <div className="flex items-center justify-between relative h-full">
             <div className="w-[112px] bg-white h-full flex items-center flex-col relative rounded-l-[34px] justify-around sideShadow">
               {actions.map((item, index) => (
                 <div
@@ -787,195 +653,60 @@ export default function Home() {
                   {item.name.substring(2)}
                 </div>
               ))}
-              {/* <div
-              className={
-                active === 0
-                  ? 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer mt-[134px]'
-                  : 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button mt-[134px]'
-              }
-              onClick={() => changeActive(0)}
-            >
-              高清
-              <br />
-              放大
             </div>
-            <div
-              className={
-                active === 1
-                  ? 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer'
-                  : 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button'
-              }
-              onClick={() => changeActive(1)}
-            >
-              四方
-              <br />
-              连续
-            </div>
-            <div
-              className={
-                active === 2
-                  ? 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer'
-                  : 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button'
-              }
-              onClick={() => changeActive(2)}
-            >
-              通用
-              <br />
-              分层
-            </div>
-            <div
-              className={
-                active === 3
-                  ? 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer mb-[267px]'
-                  : 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button mb-[267px]'
-              }
-              onClick={() => changeActive(3)}
-            >
-              一键
-              <br />
-              配色
-            </div> */}
-              {/* <div className=" absolute w-[205px] h-[267px] bg-[#F6F4FE] bottom-0 rounded-[18px] left-3 pt-[15px]">
-          <img
-            src="/wechat.png"
-            className="w-[187px] h-[192px] rounded-[13px] wechatShadow"
-          />
-          <div className="text-[13px] font-extrabold pt-[22px] pl-2">
-            元七AI｜纺织业AI图案专家👆
-          </div>
-        </div> */}
-              {/* {active !== 0 ? (
-          <div className=" absolute w-[205px] h-[267px] bg-[#F6F4FE] bottom-0 rounded-[18px] left-3 pt-[15px]">
-            <img
-              src="/wechat.png"
-              className="w-[187px] h-[192px] rounded-[13px] wechatShadow"
-            />
-            <div className="text-[13px] font-extrabold pt-[22px] pl-2">
-              元七AI｜纺织业AI图案专家👆
-            </div>
-          </div>
-        ) : (
-          <></>
-        )} */}
-            </div>
-            {active === 4 ? (
-              <>
-                <div className="flex-1 h-full py-[39px]">
-                  <div className="flex items-center justify-between h-[50%]">
-                    <div className="p-[60px] text-[15px] leading-loose">
-                      <div className="font-bold">高清放大功能安装方式：</div>
-                      <div>1.下载安装包，支持 windows 系统电脑</div>
-                      <div className="mb-[10px]">2.打开安装包，点击安装</div>
-                      <div
-                        className="w-[217px] h-[29px] bg-black text-white text-[15px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
-                        onClick={downloadZip}
-                      >
-                        下载安装包
-                      </div>
-                    </div>
-                    <div className="p-[60px] text-[15px] leading-loose border-l">
-                      <div className="font-bold">高清放大功能使用方式：</div>
-                      <div>打开软件</div>
-                      <div>
-                        上传需放大的图片，需注意，免费版软件有局限性，对图案处理效果有限
-                      </div>
-                      <div>
-                        选择合适的放大算法模型，手绘类风格推荐 【Digital
-                        art】模型，真实照片类风格 ，推荐【Ultrasharp】模型
-                      </div>
-                      <div>设置结果导出文件夹</div>
-                      <div>点击 Upscayl</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between h-[50%] mx-[60px] border-t">
-                    <div className="text-[23px] leading-loose font-bold">
-                      <div>免费版效果不理想？</div>
-                      <div>扫码联系，体验元七AI高级版</div>
-                    </div>
-                    <div className="pr-[60px] text-[23px] leading-loose font-light text-center flex items-center justify-center flex-col">
+            <div className="flex-1 h-full py-[39px]">
+              <div className="h-full border-r border-black/[.2] flex items-center flex-col">
+                <div className="h-[58px]"></div>
+                <div className="w-[599px] h-[584px] rounded-xl bg-[#F7F7F7] flex items-center justify-center relative">
+                  {file ? (
+                    <div className="w-[395px] h-[404px] relative">
                       <img
-                        src="/wechat.png"
-                        className="w-[187px] h-[192px] rounded-[13px] wechatShadow"
+                        src={originImage}
+                        alt="originImage"
+                        className=" object-contain w-full h-full"
                       />
-                      <div>微信扫码联系AI专家</div>
-                      <div>体验元七AI高级版</div>
-                    </div>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="flex-1 h-full py-[39px]">
-                  <div className="h-full border-r border-black/[.2] flex items-center flex-col">
-                    {/* {active === 0 ? (
-            <div className="flex items-center justify-around mb-[35px]">
-              <div className="text-[15px] font-extrabold">放大风格：</div>
-              <div className="w-[111px] h-[23px] border border-black rounded-[14px] flex items-center justify-center text-[10px] cursor-pointer">
-                渲染风格
-              </div>
-              <div className="w-[111px] h-[23px] border border-black rounded-[14px] flex items-center justify-center text-[10px] mx-[46px] cursor-pointer">
-                实边绘画风格
-              </div>
-              <div className="w-[111px] h-[23px] border border-black rounded-[14px] flex items-center justify-center text-[10px] cursor-pointer">
-                照片风格
-              </div>
-            </div>
-          ) : (
-            <div className="h-[58px]"></div>
-          )} */}
-
-                    <div className="h-[58px]"></div>
-
-                    <div className="w-[599px] h-[584px] rounded-xl bg-[#F7F7F7] flex items-center justify-center relative">
-                      {file ? (
-                        <div className="w-[395px] h-[404px] relative">
-                          <img
-                            src={originImage}
-                            alt="originImage"
-                            className=" object-contain w-full h-full"
-                          />
-                          {/* <Image
+                      {/* <Image
                       src={originImage}
                       alt="originImage"
                       layout="fill"
                       objectFit="contain"
                     /> */}
-                        </div>
-                      ) : fileLoading ? (
-                        <div className=" absolute h-[593px] bg-black/[.23] top-0 left-0 w-full flex items-center justify-center">
-                          <span className="loading loading-infinity loading-lg"></span>
-                        </div>
-                      ) : !selectedOrder.id ? (
-                        <div
-                          {...getRootProps({ className: 'dropzone' })}
-                          className="w-full h-full flex items-center justify-center flex-col"
-                        >
-                          <input {...getInputProps()} accept="image/*" />
-                          <p className="text-[16px]">
-                            支持拖拽、Ctrl+V 复制上传图片
-                          </p>
-                          <p className="text-[16px] text-center">
-                            图片大小不超过12MB，支持PNG、JPG、JPEG、WEBP等格式
-                          </p>
-                          <div className="w-[217px] h-[40px] bg-black text-white text-[15px] font-extrabold flex items-center justify-center rounded-[28px] mt-[20px] mx-auto cursor-pointer">
-                            <PlusCircleOutlined />
-                            上传图片
-                          </div>
-                        </div>
-                      ) : (
-                        <div>暂无图片</div>
-                      )}
                     </div>
-                    {/* <div className="text-[15px] text-black w-[599px] mt-2">
-                上传图片大小不能超过12MB
-              </div> */}
-                    <div className="relative w-full pt-[56px]">
+                  ) : fileLoading ? (
+                    <div className=" absolute h-[593px] bg-black/[.23] top-0 left-0 w-full flex items-center justify-center">
+                      <span className="loading loading-infinity loading-lg"></span>
+                    </div>
+                  ) : !selectedOrder.id ? (
+                    <div
+                      {...getRootProps({ className: 'dropzone' })}
+                      className="w-full h-full flex items-center justify-center flex-col"
+                    >
+                      <input {...getInputProps()} accept="image/*" />
+                      <p className="text-[16px]">
+                        支持拖拽、Ctrl+V 复制上传图片
+                      </p>
+                      <p className="text-[16px] text-center">
+                        图片大小不超过12MB，支持PNG、JPG、JPEG、WEBP等格式
+                      </p>
+                      <div className="w-[217px] h-[40px] bg-black text-white text-[15px] font-extrabold flex items-center justify-center rounded-[28px] mt-[20px] mx-auto cursor-pointer">
+                        <PlusCircleOutlined />
+                        上传图片
+                      </div>
+                    </div>
+                  ) : (
+                    <div>暂无图片</div>
+                  )}
+                </div>
+                {file && !selectedOrder.orderStatus && (
+                  <div className="relative w-full pt-[56px]">
+                    <Tooltip title="删除原图">
                       <div className="bg-[#F4F5F8] w-[39px] h-[38px] rounded-md absolute right-[116px] top-[18px] cursor-pointer flex items-center justify-center">
                         <img
                           src="/delete.png"
                           className="w-[28px] h-[30px]"
                           onClick={() => {
                             if (selectedOrder.orderStatus) {
+                              
                             } else {
                               setFile(null)
                               setOriginImage(null)
@@ -983,6 +714,8 @@ export default function Home() {
                           }}
                         />
                       </div>
+                    </Tooltip>
+                    <Tooltip title="重新上传">
                       <div className="bg-[#F4F5F8] w-[39px] h-[38px] rounded-md absolute right-[69px] top-[18px] cursor-pointer flex items-center justify-center">
                         <img
                           src="/upload.png"
@@ -995,206 +728,205 @@ export default function Home() {
                           }}
                         />
                       </div>
-                      {file ? (
-                        loading ? (
-                          <div className="w-[217px] h-[54px] bg-gray-400 text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer">
-                            正在生成中，请稍后
-                          </div>
-                        ) : !account ? (
-                          <div
-                            className="w-[217px] h-[54px] bg-black text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
-                            onClick={openModal}
-                          >
-                            登录
-                          </div>
-                        ) : selectedOrder.orderStatus == 'SUCCESS' ? (
-                          <div
-                            className="w-[217px] h-[54px] bg-black text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
-                            onClick={reDeal}
-                          >
-                            <div className="flex items-baseline">
-                              重新生成
-                              <span className="text-[12px]">
-                                消耗{actions[active].integral}积分
-                              </span>
-                            </div>
-                          </div>
-                        ) : !selectedOrder.id ? (
-                          <div
-                            className="w-[217px] h-[54px] bg-black text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
-                            onClick={dealImage}
-                          >
-                            <div className="flex items-baseline">
-                              立即生成
-                              <span className="text-[12px]">
-                                消耗{actions[active].integral}积分
-                              </span>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="w-[217px] h-[54px] bg-gray-400 text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-not-allowed">
-                            {selectedOrder.orderStatus == 'ORDERED'
-                              ? '正在生成中...'
-                              : '生成'}
-                          </div>
-                        )
-                      ) : account ? (
-                        <div className="w-[217px] h-[54px] bg-gray-400 text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-not-allowed">
-                          生成
+                    </Tooltip>
+
+                    {file ? (
+                      loading ? (
+                        <div className="w-[217px] h-[54px] bg-gray-400 text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer">
+                          正在生成中，请稍后
                         </div>
-                      ) : (
+                      ) : !account ? (
                         <div
                           className="w-[217px] h-[54px] bg-black text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
                           onClick={openModal}
                         >
                           登录
                         </div>
-                      )}
-                    </div>
+                      ) : selectedOrder.orderStatus == 'SUCCESS' ? (
+                        <div
+                          className="w-[217px] h-[54px] bg-black text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
+                          onClick={reDeal}
+                        >
+                          <div className="flex items-baseline">
+                            重新生成
+                            <span className="text-[12px]">
+                              消耗{actions[active].integral}积分
+                            </span>
+                          </div>
+                        </div>
+                      ) : !selectedOrder.id ? (
+                        <div
+                          className="w-[217px] h-[54px] bg-black text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
+                          onClick={dealImage}
+                        >
+                          <div className="flex items-baseline">
+                            立即生成
+                            <span className="text-[12px]">
+                              消耗{actions[active].integral}积分
+                            </span>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="w-[217px] h-[54px] bg-gray-400 text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-not-allowed">
+                          {selectedOrder.orderStatus == 'ORDERED'
+                            ? '正在生成中...'
+                            : '生成'}
+                        </div>
+                      )
+                    ) : account ? (
+                      <div className="w-[217px] h-[54px] bg-gray-400 text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-not-allowed">
+                        生成
+                      </div>
+                    ) : (
+                      <div
+                        className="w-[217px] h-[54px] bg-black text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
+                        onClick={openModal}
+                      >
+                        登录
+                      </div>
+                    )}
                   </div>
-                </div>
-                <div className="flex-1 h-full py-[39px]">
-                  <div className="h-full pl-[62px] pr-[57px] pt-[58px]">
-                    <div className="h-[617px] relative">
-                      <div className="flex items-center justify-center">
-                        {resultFile ? (
-                          <div className="w-[593px] h-[617px] relative">
-                            <img
-                              src={resultFile}
-                              className=" object-contain w-[593px] h-[617px]"
-                              onLoad={resultFileLoad}
-                            />
-                            {/* <Image
+                )}
+              </div>
+            </div>
+            <div className="flex-1 h-full py-[39px]">
+              <div className="h-full pl-[62px] pr-[57px] pt-[58px]">
+                <div className="h-[617px] relative">
+                  <div className="flex items-center justify-center">
+                    {resultFile ? (
+                      <div className="w-[593px] h-[617px] relative">
+                        <img
+                          src={resultFile}
+                          className=" object-contain w-[593px] h-[617px]"
+                          onLoad={resultFileLoad}
+                        />
+                        {/* <Image
                     src={resultFile}
                     alt="resultFile"
                     layout="fill"
                     objectFit="contain"
                     onLoad={resultFileLoad}
                   /> */}
-                          </div>
-                        ) : selectedOrder.id ? (
-                          getOrderResultShow(selectedOrder)
-                        ) : (
-                          <></>
-                        )}
                       </div>
-                      {loading ? (
-                        <div className=" absolute h-[617px] bg-black/[.23] top-0 left-0 w-full flex items-center justify-center flex-col">
-                          <span className="loading loading-infinity loading-lg"></span>
-                          <div className="text-[16px]">图片生成中...</div>
-                        </div>
-                      ) : (
-                        <></>
-                      )}
+                    ) : selectedOrder.id ? (
+                      getOrderResultShow(selectedOrder)
+                    ) : (
+                      <></>
+                    )}
+                  </div>
+                  {loading ? (
+                    <div className=" absolute h-[617px] bg-black/[.23] top-0 left-0 w-full flex items-center justify-center flex-col">
+                      <span className="loading loading-infinity loading-lg"></span>
+                      <div className="text-[16px]">图片生成中...</div>
                     </div>
-                    {/* {active == 0 ? (
+                  ) : (
+                    <></>
+                  )}
+                </div>
+                {/* {active == 0 ? (
                 <div className="flex items-center justify-between mt-[37px]">
                   123
                 </div>
               ) : (
                 <div></div>
               )} */}
-                    <div className="flex items-center justify-between mt-[37px]">
-                      {resultFile ? (
-                        <div
-                          className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer"
-                          onClick={downloadImage}
-                        >
-                          下载文件
-                        </div>
-                      ) : (
-                        <></>
-                      )}
-                      {getNextButton()}
+                <div className="flex items-center justify-between mt-[37px]">
+                  {resultFile ? (
+                    <div
+                      className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer"
+                      onClick={downloadImage}
+                    >
+                      下载文件
                     </div>
-                  </div>
-                </div>
-                <div className=" absolute bottomArea py-2 px-4 flex overflow-x-auto">
-                  <div
-                    className="min-w-[200px] min-h-[200px] border-dashed rounded-sm bg-white border-[3px] cursor-pointer flex items-center justify-center mr-4"
-                    onClick={clearOrder}
-                  >
-                    <PlusOutlined className="text-[50px]" />
-                  </div>
-                  {orderList.length > 0 ? (
-                    <>
-                      {orderList.map((order) => (
-                        <div
-                          className={
-                            selectedOrder.id == order.id
-                              ? 'min-w-[200px] min-h-[200px] rounded-sm bg-white border-[3px] cursor-pointer flex items-center justify-center mr-4 border-black'
-                              : 'min-w-[200px] min-h-[200px] border-dashed rounded-sm bg-white border-[3px] cursor-pointer flex items-center justify-center mr-4'
-                          }
-                          key={order.id}
-                          onClick={() => {
-                            selectOrder(order)
-                          }}
-                        >
-                          {order.taskOrderList &&
-                          order.taskOrderList.length > 0 &&
-                          order.taskOrderList[0].input ? (
-                            <>
-                              <img
-                                src={
-                                  order.taskOrderList[0].input +
-                                  '?x-oss-process=image/resize,m_lfit,w_375,limit_0'
-                                }
-                                className="w-full h-full object-contain"
-                              />
-                            </>
-                          ) : (
-                            '暂无图片'
-                          )}
-                        </div>
-                      ))}
-                      {!isEnd ? (
-                        <div
-                          className="min-h-[200px] rounded-sm cursor-pointer px-[4px] bg-white border-gray-300 border text-center"
-                          style={{ writingMode: 'vertical-lr' }}
-                          onClick={openOrderList}
-                        >
-                          更多
-                        </div>
-                      ) : (
-                        <></>
-                      )}
-                    </>
                   ) : (
-                    <>
-                      <div className="flex-1 flex items-center justify-center">
-                        <div>暂无生图订单</div>
-                      </div>
-                    </>
+                    <></>
                   )}
+                  {getNextButton()}
                 </div>
-              </>
-            )}
-          </>
-        ) : (
-          <>
-            <div className="w-screen h-full">
-              <Result
-                status="500"
-                title="正在维护中"
-                subTitle="对不起，高级版数码印花文件生成工具正在维护中"
-                extra={
-                  <div>
-                    <div>联系我们</div>
-                    <div className="flex items-center justify-center hover:bg-white">
-                      <img
-                        src="/wechat.png"
-                        className="w-[187px] h-[192px] rounded-[13px]"
-                      />
-                      <img
-                        src="/wcx.png"
-                        className="w-[187px] h-[192px] rounded-[13px]"
-                      />
-                    </div>
-                  </div>
-                }
-              />
+              </div>
             </div>
-          </>
+            <div className=" absolute bottomArea py-2 px-4 flex overflow-x-auto">
+              <div
+                className="min-w-[200px] min-h-[200px] border-dashed rounded-sm bg-white border-[3px] cursor-pointer flex items-center justify-center mr-4"
+                onClick={clearOrder}
+              >
+                <PlusOutlined className="text-[50px]" />
+              </div>
+              {orderList.length > 0 ? (
+                <>
+                  {orderList.map((order) => (
+                    <div
+                      className={
+                        selectedOrder.id == order.id
+                          ? 'min-w-[200px] min-h-[200px] max-w-[200px] max-h-[200px] rounded-sm bg-white border-[3px] cursor-pointer flex items-center justify-center mr-4 border-black'
+                          : 'min-w-[200px] min-h-[200px] max-w-[200px] max-h-[200px] border-dashed rounded-sm bg-white border-[3px] cursor-pointer flex items-center justify-center mr-4'
+                      }
+                      key={order.id}
+                      onClick={() => {
+                        selectOrder(order)
+                      }}
+                    >
+                      {order.taskOrderList &&
+                      order.taskOrderList.length > 0 &&
+                      order.taskOrderList[0].input ? (
+                        <>
+                          <img
+                            src={
+                              order.taskOrderList[0].input +
+                              '?x-oss-process=image/resize,m_lfit,w_375,limit_0'
+                            }
+                            className="w-full h-full object-contain"
+                          />
+                        </>
+                      ) : (
+                        '暂无图片'
+                      )}
+                    </div>
+                  ))}
+                  {!isEnd ? (
+                    <div
+                      className="min-h-[200px] rounded-sm cursor-pointer px-[4px] bg-white border-gray-300 border text-center"
+                      style={{ writingMode: 'vertical-lr' }}
+                      onClick={openOrderList}
+                    >
+                      更多
+                    </div>
+                  ) : (
+                    <></>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div className="flex-1 flex items-center justify-center">
+                    <div>暂无生图订单</div>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="w-screen h-full">
+            <Result
+              status="500"
+              title="正在维护中"
+              subTitle="对不起，高级版数码印花文件生成工具正在维护中"
+              extra={
+                <div>
+                  <div>联系我们</div>
+                  <div className="flex items-center justify-center hover:bg-white">
+                    <img
+                      src="/wechat.png"
+                      className="w-[187px] h-[192px] rounded-[13px]"
+                    />
+                    <img
+                      src="/wcx.png"
+                      className="w-[187px] h-[192px] rounded-[13px]"
+                    />
+                  </div>
+                </div>
+              }
+            />
+          </div>
         )}
 
         <Modal
