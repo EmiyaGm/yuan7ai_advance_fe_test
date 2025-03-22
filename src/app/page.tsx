@@ -654,10 +654,10 @@ export default function Home() {
                 </div>
               ))}
             </div>
-            <div className="flex-1 h-full py-[39px]">
+            <div className="flex-1 h-full">
               <div className="h-full border-r border-black/[.2] flex items-center flex-col">
-                <div className="h-[58px]"></div>
-                <div className="w-[599px] h-[584px] rounded-xl bg-[#F7F7F7] flex items-center justify-center relative">
+                <div className="h-[28px]"></div>
+                <div className="w-[550px] h-[400px] rounded-xl bg-[#F7F7F7] flex items-center justify-center relative">
                   {file ? (
                     <div className="w-[395px] h-[404px] relative">
                       <img
@@ -706,7 +706,6 @@ export default function Home() {
                           className="w-[28px] h-[30px]"
                           onClick={() => {
                             if (selectedOrder.orderStatus) {
-                              
                             } else {
                               setFile(null)
                               setOriginImage(null)
@@ -789,24 +788,24 @@ export default function Home() {
                 )}
               </div>
             </div>
-            <div className="flex-1 h-full py-[39px]">
-              <div className="h-full pl-[62px] pr-[57px] pt-[58px]">
-                <div className="h-[617px] relative">
+            <div className="flex-1 h-full">
+              <div className="h-full pl-[62px]">
+                <div className="h-[28px]"></div>
+                <div className="w-[550px] h-[400px] relative">
                   <div className="flex items-center justify-center">
                     {resultFile ? (
-                      <div className="w-[593px] h-[617px] relative">
-                        <img
+                      <div className="w-[550px] h-[400px] relative">
+                        {/* <img
                           src={resultFile}
                           className=" object-contain w-[593px] h-[617px]"
                           onLoad={resultFileLoad}
+                        /> */}
+                        <Image
+                          src={resultFile}
+                          alt="resultFile"
+                          onLoad={resultFileLoad}
+                          className="object-contain !w-[550px] !h-[400px]"
                         />
-                        {/* <Image
-                    src={resultFile}
-                    alt="resultFile"
-                    layout="fill"
-                    objectFit="contain"
-                    onLoad={resultFileLoad}
-                  /> */}
                       </div>
                     ) : selectedOrder.id ? (
                       getOrderResultShow(selectedOrder)
@@ -815,7 +814,7 @@ export default function Home() {
                     )}
                   </div>
                   {loading ? (
-                    <div className=" absolute h-[617px] bg-black/[.23] top-0 left-0 w-full flex items-center justify-center flex-col">
+                    <div className=" absolute h-[400px] bg-black/[.23] top-0 left-0 w-full flex items-center justify-center flex-col">
                       <span className="loading loading-infinity loading-lg"></span>
                       <div className="text-[16px]">图片生成中...</div>
                     </div>
@@ -823,13 +822,6 @@ export default function Home() {
                     <></>
                   )}
                 </div>
-                {/* {active == 0 ? (
-                <div className="flex items-center justify-between mt-[37px]">
-                  123
-                </div>
-              ) : (
-                <div></div>
-              )} */}
                 <div className="flex items-center justify-between mt-[37px]">
                   {resultFile ? (
                     <div
@@ -845,9 +837,9 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <div className=" absolute bottomArea py-2 px-4 flex overflow-x-auto">
+            <div className=" absolute bottomArea py-[8px] px-[16px] flex overflow-x-auto">
               <div
-                className="min-w-[200px] min-h-[200px] border-dashed rounded-sm bg-white border-[3px] cursor-pointer flex items-center justify-center mr-4"
+                className="min-w-[200px] min-h-[200px] border-dashed rounded-sm bg-white border-[3px] cursor-pointer flex items-center justify-center mr-[16px]"
                 onClick={clearOrder}
               >
                 <PlusOutlined className="text-[50px]" />
@@ -968,9 +960,14 @@ export default function Home() {
                   {modalOrderList.map((order: any) => (
                     <div
                       className={
-                        'min-w-[150px] min-h-[150px] max-w-[150px] max-h-[150px] rounded-sm bg-white border-[3px] cursor-pointer flex items-center justify-center border-gray-500 mb-[8px] mr-[8px]'
+                        selectedOrder.id == order.id
+                          ? 'min-w-[150px] min-h-[150px] max-w-[150px] max-h-[150px] rounded-sm bg-white border-[3px] cursor-pointer flex items-center justify-center mr-[8px] border-black mb-[8px]'
+                          : 'min-w-[150px] min-h-[150px] max-w-[150px] max-h-[150px] rounded-sm bg-white border-[3px] cursor-pointer flex items-center justify-center mr-[8px] mb-[8px]'
                       }
                       key={order.id}
+                      onClick={() => {
+                        selectOrder(order)
+                      }}
                     >
                       {order.taskOrderList &&
                       order.taskOrderList.length > 0 &&
@@ -981,9 +978,8 @@ export default function Home() {
                               order.taskOrderList[0].input +
                               '?x-oss-process=image/resize,m_lfit,w_375,limit_0'
                             }
-                            className="object-contain"
-                            width="100%"
-                            height="100%"
+                            className="object-contain !w-[144px] !h-[144px]"
+                            preview={false}
                           />
                         </>
                       ) : (
