@@ -50,6 +50,8 @@ export default function Home() {
 
   const [orderModalOpen, setOrderModalOpen] = useState(false)
 
+  const [updateOrder, setUpdateOrder] = useState<any>(null)
+
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
     maxFiles: 1,
     maxSize: 12000000,
@@ -693,6 +695,30 @@ export default function Home() {
       }
     }
   }, [acceptedFiles])
+
+  useEffect(() => {
+    if (selectedOrder.id) {
+      clearInterval(updateOrder)
+      setUpdateOrder(
+        setInterval(() => {
+          fetchGetOrderById(selectedOrder.id).then((orderRes) => {
+            if (orderRes.data && orderRes.msg == 'success') {
+              setSelectedOrder(orderRes.data)
+            } else if (orderRes.code == 402) {
+              message.error('登录失效，请重新登录')
+              clearInterval(updateOrder)
+              logout()
+            } else {
+              clearInterval(updateOrder)
+              message.error(orderRes.msg)
+            }
+          })
+        }, 3000),
+      )
+    } else {
+      clearInterval(updateOrder)
+    }
+  }, [selectedOrder])
 
   return (
     <Spin spinning={pageLoading}>
