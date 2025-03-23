@@ -368,7 +368,7 @@ export default function Home() {
     const link = document.createElement('a')
     link.style.display = 'none'
     const type = resultFile.split('.')[resultFile.split('.').length - 1]
-    link.href = '/api/download?imageUrl=' + encodeURIComponent(resultFile)
+    link.href = resultFile
     link.setAttribute('download', `resultFile${new Date().getTime()}.${type}`)
     document.body.appendChild(link)
     link.click()
@@ -721,7 +721,7 @@ export default function Home() {
                 <div className="h-[28px]"></div>
                 <div className="w-[550px] h-[400px] rounded-xl bg-[#F7F7F7] flex items-center justify-center relative">
                   {file ? (
-                    <div className="w-[395px] h-[404px] relative">
+                    <div className="w-full h-full relative">
                       <img
                         src={originImage}
                         alt="originImage"
