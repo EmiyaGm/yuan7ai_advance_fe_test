@@ -88,6 +88,46 @@ export default function Home() {
     }
   }
 
+  const payOrder = (data: any) => {
+    fetchPrePay({
+      orderId: data.id,
+      payChannel: 'YUANQI',
+      payProduct: 'POINTS_TRANS',
+      payDesc: `${actions[active].name}服务下单，订单号（${data.id}）`,
+    })
+      .then((payRes: any) => {
+        if (payRes.data && payRes.msg == 'success') {
+          updateUserPoint()
+          getOrders(actions[active].generateImageType, (list: any) => {
+            fetchGetOrderById(data.id).then((orderRes) => {
+              if (orderRes.data && orderRes.msg == 'success') {
+                setSelectedOrder({
+                  ...selectOrder,
+                  ...orderRes.data
+                })
+                selectOrder(selectOrder)
+              } else if (orderRes.code == 402) {
+                message.error('登录失效，请重新登录')
+                logout()
+              } else {
+                message.error(orderRes.msg)
+              }
+            })
+          })
+        } else if (payRes.code == 402) {
+          message.error('登录失效，请重新登录')
+          logout()
+        } else {
+          getOrders(actions[active].generateImageType)
+          message.error(payRes.msg)
+        }
+      })
+      .catch((payErr) => {
+        getOrders(actions[active].generateImageType)
+        console.log(payErr)
+      })
+  }
+
   const dealImage = async () => {
     if ((account || localStorage.getItem('yqai-account')) && !loading) {
       const pointRes = await fetchGetPoint()
@@ -247,7 +287,9 @@ export default function Home() {
   const changeActive = (index: number) => {
     setActive(index)
     if (resultFile) {
-      setOriginImage(resultFile + '?x-oss-process=image/resize,m_lfit,w_2048,limit_1')
+      setOriginImage(
+        resultFile + '?x-oss-process=image/resize,m_lfit,w_2048,limit_1',
+      )
       setFile(resultFile + '?x-oss-process=image/resize,m_lfit,w_2048,limit_1')
     } else {
       setFile(null)
@@ -278,16 +320,22 @@ export default function Home() {
       switch (order.orderStatus) {
         case 'UNPAID':
           return (
-            <>
-              <div>
-                <div>
-                  本次{actions[active].name}服务还未支付所需要的积分，暂未开始
-                </div>
-                <div className="w-[217px] h-[54px] bg-black text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-not-allowed">
-                  生成
-                </div>
-              </div>
-            </>
+            <div>
+              <Result
+                title={`本次${actions[active].name}服务还未支付所需要的积分，暂未开始`}
+                extra={
+                  <Button
+                    type="primary"
+                    key="console"
+                    onClick={() => {
+                      payOrder(order)
+                    }}
+                  >
+                    去支付
+                  </Button>
+                }
+              />
+            </div>
           )
         case 'ORDERED':
           return <></>
@@ -678,7 +726,10 @@ export default function Home() {
                       {...getRootProps({ className: 'dropzone' })}
                       className="w-full h-full flex items-center justify-center flex-col"
                     >
-                      <input {...getInputProps()} accept="image/.jpg,.png,.jpeg,.webp" />
+                      <input
+                        {...getInputProps()}
+                        accept="image/.jpg,.png,.jpeg,.webp"
+                      />
                       <p className="text-[16px]">
                         支持拖拽、Ctrl+V 复制上传图片
                       </p>
@@ -694,37 +745,41 @@ export default function Home() {
                     <div>暂无图片</div>
                   )}
                 </div>
-                {file && !selectedOrder.orderStatus && (
+                {file && (
                   <div className="relative w-full pt-[56px]">
-                    <Tooltip title="删除原图">
-                      <div className="bg-[#F4F5F8] w-[39px] h-[38px] rounded-md absolute right-[116px] top-[18px] cursor-pointer flex items-center justify-center">
-                        <img
-                          src="/delete.png"
-                          className="w-[28px] h-[30px]"
-                          onClick={() => {
-                            if (selectedOrder.orderStatus) {
-                            } else {
-                              setFile(null)
-                              setOriginImage(null)
-                            }
-                          }}
-                        />
-                      </div>
-                    </Tooltip>
-                    <Tooltip title="重新上传">
-                      <div className="bg-[#F4F5F8] w-[39px] h-[38px] rounded-md absolute right-[69px] top-[18px] cursor-pointer flex items-center justify-center">
-                        <img
-                          src="/upload.png"
-                          className="w-[28px] h-[30px]"
-                          onClick={() => {
-                            if (selectedOrder.orderStatus) {
-                            } else {
-                              handleIconClick()
-                            }
-                          }}
-                        />
-                      </div>
-                    </Tooltip>
+                    {!selectedOrder.orderStatus && (
+                      <>
+                        <Tooltip title="删除原图">
+                          <div className="bg-[#F4F5F8] w-[39px] h-[38px] rounded-md absolute right-[116px] top-[18px] cursor-pointer flex items-center justify-center">
+                            <img
+                              src="/delete.png"
+                              className="w-[28px] h-[30px]"
+                              onClick={() => {
+                                if (selectedOrder.orderStatus) {
+                                } else {
+                                  setFile(null)
+                                  setOriginImage(null)
+                                }
+                              }}
+                            />
+                          </div>
+                        </Tooltip>
+                        <Tooltip title="重新上传">
+                          <div className="bg-[#F4F5F8] w-[39px] h-[38px] rounded-md absolute right-[69px] top-[18px] cursor-pointer flex items-center justify-center">
+                            <img
+                              src="/upload.png"
+                              className="w-[28px] h-[30px]"
+                              onClick={() => {
+                                if (selectedOrder.orderStatus) {
+                                } else {
+                                  handleIconClick()
+                                }
+                              }}
+                            />
+                          </div>
+                        </Tooltip>
+                      </>
+                    )}
 
                     {file ? (
                       loading ? (
