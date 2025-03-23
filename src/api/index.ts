@@ -102,7 +102,7 @@ export const fetchRegister = async (data: any) => {
     body: JSON.stringify(data),
     headers: {
       'content-type': 'application/json',
-      'CustomerToken': localStorage.getItem('yqai-token') || ''
+      CustomerToken: localStorage.getItem('yqai-token') || '',
     },
   })
 
@@ -130,7 +130,7 @@ export const fetchGetPoint = async () => {
       method: 'GET',
       headers: {
         'content-type': 'application/json',
-        'CustomerToken': localStorage.getItem('yqai-token') || ''
+        CustomerToken: localStorage.getItem('yqai-token') || '',
       },
     },
   )
@@ -157,13 +157,18 @@ export const fetchCreateActionOrder = async (data: any) => {
       method: 'POST',
       body: JSON.stringify({
         commodityItemList: [
-          { id: data.id, quantity: 1, originalImage: data.originalImage, orderType: data.orderType },
+          {
+            id: data.id,
+            quantity: 1,
+            originalImage: data.originalImage,
+            orderType: data.orderType,
+          },
         ],
         orderType: data.orderType,
       }),
       headers: {
         'content-type': 'application/json',
-        'CustomerToken': localStorage.getItem('yqai-token') || ''
+        CustomerToken: localStorage.getItem('yqai-token') || '',
       },
     },
   )
@@ -179,7 +184,7 @@ export const fetchCreateOrder = async (data: any) => {
       body: JSON.stringify(data),
       headers: {
         'content-type': 'application/json',
-        'CustomerToken': localStorage.getItem('yqai-token') || ''
+        CustomerToken: localStorage.getItem('yqai-token') || '',
       },
     },
   )
@@ -190,7 +195,12 @@ export const fetchCreateOrder = async (data: any) => {
 export const fetchGetActions = async () => {
   const resp = await fetch(`${baseAccountUrl}/api/product/pageQuery`, {
     method: 'POST',
-    body: JSON.stringify({ size: 99, page: 1, productCategoryIdList: [6] }),
+    body: JSON.stringify({
+      size: 99,
+      page: 1,
+      productCategoryIdList: [6],
+      orderItems: [{ asc: true, column: 'sort' }],
+    }),
     headers: {
       'content-type': 'application/json',
     },
@@ -205,7 +215,7 @@ export const fetchGetOrders = async (data: any) => {
     body: JSON.stringify(data),
     headers: {
       'content-type': 'application/json',
-      'CustomerToken': localStorage.getItem('yqai-token') || ''
+      CustomerToken: localStorage.getItem('yqai-token') || '',
     },
   })
   const json = await resp.json()
@@ -218,7 +228,7 @@ export const fetchPrePay = async (data: any) => {
     body: JSON.stringify(data),
     headers: {
       'content-type': 'application/json',
-      'CustomerToken': localStorage.getItem('yqai-token') || ''
+      CustomerToken: localStorage.getItem('yqai-token') || '',
     },
   })
   const json = await resp.json()
@@ -232,7 +242,7 @@ export const fetchGetOrderById = async (id: any) => {
       method: 'GET',
       headers: {
         'content-type': 'application/json',
-        'CustomerToken': localStorage.getItem('yqai-token') || ''
+        CustomerToken: localStorage.getItem('yqai-token') || '',
       },
     },
   )
@@ -246,7 +256,7 @@ export const fetchGetPointRecords = async (data: any) => {
     body: JSON.stringify(data),
     headers: {
       'content-type': 'application/json',
-      'CustomerToken': localStorage.getItem('yqai-token') || ''
+      CustomerToken: localStorage.getItem('yqai-token') || '',
     },
   })
   const json = await resp.json()
@@ -259,7 +269,20 @@ export const fetchGenerateOssPolicy = async (data: any) => {
     body: JSON.stringify(data),
     headers: {
       'content-type': 'application/json',
-      'CustomerToken': localStorage.getItem('yqai-token') || ''
+      CustomerToken: localStorage.getItem('yqai-token') || '',
+    },
+  })
+  const json = await resp.json()
+  return json
+}
+
+export const fetchVote = async (data: any) => {
+  const resp = await fetch(`${baseAccountUrl}/api/task/vote`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: {
+      'content-type': 'application/json',
+      CustomerToken: localStorage.getItem('yqai-token') || '',
     },
   })
   const json = await resp.json()

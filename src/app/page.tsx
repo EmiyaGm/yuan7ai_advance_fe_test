@@ -19,12 +19,19 @@ import {
   fetchGetOrders,
   fetchGetPoint,
   fetchPrePay,
+  fetchVote,
 } from '@/api'
 import { useAccount } from '@/contexts/AccountContext'
 import { useDropzone } from 'react-dropzone'
-import { PlusCircleOutlined, PlusOutlined } from '@ant-design/icons'
+import {
+  DislikeOutlined,
+  LikeOutlined,
+  PlusCircleOutlined,
+  PlusOutlined,
+} from '@ant-design/icons'
 import { useModal } from '@/contexts/ModalContext'
 import { useLoading } from '@/contexts/LoadingContext'
+import { compressionFile, imageUrlToBase64 } from '../../utils/compressionFile'
 
 export default function Home() {
   const [active, setActive] = useState(0)
@@ -88,7 +95,6 @@ export default function Home() {
         setFile(selectedFile)
         setFileLoading(false)
       }
-      console.log('Selected file:', selectedFile)
       // 在这里处理文件，比如上传或预览
     }
   }
@@ -287,26 +293,62 @@ export default function Home() {
   //   manual: true,
   // });
 
-  const changeActive = (index: number) => {
-    setActive(index)
-    if (resultFile) {
-      setOriginImage(
-        resultFile + '?x-oss-process=image/resize,m_lfit,w_2048,limit_1',
-      )
-      setFile(resultFile + '?x-oss-process=image/resize,m_lfit,w_2048,limit_1')
-    } else {
-      setFile(null)
+  const changeActive = (index: number, item: any) => {
+    if (item.status == 3) {
+      message.info('即将上线')
+      return
     }
-    setSelectedOrder({})
-    setResultFile(null)
+    setActive(index)
+    if (account) {
+      clearOrder()
+      if (actions.length > 0) {
+        getOrders(actions[index].generateImageType)
+      }
+    } else {
+      clearOrder()
+      setOrderList([])
+    }
   }
 
-  const nextStep = () => {
-    changeActive(active + 1)
+  const nextStep = async () => {
+    if (actions[active + 1].status == 3) {
+      message.info('即将上线')
+      return
+    }
+    setActive(active + 1)
+    if (account) {
+      if (actions.length > 0) {
+        getOrders(actions[active + 1].generateImageType)
+      }
+      setFile(null)
+      setOriginImage(null)
+      if (resultFile) {
+        openLoading()
+        imageUrlToBase64(resultFile, `originImage${new Date().getTime()}`).then(
+          (res: any) => {
+            const reader = new FileReader()
+            reader.readAsDataURL(res)
+            setFileLoading(true)
+            reader.onloadend = () => {
+              setOriginImage(reader.result)
+              setFile(res)
+              closeLoading()
+            }
+          },
+        )
+      } else {
+        setFile(null)
+      }
+      setSelectedOrder({})
+      setResultFile(null)
+    } else {
+      clearOrder()
+      setOrderList([])
+    }
   }
 
   const getNextButton = () => {
-    return actions.length > active + 1 ? (
+    return actions.length > active + 1 && resultFile ? (
       <div
         className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer"
         onClick={nextStep}
@@ -660,7 +702,7 @@ export default function Home() {
       clearOrder()
       setOrderList([])
     }
-  }, [account, active, actions])
+  }, [account, actions])
 
   useEffect(() => {
     if (acceptedFiles.length > 0) {
@@ -726,6 +768,34 @@ export default function Home() {
     }
   }, [selectedOrder])
 
+  const vote = (data: any) => {
+    if (selectedOrder.id) {
+      fetchVote({
+        taskOrderId: selectedOrder.taskOrderList[0].id,
+        voteTask: data,
+      }).then((res) => {
+        if (res.data && res.msg == 'success') {
+          message.success('评价成功')
+          fetchGetOrderById(selectedOrder.id).then((orderRes) => {
+            if (orderRes.data && orderRes.msg == 'success') {
+              setSelectedOrder(orderRes.data)
+            } else if (orderRes.code == 402) {
+              message.error('登录失效，请重新登录')
+              logout()
+            } else {
+              message.error(orderRes.msg)
+            }
+          })
+        } else if (res.code == 402) {
+          message.error('登录失效，请重新登录')
+          logout()
+        } else {
+          message.error(res.msg)
+        }
+      })
+    }
+  }
+
   return (
     <Spin spinning={pageLoading}>
       <div className="childrenHeight bg-white rounded-[34px]  w-screen my-0 mx-auto">
@@ -739,7 +809,7 @@ export default function Home() {
                       ? 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer'
                       : 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button'
                   }
-                  onClick={() => changeActive(index)}
+                  onClick={() => changeActive(index, item)}
                   key={item.id}
                 >
                   {item.name.substring(0, 2)}
@@ -892,25 +962,58 @@ export default function Home() {
                 <div className="w-[550px] h-[400px] relative">
                   <div className="flex items-center justify-center">
                     {resultFile ? (
-                      <div className="w-[550px] h-[400px] relative">
-                        {/* <img
-                          src={resultFile}
-                          className=" object-contain w-[593px] h-[617px]"
-                          onLoad={resultFileLoad}
-                        /> */}
-                        <Image
-                          src={resultFile}
-                          alt="resultFile"
-                          onLoad={resultFileLoad}
-                          className="object-contain !w-[550px] !h-[400px]"
-                        />
-                      </div>
+                      <>
+                        <div className="w-[550px] h-[400px] relative">
+                          <Image
+                            src={resultFile}
+                            alt="resultFile"
+                            onLoad={resultFileLoad}
+                            className="object-contain !w-[550px] !h-[400px]"
+                          />
+                        </div>
+                      </>
                     ) : selectedOrder.id ? (
                       getOrderResultShow(selectedOrder)
                     ) : (
                       <></>
                     )}
                   </div>
+                  {resultFile && (
+                    <div className=" absolute top-0 right-[-60px] text-[32px]">
+                      <Tooltip title="好评">
+                        {selectedOrder.taskOrderList[0].upvote ? (
+                          <div className="mb-[10px] cursor-pointer flex items-center justify-center w-[50px] h-[50px] rounded-sm bg-black text-white">
+                            <LikeOutlined />
+                          </div>
+                        ) : (
+                          <div
+                            className="mb-[10px] cursor-pointer flex items-center justify-center w-[50px] h-[50px] rounded-sm bg-gray-200"
+                            onClick={() => {
+                              vote(true)
+                            }}
+                          >
+                            <LikeOutlined />
+                          </div>
+                        )}
+                      </Tooltip>
+                      <Tooltip title="差评">
+                        {selectedOrder.taskOrderList[0].downvote ? (
+                          <div className="cursor-pointer flex items-center justify-center w-[50px] h-[50px] rounded-sm bg-black text-white">
+                            <DislikeOutlined />
+                          </div>
+                        ) : (
+                          <div
+                            className="cursor-pointer flex items-center justify-center w-[50px] h-[50px] rounded-sm bg-gray-200"
+                            onClick={() => {
+                              vote(false)
+                            }}
+                          >
+                            <DislikeOutlined />
+                          </div>
+                        )}
+                      </Tooltip>
+                    </div>
+                  )}
                   {loading ? (
                     <div className=" absolute h-[400px] bg-black/[.23] top-0 left-0 w-full flex items-center justify-center flex-col">
                       <span className="loading loading-infinity loading-lg"></span>
@@ -920,7 +1023,7 @@ export default function Home() {
                     <></>
                   )}
                 </div>
-                <div className="flex items-center justify-between mt-[37px]">
+                <div className="flex items-center justify-between mt-[37px] mr-[62px]">
                   {resultFile ? (
                     <div
                       className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer"
