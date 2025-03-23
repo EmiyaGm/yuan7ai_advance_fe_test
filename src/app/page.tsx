@@ -56,6 +56,9 @@ export default function Home() {
     maxFiles: 1,
     maxSize: 12000000,
     multiple: false,
+    accept: {
+      'image/*': ['jpg', 'png', 'jpeg', 'webp'],
+    },
   })
 
   const updateUserPoint = async () => {
@@ -103,11 +106,7 @@ export default function Home() {
           getOrders(actions[active].generateImageType, (list: any) => {
             fetchGetOrderById(data.id).then((orderRes) => {
               if (orderRes.data && orderRes.msg == 'success') {
-                setSelectedOrder({
-                  ...selectOrder,
-                  ...orderRes.data,
-                })
-                selectOrder(selectOrder)
+                setSelectedOrder(orderRes.data)
               } else if (orderRes.code == 402) {
                 message.error('登录失效，请重新登录')
                 logout()
@@ -188,7 +187,6 @@ export default function Home() {
                         orderType: actions[active].generateImageType,
                       })
                         .then((r) => {
-                          setLoading(false)
                           if (r.data && r.msg == 'success') {
                             if (r.data.id) {
                               fetchPrePay({
@@ -210,7 +208,6 @@ export default function Home() {
                                               orderRes.msg == 'success'
                                             ) {
                                               setSelectedOrder(orderRes.data)
-                                              selectOrder(list[0])
                                             } else if (orderRes.code == 402) {
                                               message.error(
                                                 '登录失效，请重新登录',
@@ -224,9 +221,11 @@ export default function Home() {
                                       },
                                     )
                                   } else if (payRes.code == 402) {
+                                    setLoading(false)
                                     message.error('登录失效，请重新登录')
                                     logout()
                                   } else {
+                                    setLoading(false)
                                     getOrders(actions[active].generateImageType)
                                     message.error(payRes.msg)
                                   }
@@ -237,9 +236,11 @@ export default function Home() {
                                 })
                             }
                           } else if (r.code == 402) {
+                            setLoading(false)
                             message.error('登录失效，请重新登录')
                             logout()
                           } else {
+                            setLoading(false)
                             message.error(r.msg)
                           }
                         })
@@ -356,15 +357,9 @@ export default function Home() {
     )
   }
 
-  const [uid, setUid] = useState('')
-
   const resultFileLoad = () => {
     setLoading(false)
   }
-
-  const [psdFile, setPsdFile] = useState<any>(null)
-
-  const [svgFile, setSvgFile] = useState<any>(null)
 
   const downloadImage = () => {
     const link = document.createElement('a')
@@ -470,31 +465,17 @@ export default function Home() {
               setResultFile(null)
             }
             setSelectedOrder(orderRes.data)
-          } else if (order.taskOrderList && order.taskOrderList.length > 0) {
-            setFile(order.taskOrderList[0].input)
-            setOriginImage(order.taskOrderList[0].input)
-            if (order.taskOrderList[0].output) {
-              setResultFile(order.taskOrderList[0].output)
-            } else {
-              setResultFile(null)
-            }
-            setSelectedOrder({
-              ...orderRes.data,
-              taskOrderList: order.taskOrderList,
-            })
           } else {
             setFile(null)
             setOriginImage(null)
             setResultFile(null)
             setSelectedOrder(orderRes.data)
           }
-          console.log(orderRes.data.orderStatus)
           if (orderRes.data.orderStatus == 'ORDERED') {
             setLoading(true)
           } else {
             setLoading(false)
           }
-          // TODO 显示订单相关内容在页面上
         } else if (orderRes.code == 402) {
           message.error('登录失效，请重新登录')
           logout()
@@ -594,7 +575,8 @@ export default function Home() {
         openPointModal()
         return
       }
-      openLoading()
+      setResultFile(null)
+      setLoading(true)
       if (
         selectedOrder.id &&
         selectedOrder.taskOrderList &&
@@ -618,8 +600,6 @@ export default function Home() {
                 })
                   .then((payRes: any) => {
                     if (payRes.data && payRes.msg == 'success') {
-                      closeLoading()
-                      console.log(payRes.data)
                       updateUserPoint()
                       getOrders(
                         actions[active].generateImageType,
@@ -627,7 +607,6 @@ export default function Home() {
                           fetchGetOrderById(r.data.id).then((orderRes) => {
                             if (orderRes.data && orderRes.msg == 'success') {
                               setSelectedOrder(orderRes.data)
-                              selectOrder(list[0])
                             } else if (orderRes.code == 402) {
                               message.error('登录失效，请重新登录')
                               logout()
@@ -638,11 +617,11 @@ export default function Home() {
                         },
                       )
                     } else if (payRes.code == 402) {
-                      closeLoading()
+                      setLoading(false)
                       message.error('登录失效，请重新登录')
                       logout()
                     } else {
-                      closeLoading()
+                      setLoading(false)
                       getOrders(actions[active].generateImageType)
                       message.error(payRes.msg)
                     }
@@ -653,20 +632,20 @@ export default function Home() {
                   })
               }
             } else if (r.code == 402) {
-              closeLoading()
+              setLoading(false)
               message.error('登录失效，请重新登录')
               logout()
             } else {
-              closeLoading()
+              setLoading(false)
               message.error(r.msg)
             }
           })
           .catch(() => {
-            closeLoading()
+            setLoading(false)
             message.error(`${actions[active].name}服务暂时不可用，请稍后再试`)
           })
       } else {
-        closeLoading()
+        setLoading(false)
       }
     }
   }
@@ -699,22 +678,49 @@ export default function Home() {
   useEffect(() => {
     if (selectedOrder.id) {
       clearInterval(updateOrder)
-      setUpdateOrder(
-        setInterval(() => {
-          fetchGetOrderById(selectedOrder.id).then((orderRes) => {
-            if (orderRes.data && orderRes.msg == 'success') {
-              setSelectedOrder(orderRes.data)
-            } else if (orderRes.code == 402) {
-              message.error('登录失效，请重新登录')
-              clearInterval(updateOrder)
-              logout()
-            } else {
-              clearInterval(updateOrder)
-              message.error(orderRes.msg)
-            }
-          })
-        }, 3000),
-      )
+      if (selectedOrder.orderStatus !== 'SUCCESS') {
+        setUpdateOrder(
+          setInterval(() => {
+            fetchGetOrderById(selectedOrder.id).then((orderRes) => {
+              if (orderRes.data && orderRes.msg == 'success') {
+                setSelectedOrder(orderRes.data)
+                if (
+                  orderRes.data.taskOrderList &&
+                  orderRes.data.taskOrderList.length > 0
+                ) {
+                  setFile(orderRes.data.taskOrderList[0].input)
+                  setOriginImage(orderRes.data.taskOrderList[0].input)
+                  if (orderRes.data.taskOrderList[0].output) {
+                    setResultFile(orderRes.data.taskOrderList[0].output)
+                  } else {
+                    setResultFile(null)
+                  }
+                  setSelectedOrder(orderRes.data)
+                } else {
+                  setFile(null)
+                  setOriginImage(null)
+                  setResultFile(null)
+                  setSelectedOrder(orderRes.data)
+                }
+                if (orderRes.data.orderStatus == 'ORDERED') {
+                  setLoading(true)
+                } else {
+                  setLoading(false)
+                }
+              } else if (orderRes.code == 402) {
+                message.error('登录失效，请重新登录')
+                clearInterval(updateOrder)
+                logout()
+              } else {
+                clearInterval(updateOrder)
+                message.error(orderRes.msg)
+              }
+            })
+          }, 10000),
+        )
+      } else {
+        clearInterval(updateOrder)
+      }
     } else {
       clearInterval(updateOrder)
     }
@@ -769,10 +775,7 @@ export default function Home() {
                       {...getRootProps({ className: 'dropzone' })}
                       className="w-full h-full flex items-center justify-center flex-col"
                     >
-                      <input
-                        {...getInputProps()}
-                        accept="image/.jpg,.png,.jpeg,.webp"
-                      />
+                      <input {...getInputProps()} />
                       <p className="text-[16px]">
                         支持拖拽、Ctrl+V 复制上传图片
                       </p>
