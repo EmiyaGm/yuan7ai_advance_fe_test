@@ -103,7 +103,7 @@ export default function Home() {
               if (orderRes.data && orderRes.msg == 'success') {
                 setSelectedOrder({
                   ...selectOrder,
-                  ...orderRes.data
+                  ...orderRes.data,
                 })
                 selectOrder(selectOrder)
               } else if (orderRes.code == 402) {
@@ -575,80 +575,97 @@ export default function Home() {
     getModalOrderList(page, 20)
   }
 
-  const reDeal = () => {
-    openLoading()
-    if (
-      selectedOrder.id &&
-      selectedOrder.taskOrderList &&
-      selectedOrder.taskOrderList.length > 0 &&
-      selectedOrder.taskOrderList[0].input
-    ) {
-      const originalImage = selectedOrder.taskOrderList[0].input
-      fetchCreateActionOrder({
-        id: actions[active].id,
-        originalImage,
-        orderType: actions[active].generateImageType,
-      })
-        .then((r) => {
-          if (r.data && r.msg == 'success') {
-            if (r.data.id) {
-              fetchPrePay({
-                orderId: r.data.id,
-                payChannel: 'YUANQI',
-                payProduct: 'POINTS_TRANS',
-                payDesc: `${actions[active].name}服务下单，订单号（${r.data.id}）`,
-              })
-                .then((payRes: any) => {
-                  if (payRes.data && payRes.msg == 'success') {
-                    closeLoading()
-                    console.log(payRes.data)
-                    updateUserPoint()
-                    getOrders(
-                      actions[active].generateImageType,
-                      (list: any) => {
-                        fetchGetOrderById(r.data.id).then((orderRes) => {
-                          if (orderRes.data && orderRes.msg == 'success') {
-                            setSelectedOrder(orderRes.data)
-                            selectOrder(list[0])
-                          } else if (orderRes.code == 402) {
-                            message.error('登录失效，请重新登录')
-                            logout()
-                          } else {
-                            message.error(orderRes.msg)
-                          }
-                        })
-                      },
-                    )
-                  } else if (payRes.code == 402) {
-                    closeLoading()
-                    message.error('登录失效，请重新登录')
-                    logout()
-                  } else {
-                    closeLoading()
+  const reDeal = async () => {
+    if ((account || localStorage.getItem('yqai-account')) && !loading) {
+      const pointRes = await fetchGetPoint()
+      let userPoint = 0
+      if (pointRes.data && pointRes.msg == 'success') {
+        userPoint =
+          (pointRes.data.amount || 0) - (pointRes.data.freezeAmount || 0)
+      } else if (pointRes.code == 402) {
+        message.error('登录失效，请重新登录')
+        logout()
+        return
+      }
+      if (userPoint < actions[active].integral) {
+        message.info('积分不足，请充值')
+        openPointModal()
+        return
+      }
+      openLoading()
+      if (
+        selectedOrder.id &&
+        selectedOrder.taskOrderList &&
+        selectedOrder.taskOrderList.length > 0 &&
+        selectedOrder.taskOrderList[0].input
+      ) {
+        const originalImage = selectedOrder.taskOrderList[0].input
+        fetchCreateActionOrder({
+          id: actions[active].id,
+          originalImage,
+          orderType: actions[active].generateImageType,
+        })
+          .then((r) => {
+            if (r.data && r.msg == 'success') {
+              if (r.data.id) {
+                fetchPrePay({
+                  orderId: r.data.id,
+                  payChannel: 'YUANQI',
+                  payProduct: 'POINTS_TRANS',
+                  payDesc: `${actions[active].name}服务下单，订单号（${r.data.id}）`,
+                })
+                  .then((payRes: any) => {
+                    if (payRes.data && payRes.msg == 'success') {
+                      closeLoading()
+                      console.log(payRes.data)
+                      updateUserPoint()
+                      getOrders(
+                        actions[active].generateImageType,
+                        (list: any) => {
+                          fetchGetOrderById(r.data.id).then((orderRes) => {
+                            if (orderRes.data && orderRes.msg == 'success') {
+                              setSelectedOrder(orderRes.data)
+                              selectOrder(list[0])
+                            } else if (orderRes.code == 402) {
+                              message.error('登录失效，请重新登录')
+                              logout()
+                            } else {
+                              message.error(orderRes.msg)
+                            }
+                          })
+                        },
+                      )
+                    } else if (payRes.code == 402) {
+                      closeLoading()
+                      message.error('登录失效，请重新登录')
+                      logout()
+                    } else {
+                      closeLoading()
+                      getOrders(actions[active].generateImageType)
+                      message.error(payRes.msg)
+                    }
+                  })
+                  .catch((payErr) => {
                     getOrders(actions[active].generateImageType)
-                    message.error(payRes.msg)
-                  }
-                })
-                .catch((payErr) => {
-                  getOrders(actions[active].generateImageType)
-                  console.log(payErr)
-                })
+                    console.log(payErr)
+                  })
+              }
+            } else if (r.code == 402) {
+              closeLoading()
+              message.error('登录失效，请重新登录')
+              logout()
+            } else {
+              closeLoading()
+              message.error(r.msg)
             }
-          } else if (r.code == 402) {
+          })
+          .catch(() => {
             closeLoading()
-            message.error('登录失效，请重新登录')
-            logout()
-          } else {
-            closeLoading()
-            message.error(r.msg)
-          }
-        })
-        .catch(() => {
-          closeLoading()
-          message.error(`${actions[active].name}服务暂时不可用，请稍后再试`)
-        })
-    } else {
-      closeLoading()
+            message.error(`${actions[active].name}服务暂时不可用，请稍后再试`)
+          })
+      } else {
+        closeLoading()
+      }
     }
   }
 
