@@ -328,7 +328,6 @@ export default function Home() {
           (res: any) => {
             const reader = new FileReader()
             reader.readAsDataURL(res)
-            setFileLoading(true)
             reader.onloadend = () => {
               setOriginImage(reader.result)
               setFile(res)
