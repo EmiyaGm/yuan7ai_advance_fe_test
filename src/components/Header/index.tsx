@@ -13,6 +13,7 @@ import {
   Space,
   Statistic,
   Table,
+  Tabs,
 } from 'antd'
 import { useEffect, useRef, useState } from 'react'
 import {
@@ -86,6 +87,8 @@ export function Header() {
   const [pointList, setPointList] = useState<any[]>([])
 
   const [deadline, setDeadLine] = useState(Date.now() + 1000 * 60 * 15)
+
+  const [loginType, setLoginType] = useState('phone')
 
   // const deadline = Date.now() + 1000 * 60 * 15 // Dayjs is also OK
 
@@ -591,91 +594,80 @@ export function Header() {
             onFinish={onFinish}
             initialValues={loginInitial}
           >
-            {/* <>
-              <ProFormText
-                name="username"
-                fieldProps={{
-                  size: 'large',
-                  prefix: <UserOutlined className={'prefixIcon'} />,
-                }}
-                placeholder={'请输入用户名'}
-                rules={[
-                  {
-                    required: true,
-                    message: '请输入用户名!',
-                  },
-                ]}
-              />
-              <ProFormText.Password
-                name="password"
-                fieldProps={{
-                  size: 'large',
-                  prefix: <LockOutlined className={'prefixIcon'} />,
-                }}
-                placeholder={'请输入密码'}
-                rules={[
-                  {
-                    required: true,
-                    message: '请输入密码！',
-                  },
-                ]}
-              />
-            </> */}
-            <>
-              <ProFormText
-                fieldProps={{
-                  size: 'large',
-                  prefix: <MobileOutlined className={'prefixIcon'} />,
-                }}
-                name="phone"
-                placeholder={'手机号'}
-                rules={[
-                  {
-                    required: true,
-                    message: '请输入手机号！',
-                  },
-                  {
-                    pattern: /^1\d{10}$/,
-                    message: '手机号格式错误！',
-                  },
-                ]}
-              />
-              <ProFormCaptcha
-                fieldProps={{
-                  size: 'large',
-                  prefix: <LockOutlined className={'prefixIcon'} />,
-                }}
-                captchaProps={{
-                  size: 'large',
-                }}
-                placeholder={'请输入验证码'}
-                captchaTextRender={(timing, count) => {
-                  if (timing) {
-                    return `${count} ${'获取验证码'}`
-                  }
-                  return '获取验证码'
-                }}
-                phoneName="phone"
-                name="smsCode"
-                rules={[
-                  {
-                    required: true,
-                    message: '请输入验证码！',
-                  },
-                ]}
-                countDown={countDown}
-                onGetCaptcha={async (phone) => {
-                  const res = await fetchSendSms({ phone, type: '1' })
-                  if (res.data == 60) {
-                    message.success(`手机号 ${phone} 验证码发送成功!`)
-                    setCountDown(60)
-                  } else {
-                    message.info(`验证码发送太频繁，请稍后再试`)
-                    setCountDown(res.data)
-                  }
-                }}
-              />
-            </>
+            {/* <Tabs
+              centered
+              activeKey={loginType}
+              onChange={(activeKey) => setLoginType(activeKey)}
+            >
+              <Tabs.TabPane key={'wechat'} tab={'微信扫码登录'} />
+              <Tabs.TabPane key={'phone'} tab={'手机号登录'} />
+            </Tabs> */}
+            {loginType == 'wechat' && (
+              <>
+                <div className='flex items-center justify-between flex-col my-[8px]'>
+                  <div className='w-[400px] h-[400px] mb-[8px]'></div>
+                  <div className='text-center'>打开微信扫一扫，快速登录/注册</div>
+                </div>
+              </>
+            )}
+            {loginType == 'phone' && (
+              <>
+                <ProFormText
+                  fieldProps={{
+                    size: 'large',
+                    prefix: <MobileOutlined className={'prefixIcon'} />,
+                  }}
+                  name="phone"
+                  placeholder={'手机号'}
+                  rules={[
+                    {
+                      required: true,
+                      message: '请输入手机号！',
+                    },
+                    {
+                      pattern: /^1\d{10}$/,
+                      message: '手机号格式错误！',
+                    },
+                  ]}
+                />
+                <ProFormCaptcha
+                  fieldProps={{
+                    size: 'large',
+                    prefix: <LockOutlined className={'prefixIcon'} />,
+                  }}
+                  captchaProps={{
+                    size: 'large',
+                  }}
+                  placeholder={'请输入验证码'}
+                  captchaTextRender={(timing, count) => {
+                    if (timing) {
+                      return `${count} ${'获取验证码'}`
+                    }
+                    return '获取验证码'
+                  }}
+                  phoneName="phone"
+                  name="smsCode"
+                  rules={[
+                    {
+                      required: true,
+                      message: '请输入验证码！',
+                    },
+                  ]}
+                  countDown={countDown}
+                  onGetCaptcha={async (phone) => {
+                    const res = await fetchSendSms({ phone, type: '1' })
+                    if (res.data == 60) {
+                      message.success(`手机号 ${phone} 验证码发送成功!`)
+                      setCountDown(60)
+                    } else {
+                      message.info(`验证码发送太频繁，请稍后再试`)
+                      setCountDown(res.data)
+                    }
+                  }}
+                />
+              </>
+            )}
+
             {/* <div className="mb-6 pb-6">
               <a
                 style={{
