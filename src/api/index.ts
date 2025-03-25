@@ -141,7 +141,7 @@ export const fetchGetPoint = async () => {
 export const fetchGetPoints = async () => {
   const resp = await fetch(`${baseAccountUrl}/api/product/pageQuery`, {
     method: 'POST',
-    body: JSON.stringify({ size: 99, page: 1, productCategoryIdList: [5] }),
+    body: JSON.stringify({ size: 99, page: 1, productCategoryIdList: [5], orderItems: [{ asc: true, column: 'price' }] }),
     headers: {
       'content-type': 'application/json',
     },
