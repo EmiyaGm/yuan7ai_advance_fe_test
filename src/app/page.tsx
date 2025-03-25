@@ -975,122 +975,136 @@ export default function Home() {
                     {resultFile ? (
                       <>
                         <div className="w-[550px] h-[400px] relative">
-                          <Image
-                            src={resultFile}
-                            alt="resultFile"
-                            onLoad={resultFileLoad}
-                            className="object-contain !w-[550px] !h-[400px]"
-                            preview={{
-                              toolbarRender: () => <></>,
-                              imageRender: (originalNode, info) => {
-                                return (
-                                  <div className=" relative w-full h-full">
-                                    <div
-                                      className=" absolute top-[5%] text-white text-[32px] z-[9999]"
-                                      style={{ left: 'calc(50vw - 81px)' }}
-                                    >
-                                      鼠标滚轮放大缩小
-                                    </div>
-                                    <div className="bg-white text-black text-[32px] z-[9999] fixed top-[32px] left-[32px] h-[60px] w-[150px] flex items-center justify-center rounded-lg">
-                                      {showScale}
-                                    </div>
-                                    <TransformWrapper
-                                      initialScale={1}
-                                      minScale={0.1}
-                                      maxScale={8}
-                                      wheel={{ step: 0.1 }}
-                                      onTransformed={onTransformed}
-                                      limitToBounds={false}
-                                    >
-                                      {({ resetTransform }) => (
-                                        <>
-                                          {/* 工具栏 */}
-                                          <div className="ant-image-preview-footer z-[9999]">
-                                            <div className="ant-image-preview-operations">
-                                              <div
-                                                className="ant-image-preview-operations-operation"
-                                                onClick={() => {
-                                                  resetTransform()
-                                                }}
-                                              >
-                                                还原
+                          {actions[active].generateImageType ==
+                          'FOUR_SQUARE' ? (
+                            <>
+                              <Image
+                                src={resultFile}
+                                alt="resultFile"
+                                onLoad={resultFileLoad}
+                                className="object-contain !w-[550px] !h-[400px]"
+                                preview={{
+                                  toolbarRender: () => <></>,
+                                  imageRender: (originalNode, info) => {
+                                    return (
+                                      <div className=" relative w-full h-full">
+                                        <div
+                                          className=" absolute top-[5%] text-white text-[32px] z-[9999]"
+                                          style={{ left: 'calc(50vw - 81px)' }}
+                                        >
+                                          鼠标滚轮放大缩小
+                                        </div>
+                                        <div className="bg-white text-black text-[32px] z-[9999] fixed top-[32px] left-[32px] h-[60px] w-[150px] flex items-center justify-center rounded-lg">
+                                          {showScale}
+                                        </div>
+                                        <TransformWrapper
+                                          initialScale={1}
+                                          minScale={0.1}
+                                          maxScale={8}
+                                          wheel={{ step: 0.1 }}
+                                          onTransformed={onTransformed}
+                                          limitToBounds={false}
+                                        >
+                                          {({ resetTransform }) => (
+                                            <>
+                                              {/* 工具栏 */}
+                                              <div className="ant-image-preview-footer z-[9999]">
+                                                <div className="ant-image-preview-operations">
+                                                  <div
+                                                    className="ant-image-preview-operations-operation"
+                                                    onClick={() => {
+                                                      resetTransform()
+                                                    }}
+                                                  >
+                                                    还原
+                                                  </div>
+                                                </div>
                                               </div>
-                                            </div>
-                                          </div>
 
-                                          {/* 缩放容器 */}
-                                          <TransformComponent>
-                                            <div className="flex items-center justify-center">
-                                              <div
-                                                style={{
-                                                  width: '80%',
-                                                  height: '80%',
-                                                  display: 'flex',
-                                                  flexDirection: 'column',
-                                                  gap: '0px',
-                                                  alignItems: 'center',
-                                                  justifyContent: 'center',
-                                                }}
-                                              >
-                                                <div
-                                                  style={{
-                                                    display: 'flex',
-                                                    gap: '0px',
-                                                    flex: 1,
-                                                  }}
-                                                >
-                                                  <img
-                                                    src={resultFile}
+                                              {/* 缩放容器 */}
+                                              <TransformComponent>
+                                                <div className="flex items-center justify-center">
+                                                  <div
                                                     style={{
-                                                      width: '50%',
-                                                      height: 'auto',
-                                                      objectFit: 'contain',
+                                                      width: '80%',
+                                                      height: '80%',
+                                                      display: 'flex',
+                                                      flexDirection: 'column',
+                                                      gap: '0px',
+                                                      alignItems: 'center',
+                                                      justifyContent: 'center',
                                                     }}
-                                                  />
-                                                  <img
-                                                    src={resultFile}
-                                                    style={{
-                                                      width: '50%',
-                                                      height: 'auto',
-                                                      objectFit: 'contain',
-                                                    }}
-                                                  />
+                                                  >
+                                                    <div
+                                                      style={{
+                                                        display: 'flex',
+                                                        gap: '0px',
+                                                        flex: 1,
+                                                      }}
+                                                    >
+                                                      <img
+                                                        src={resultFile}
+                                                        style={{
+                                                          width: '50%',
+                                                          height: 'auto',
+                                                          objectFit: 'contain',
+                                                        }}
+                                                      />
+                                                      <img
+                                                        src={resultFile}
+                                                        style={{
+                                                          width: '50%',
+                                                          height: 'auto',
+                                                          objectFit: 'contain',
+                                                        }}
+                                                      />
+                                                    </div>
+                                                    <div
+                                                      style={{
+                                                        display: 'flex',
+                                                        gap: '0px',
+                                                        flex: 1,
+                                                      }}
+                                                    >
+                                                      <img
+                                                        src={resultFile}
+                                                        style={{
+                                                          width: '50%',
+                                                          height: 'auto',
+                                                          objectFit: 'contain',
+                                                        }}
+                                                      />
+                                                      <img
+                                                        src={resultFile}
+                                                        style={{
+                                                          width: '50%',
+                                                          height: 'auto',
+                                                          objectFit: 'contain',
+                                                        }}
+                                                      />
+                                                    </div>
+                                                  </div>
                                                 </div>
-                                                <div
-                                                  style={{
-                                                    display: 'flex',
-                                                    gap: '0px',
-                                                    flex: 1,
-                                                  }}
-                                                >
-                                                  <img
-                                                    src={resultFile}
-                                                    style={{
-                                                      width: '50%',
-                                                      height: 'auto',
-                                                      objectFit: 'contain',
-                                                    }}
-                                                  />
-                                                  <img
-                                                    src={resultFile}
-                                                    style={{
-                                                      width: '50%',
-                                                      height: 'auto',
-                                                      objectFit: 'contain',
-                                                    }}
-                                                  />
-                                                </div>
-                                              </div>
-                                            </div>
-                                          </TransformComponent>
-                                        </>
-                                      )}
-                                    </TransformWrapper>
-                                  </div>
-                                )
-                              },
-                            }}
-                          />
+                                              </TransformComponent>
+                                            </>
+                                          )}
+                                        </TransformWrapper>
+                                      </div>
+                                    )
+                                  },
+                                }}
+                              />
+                            </>
+                          ) : (
+                            <>
+                              <Image
+                                src={resultFile}
+                                alt="resultFile"
+                                onLoad={resultFileLoad}
+                                className="object-contain !w-[550px] !h-[400px]"
+                              />
+                            </>
+                          )}
                         </div>
                       </>
                     ) : selectedOrder.id ? (
