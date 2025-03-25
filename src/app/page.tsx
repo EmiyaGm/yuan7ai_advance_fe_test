@@ -31,7 +31,12 @@ import {
 } from '@ant-design/icons'
 import { useModal } from '@/contexts/ModalContext'
 import { useLoading } from '@/contexts/LoadingContext'
-import { compressionFile, imageUrlToBase64 } from '../../utils/compressionFile'
+import { imageUrlToBase64 } from '../../utils/compressionFile'
+import {
+  TransformWrapper,
+  TransformComponent,
+  ReactZoomPanPinchRef,
+} from 'react-zoom-pan-pinch'
 
 export default function Home() {
   const [active, setActive] = useState(0)
@@ -64,7 +69,7 @@ export default function Home() {
     maxSize: 12000000,
     multiple: false,
     accept: {
-      'image/*': ['jpg', 'png', 'jpeg', 'webp'],
+      'image/*': ['.jpg', '.png', '.jpeg', '.webp'],
     },
   })
 
@@ -795,6 +800,13 @@ export default function Home() {
     }
   }
 
+  const [showScale, setShowScale] = useState('100%')
+
+  const onTransformed = (_: ReactZoomPanPinchRef, { scale }: any) => {
+    console.log(scale)
+    setShowScale(`${(scale * 100).toFixed(2)}%`)
+  }
+
   return (
     <Spin spinning={pageLoading}>
       <div className="childrenHeight bg-white rounded-[34px]  w-screen my-0 mx-auto">
@@ -968,6 +980,116 @@ export default function Home() {
                             alt="resultFile"
                             onLoad={resultFileLoad}
                             className="object-contain !w-[550px] !h-[400px]"
+                            preview={{
+                              toolbarRender: () => <></>,
+                              imageRender: (originalNode, info) => {
+                                return (
+                                  <div className=" relative w-full h-full">
+                                    <div
+                                      className=" absolute top-[5%] text-white text-[32px] z-[9999]"
+                                      style={{ left: 'calc(50vw - 81px)' }}
+                                    >
+                                      鼠标滚轮放大缩小
+                                    </div>
+                                    <div className="bg-white text-black text-[32px] z-[9999] fixed top-[32px] left-[32px] h-[60px] w-[150px] flex items-center justify-center rounded-lg">
+                                      {showScale}
+                                    </div>
+                                    <TransformWrapper
+                                      initialScale={1}
+                                      minScale={0.1}
+                                      maxScale={8}
+                                      wheel={{ step: 0.1 }}
+                                      onTransformed={onTransformed}
+                                      limitToBounds={false}
+                                    >
+                                      {({ resetTransform }) => (
+                                        <>
+                                          {/* 工具栏 */}
+                                          <div className="ant-image-preview-footer z-[9999]">
+                                            <div className="ant-image-preview-operations">
+                                              <div
+                                                className="ant-image-preview-operations-operation"
+                                                onClick={() => {
+                                                  resetTransform()
+                                                }}
+                                              >
+                                                还原
+                                              </div>
+                                            </div>
+                                          </div>
+
+                                          {/* 缩放容器 */}
+                                          <TransformComponent>
+                                            <div className="flex items-center justify-center">
+                                              <div
+                                                style={{
+                                                  width: '80%',
+                                                  height: '80%',
+                                                  display: 'flex',
+                                                  flexDirection: 'column',
+                                                  gap: '0px',
+                                                  alignItems: 'center',
+                                                  justifyContent: 'center',
+                                                }}
+                                              >
+                                                <div
+                                                  style={{
+                                                    display: 'flex',
+                                                    gap: '0px',
+                                                    flex: 1,
+                                                  }}
+                                                >
+                                                  <img
+                                                    src={resultFile}
+                                                    style={{
+                                                      width: '50%',
+                                                      height: 'auto',
+                                                      objectFit: 'contain',
+                                                    }}
+                                                  />
+                                                  <img
+                                                    src={resultFile}
+                                                    style={{
+                                                      width: '50%',
+                                                      height: 'auto',
+                                                      objectFit: 'contain',
+                                                    }}
+                                                  />
+                                                </div>
+                                                <div
+                                                  style={{
+                                                    display: 'flex',
+                                                    gap: '0px',
+                                                    flex: 1,
+                                                  }}
+                                                >
+                                                  <img
+                                                    src={resultFile}
+                                                    style={{
+                                                      width: '50%',
+                                                      height: 'auto',
+                                                      objectFit: 'contain',
+                                                    }}
+                                                  />
+                                                  <img
+                                                    src={resultFile}
+                                                    style={{
+                                                      width: '50%',
+                                                      height: 'auto',
+                                                      objectFit: 'contain',
+                                                    }}
+                                                  />
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </TransformComponent>
+                                        </>
+                                      )}
+                                    </TransformWrapper>
+                                  </div>
+                                )
+                              },
+                            }}
                           />
                         </div>
                       </>
