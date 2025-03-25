@@ -218,14 +218,18 @@ export function Header() {
   const getPoints = () => {
     fetchGetPoints().then((res: any) => {
       if (res.data && res.msg == 'success') {
-        setPointList(
-          res.data.map((item: any) => ({
-            id: item.id,
-            gift: item.description || '',
-            price: item.price || 0,
-            points: item.integral || 0,
-          })),
-        )
+        const result: any[] = []
+        res.data.forEach((item: any) => {
+          if (item.status == 1) {
+            result.push({
+              id: item.id,
+              gift: item.description || '',
+              price: item.price || 0,
+              points: item.integral || 0,
+            })
+          }
+        })
+        setPointList(result)
       }
     })
   }
@@ -604,9 +608,11 @@ export function Header() {
             </Tabs> */}
             {loginType == 'wechat' && (
               <>
-                <div className='flex items-center justify-between flex-col my-[8px]'>
-                  <div className='w-[400px] h-[400px] mb-[8px]'></div>
-                  <div className='text-center'>打开微信扫一扫，快速登录/注册</div>
+                <div className="flex items-center justify-between flex-col my-[8px]">
+                  <div className="w-[400px] h-[400px] mb-[8px]"></div>
+                  <div className="text-center">
+                    打开微信扫一扫，快速登录/注册
+                  </div>
                 </div>
               </>
             )}

@@ -1045,7 +1045,7 @@ export default function Home() {
                                                       <img
                                                         src={resultFile}
                                                         style={{
-                                                          width: '50%',
+                                                          width: '30%',
                                                           height: 'auto',
                                                           objectFit: 'contain',
                                                         }}
@@ -1053,7 +1053,15 @@ export default function Home() {
                                                       <img
                                                         src={resultFile}
                                                         style={{
-                                                          width: '50%',
+                                                          width: '30%',
+                                                          height: 'auto',
+                                                          objectFit: 'contain',
+                                                        }}
+                                                      />
+                                                      <img
+                                                        src={resultFile}
+                                                        style={{
+                                                          width: '30%',
                                                           height: 'auto',
                                                           objectFit: 'contain',
                                                         }}
@@ -1069,7 +1077,7 @@ export default function Home() {
                                                       <img
                                                         src={resultFile}
                                                         style={{
-                                                          width: '50%',
+                                                          width: '30%',
                                                           height: 'auto',
                                                           objectFit: 'contain',
                                                         }}
@@ -1077,7 +1085,47 @@ export default function Home() {
                                                       <img
                                                         src={resultFile}
                                                         style={{
-                                                          width: '50%',
+                                                          width: '30%',
+                                                          height: 'auto',
+                                                          objectFit: 'contain',
+                                                        }}
+                                                      />
+                                                      <img
+                                                        src={resultFile}
+                                                        style={{
+                                                          width: '30%',
+                                                          height: 'auto',
+                                                          objectFit: 'contain',
+                                                        }}
+                                                      />
+                                                    </div>
+                                                    <div
+                                                      style={{
+                                                        display: 'flex',
+                                                        gap: '0px',
+                                                        flex: 1,
+                                                      }}
+                                                    >
+                                                      <img
+                                                        src={resultFile}
+                                                        style={{
+                                                          width: '30%',
+                                                          height: 'auto',
+                                                          objectFit: 'contain',
+                                                        }}
+                                                      />
+                                                      <img
+                                                        src={resultFile}
+                                                        style={{
+                                                          width: '30%',
+                                                          height: 'auto',
+                                                          objectFit: 'contain',
+                                                        }}
+                                                      />
+                                                      <img
+                                                        src={resultFile}
+                                                        style={{
+                                                          width: '30%',
                                                           height: 'auto',
                                                           objectFit: 'contain',
                                                         }}
