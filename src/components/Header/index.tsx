@@ -24,6 +24,7 @@ import {
   MailOutlined,
   BankOutlined,
   PhoneOutlined,
+  SyncOutlined,
 } from '@ant-design/icons'
 import type { CountdownProps, MenuProps, RadioChangeEvent } from 'antd'
 import {
@@ -32,6 +33,8 @@ import {
   fetchGetPoint,
   fetchGetPointRecords,
   fetchGetPoints,
+  fetchGetQrcode,
+  fetchGetScanResult,
   fetchLogin,
   fetchNewLogin,
   fetchPrePay,
@@ -88,7 +91,7 @@ export function Header() {
 
   const [deadline, setDeadLine] = useState(Date.now() + 1000 * 60 * 15)
 
-  const [loginType, setLoginType] = useState('phone')
+  const [loginType, setLoginType] = useState('wechat')
 
   // const deadline = Date.now() + 1000 * 60 * 15 // Dayjs is also OK
 
@@ -115,6 +118,13 @@ export function Header() {
           message.success('登录成功')
           getUserPoint()
           closeModal()
+          setLoginQrcode('')
+          if (loginCheckIntervalRef.current) {
+            clearInterval(loginCheckIntervalRef.current)
+          }
+          if (qrcodeExpireTimeoutRef.current) {
+            clearTimeout(qrcodeExpireTimeoutRef.current)
+          }
         } else if (res.msg) {
           message.error(res.msg)
         } else {
@@ -400,6 +410,92 @@ export function Header() {
     setSelectRecordType(e.target.value)
   }
 
+  const [loginQrcode, setLoginQrcode] = useState('')
+
+  const loginCheckIntervalRef = useRef<NodeJS.Timeout | null>(null)
+
+  const [qrcodeLogin, setQrcodeLogin] = useState(false)
+
+  const qrcodeExpireTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  const createQrcode = () => {
+    setQrcodeLogin(true)
+    fetchGetQrcode()
+      .then((res: any) => {
+        setQrcodeLogin(false)
+        if (res.data && res.msg == 'success') {
+          if (res.data.qrInfo && res.data.qrInfo.SYS_ossQrUrl) {
+            setLoginQrcode(res.data.qrInfo.SYS_ossQrUrl)
+            if (qrcodeExpireTimeoutRef.current) {
+              clearTimeout(qrcodeExpireTimeoutRef.current)
+            }
+            qrcodeExpireTimeoutRef.current = setTimeout(() => {
+              setLoginQrcode('')
+              if (loginCheckIntervalRef.current) {
+                clearInterval(loginCheckIntervalRef.current)
+              }
+            }, 30 * 60 * 1000)
+            if (loginCheckIntervalRef.current) {
+              clearInterval(loginCheckIntervalRef.current)
+            }
+            loginCheckIntervalRef.current = setInterval(() => {
+              fetchGetScanResult(res.data.id).then((result: any) => {
+                if (result.data && result.msg == 'success') {
+                  if (result.data.state == 'SCANNED') {
+                    if (result.data.loginInfo) {
+                      window.localStorage.setItem(
+                        'yqai-token',
+                        `${result.data.loginInfo.token}`,
+                      )
+                      window.localStorage.setItem(
+                        'yqai-account',
+                        result.data.loginInfo.name,
+                      )
+                      window.localStorage.setItem(
+                        'yqai-accountInfo',
+                        JSON.stringify(result.data.loginInfo),
+                      )
+                      setAccountData(result.data.loginInfo.name)
+                      setAccountInfoData(result.data.loginInfo)
+                      message.success('登录成功')
+                      getUserPoint()
+                      closeModal()
+                      setLoginQrcode('')
+                      if (loginCheckIntervalRef.current) {
+                        clearInterval(loginCheckIntervalRef.current)
+                      }
+                      if (qrcodeExpireTimeoutRef.current) {
+                        clearTimeout(qrcodeExpireTimeoutRef.current)
+                      }
+                    } else {
+                      message.error('无法获取用户信息登录失败，请联系客服')
+                      closeModal()
+                      setLoginQrcode('')
+                      if (loginCheckIntervalRef.current) {
+                        clearInterval(loginCheckIntervalRef.current)
+                      }
+                      if (qrcodeExpireTimeoutRef.current) {
+                        clearTimeout(qrcodeExpireTimeoutRef.current)
+                      }
+                    }
+                  }
+                } else {
+                  message.error(result.msg)
+                }
+              })
+            }, 3000)
+          } else {
+            message.error('获取二维码失败，请联系客服')
+          }
+        } else {
+          message.error(res.msg)
+        }
+      })
+      .catch(() => {
+        setQrcodeLogin(false)
+      })
+  }
+
   useEffect(() => {
     if (account) {
       setPage(1)
@@ -560,6 +656,7 @@ export function Header() {
               <div
                 className="text-sm text-black font-extrabold cursor-pointer pr-[30px]"
                 onClick={() => {
+                  createQrcode()
                   openModal()
                 }}
               >
@@ -586,37 +683,64 @@ export function Header() {
         onCancel={() => {
           setLoginInitial({})
           closeModal()
+          setLoginQrcode('')
+          if (loginCheckIntervalRef.current) {
+            clearInterval(loginCheckIntervalRef.current)
+          }
+          if (qrcodeExpireTimeoutRef.current) {
+            clearTimeout(qrcodeExpireTimeoutRef.current)
+          }
         }}
       >
         <div>
-          <LoginForm
-            logo=""
-            title={
-              <img src="/logo.jpg" alt="logo" className="w-[91.1px] h-auto" />
-            }
-            subTitle="面料企业的超级AI花型服务"
-            onFinish={onFinish}
-            initialValues={loginInitial}
+          <Tabs
+            centered
+            activeKey={loginType}
+            onChange={(activeKey) => setLoginType(activeKey)}
           >
-            {/* <Tabs
-              centered
-              activeKey={loginType}
-              onChange={(activeKey) => setLoginType(activeKey)}
-            >
-              <Tabs.TabPane key={'wechat'} tab={'微信扫码登录'} />
-              <Tabs.TabPane key={'phone'} tab={'手机号登录'} />
-            </Tabs> */}
-            {loginType == 'wechat' && (
-              <>
-                <div className="flex items-center justify-between flex-col my-[8px]">
-                  <div className="w-[400px] h-[400px] mb-[8px]"></div>
-                  <div className="text-center">
-                    打开微信扫一扫，快速登录/注册
-                  </div>
+            <Tabs.TabPane key={'wechat'} tab={'微信扫码登录'} />
+            <Tabs.TabPane key={'phone'} tab={'手机号登录'} />
+          </Tabs>
+          {loginType == 'wechat' && (
+            <>
+              <div className="flex items-center justify-between flex-col my-[8px]">
+                <div className="w-[400px] h-[400px] mb-[8px] relative">
+                  {loginQrcode ? (
+                    <img src={loginQrcode} className="w-full h-full" />
+                  ) : (
+                    !qrcodeLogin && (
+                      <div
+                        className="w-full h-full flex items-center justify-center flex-col bg-black/[.23] text-white cursor-pointer"
+                        onClick={createQrcode}
+                      >
+                        <div className="text-[56px]">
+                          <SyncOutlined />
+                        </div>
+                        <div>二维码失效，点击重试</div>
+                      </div>
+                    )
+                  )}
+                  {qrcodeLogin && (
+                    <div className="absolute w-[400px] h-[400px] bg-black/[.23] flex items-center justify-center flex-col top-0 left-0">
+                      <span className="loading loading-infinity loading-lg"></span>
+                      <div className="text-[16px]">二维码生成中...</div>
+                    </div>
+                  )}
                 </div>
-              </>
-            )}
-            {loginType == 'phone' && (
+                <div className="text-center">打开微信扫一扫，快速登录/注册</div>
+              </div>
+            </>
+          )}
+          {loginType == 'phone' && (
+            <LoginForm
+              logo=""
+              title={
+                <img src="/logo.jpg" alt="logo" className="w-[91.1px] h-auto" />
+              }
+              subTitle="面料企业的超级AI花型服务"
+              onFinish={onFinish}
+              initialValues={loginInitial}
+            >
               <>
                 <ProFormText
                   fieldProps={{
@@ -672,22 +796,8 @@ export function Header() {
                   }}
                 />
               </>
-            )}
-
-            {/* <div className="mb-6 pb-6">
-              <a
-                style={{
-                  float: 'right',
-                }}
-                onClick={() => {
-                  setIsModalOpen(false)
-                  setIsRegisterOpen(true)
-                }}
-              >
-                无账户？前往注册
-              </a>
-            </div> */}
-          </LoginForm>
+            </LoginForm>
+          )}
         </div>
       </Modal>
       <Modal

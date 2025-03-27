@@ -289,4 +289,31 @@ export const fetchVote = async (data: any) => {
   return json
 }
 
+export const fetchGetQrcode = async () => {
+  const resp = await fetch(`${baseAccountUrl}/api/login/wechat/qrcode/generate`, {
+    method: 'POST',
+    body: JSON.stringify({
+      "envVersion": "trial"
+    }),
+    headers: {
+      'content-type': 'application/json',
+      CustomerToken: localStorage.getItem('yqai-token') || '',
+    },
+  })
+  const json = await resp.json()
+  return json
+}
+
+export const fetchGetScanResult = async (id: any) => {
+  const resp = await fetch(`${baseAccountUrl}/api/qr/v1/getScanResult?id=${id}`, {
+    method: 'GET',
+    headers: {
+      'content-type': 'application/json',
+      CustomerToken: localStorage.getItem('yqai-token') || '',
+    },
+  })
+  const json = await resp.json()
+  return json
+}
+
 // export const fetchGetPointOrders = async
