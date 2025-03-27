@@ -293,7 +293,7 @@ export const fetchGetQrcode = async () => {
   const resp = await fetch(`${baseAccountUrl}/api/login/wechat/qrcode/generate`, {
     method: 'POST',
     body: JSON.stringify({
-      "envVersion": "trial"
+      "envVersion": "release"
     }),
     headers: {
       'content-type': 'application/json',
