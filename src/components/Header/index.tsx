@@ -422,7 +422,6 @@ export function Header() {
     setQrcodeLogin(true)
     fetchGetQrcode()
       .then((res: any) => {
-        setQrcodeLogin(false)
         if (res.data && res.msg == 'success') {
           if (res.data.qrInfo && res.data.qrInfo.SYS_ossQrUrl) {
             setLoginQrcode(res.data.qrInfo.SYS_ossQrUrl)
@@ -704,9 +703,11 @@ export function Header() {
           {loginType == 'wechat' && (
             <>
               <div className="flex items-center justify-between flex-col my-[8px]">
-                <div className="w-[400px] h-[400px] mb-[8px] relative">
+                <div className="w-[300px] h-[300px] mb-[8px] relative">
                   {loginQrcode ? (
-                    <img src={loginQrcode} className="w-full h-full" />
+                    <img src={loginQrcode} className="w-full h-full" onLoad={() => {
+                      setQrcodeLogin(false)
+                    }} />
                   ) : (
                     !qrcodeLogin && (
                       <div
@@ -721,7 +722,7 @@ export function Header() {
                     )
                   )}
                   {qrcodeLogin && (
-                    <div className="absolute w-[400px] h-[400px] bg-black/[.23] flex items-center justify-center flex-col top-0 left-0">
+                    <div className="absolute w-[300px] h-[300px] bg-black/[.23] flex items-center justify-center flex-col top-0 left-0">
                       <span className="loading loading-infinity loading-lg"></span>
                       <div className="text-[16px]">二维码生成中...</div>
                     </div>
