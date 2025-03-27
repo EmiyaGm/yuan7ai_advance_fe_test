@@ -434,7 +434,7 @@ export function Header() {
               if (loginCheckIntervalRef.current) {
                 clearInterval(loginCheckIntervalRef.current)
               }
-            }, 30 * 60 * 1000)
+            }, 3 * 60 * 1000)
             if (loginCheckIntervalRef.current) {
               clearInterval(loginCheckIntervalRef.current)
             }
