@@ -165,22 +165,23 @@ export default function Home() {
             actions[active].generateImageType
           }${new Date().getTime()}`
           setLoading(true)
+          const fileName = `uploadImage${new Date().getTime()}`
           fetchGenerateOssPolicy({
             ext: file.type.split('/')[1],
-            name: file.name.split('.')[0],
+            name: fileName,
             path,
           })
             .then((res: any) => {
               if (res.data && res.msg == 'success') {
                 const formData = new FormData()
-                formData.append('name', file.name.split('.')[0])
+                formData.append('name', fileName)
                 formData.append('policy', res.data.policy)
                 formData.append('OSSAccessKeyId', res.data.accessId)
                 formData.append('success_action_status', '200')
                 formData.append('signature', res.data.signature)
                 formData.append(
                   'key',
-                  `${path}/${file.name.split('.')[0]}.${
+                  `${path}/${fileName}.${
                     file.type.split('/')[1]
                   }`,
                 )
