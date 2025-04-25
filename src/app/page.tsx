@@ -945,7 +945,7 @@ export default function Home() {
                       )}
                     </div>
                     {file && (
-                      <div className="relative w-full pt-[16px] block z-[9999]">
+                      <div className="relative w-full pt-[16px] block z-[10]">
                         {!selectedOrder.orderStatus && (
                           <>
                             <Tooltip title="删除原图">
@@ -1325,7 +1325,7 @@ export default function Home() {
                         <></>
                       )}
                     </div>
-                    <div className="flex items-center justify-between mt-[37px] mr-[62px]">
+                    <div className="flex items-center justify-between mt-[37px] mr-[62px] z-[10]">
                       {resultFile ? (
                         <div
                           className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer"
