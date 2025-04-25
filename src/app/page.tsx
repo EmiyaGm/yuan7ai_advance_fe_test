@@ -904,7 +904,7 @@ export default function Home() {
                 <div className="flex-1 h-full">
                   <div className="h-full border-r border-black/[.2] flex items-center flex-col">
                     <div className="h-[28px]"></div>
-                    <div className="w-[550px] h-[400px] rounded-xl bg-[#F7F7F7] flex items-center justify-center relative">
+                    <div className="w-[550px] h-[400px] rounded-xl bg-[#F7F7F7] flex items-center justify-center relative" style={{maxHeight: 400}}>
                       {file ? (
                         <div className="w-full h-full relative">
                           <img
@@ -945,7 +945,7 @@ export default function Home() {
                       )}
                     </div>
                     {file && (
-                      <div className="relative w-full pt-[56px]">
+                      <div className="relative w-full pt-[16px] block z-[9999]">
                         {!selectedOrder.orderStatus && (
                           <>
                             <Tooltip title="删除原图">
@@ -1340,7 +1340,7 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
-                <div className=" absolute bottomArea py-[8px] px-[16px] flex overflow-x-auto">
+                <div className=" absolute bottomArea py-[8px] px-[16px] flex overflow-x-auto" style={{maxHeight: 227}}>
                   <div
                     className="min-w-[200px] min-h-[200px] border-dashed rounded-sm bg-white border-[3px] cursor-pointer flex items-center justify-center mr-[16px]"
                     onClick={clearOrder}
