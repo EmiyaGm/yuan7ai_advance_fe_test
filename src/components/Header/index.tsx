@@ -108,12 +108,12 @@ export function Header() {
       .then((res) => {
         if (res.data && res.msg == 'success') {
           window.localStorage.setItem('yqai-token', `${res.data.token}`)
-          window.localStorage.setItem('yqai-account', res.data.name)
+          window.localStorage.setItem('yqai-account', res.data.phone || res.data.name)
           window.localStorage.setItem(
             'yqai-accountInfo',
             JSON.stringify(res.data),
           )
-          setAccountData(res.data.name)
+          setAccountData(res.data.phone || res.data.name)
           setAccountInfoData(res.data)
           message.success('登录成功')
           getUserPoint()
@@ -448,13 +448,13 @@ export function Header() {
                       )
                       window.localStorage.setItem(
                         'yqai-account',
-                        result.data.loginInfo.name,
+                        result.data.loginInfo.phone || result.data.loginInfo.name,
                       )
                       window.localStorage.setItem(
                         'yqai-accountInfo',
                         JSON.stringify(result.data.loginInfo),
                       )
-                      setAccountData(result.data.loginInfo.name)
+                      setAccountData(result.data.loginInfo.phone || result.data.loginInfo.name)
                       setAccountInfoData(result.data.loginInfo)
                       message.success('登录成功')
                       getUserPoint()
