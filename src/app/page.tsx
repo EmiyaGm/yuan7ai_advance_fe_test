@@ -64,6 +64,12 @@ export default function Home() {
 
   const [updateOrder, setUpdateOrder] = useState<any>(null)
 
+  const [actionLoading, setActionLoading] = useState(true)
+
+  const [imageState, setImageState] = useState('WAIT_PROMPT')
+
+  const [resultPreviewImage, setResultPreviewImage] = useState('')
+
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
     maxFiles: 1,
     maxSize: 12000000,
@@ -181,9 +187,7 @@ export default function Home() {
                 formData.append('signature', res.data.signature)
                 formData.append(
                   'key',
-                  `${path}/${fileName}.${
-                    file.type.split('/')[1]
-                  }`,
+                  `${path}/${fileName}.${file.type.split('/')[1]}`,
                 )
                 formData.append('file', file)
                 fetch(res.data.uploadUrl, {
@@ -389,9 +393,46 @@ export default function Home() {
           )
         case 'ORDERED':
           return <></>
-        // TODO 剩下的状态显示
+        case 'FAILED':
+          return (
+            <div>
+              <Result
+                title={`本次${actions[active].name}服务生成图片失败，请联系管理员或者重新生成`}
+                extra={
+                  <Button
+                    type="primary"
+                    key="console"
+                    onClick={() => {
+                      reDeal()
+                    }}
+                  >
+                    重新生成
+                  </Button>
+                }
+              />
+            </div>
+          )
         default:
-          return <></>
+          return imageState == 'FAILED' ? (
+            <div>
+              <Result
+                title={`本次${actions[active].name}服务生成图片失败，请联系管理员或者重新生成`}
+                extra={
+                  <Button
+                    type="primary"
+                    key="console"
+                    onClick={() => {
+                      reDeal()
+                    }}
+                  >
+                    重新生成
+                  </Button>
+                }
+              />
+            </div>
+          ) : (
+            <></>
+          )
       }
     } else {
       return <></>
@@ -444,7 +485,9 @@ export default function Home() {
   const [actions, setActions] = useState<any[]>([])
 
   const getActions = () => {
+    setActionLoading(true)
     fetchGetActions().then((res: any) => {
+      setActionLoading(false)
       if (res.data && res.msg == 'success') {
         setActions(res.data)
         if (res.data.length > 0 && res.data[active].categoryId) {
@@ -500,16 +543,30 @@ export default function Home() {
       .then((orderRes) => {
         closeLoading()
         if (orderRes.data && orderRes.msg == 'success') {
+          if (orderRes.data.orderStatus == 'ORDERED') {
+            setLoading(true)
+          } else {
+            setLoading(false)
+          }
           if (
             orderRes.data.taskOrderList &&
             orderRes.data.taskOrderList.length > 0
           ) {
             setFile(orderRes.data.taskOrderList[0].input)
             setOriginImage(orderRes.data.taskOrderList[0].input)
+            setImageState(orderRes.data.taskOrderList[0].state)
             if (orderRes.data.taskOrderList[0].output) {
               setResultFile(orderRes.data.taskOrderList[0].output)
             } else {
               setResultFile(null)
+            }
+            if (
+              orderRes.data.taskOrderList[0].state == 'COMPLETED' ||
+              orderRes.data.taskOrderList[0].state == 'FAILED'
+            ) {
+              setLoading(false)
+            } else {
+              setLoading(true)
             }
             setSelectedOrder(orderRes.data)
           } else {
@@ -517,11 +574,7 @@ export default function Home() {
             setOriginImage(null)
             setResultFile(null)
             setSelectedOrder(orderRes.data)
-          }
-          if (orderRes.data.orderStatus == 'ORDERED') {
-            setLoading(true)
-          } else {
-            setLoading(false)
+            setImageState('')
           }
         } else if (orderRes.code == 402) {
           message.error('登录失效，请重新登录')
@@ -731,16 +784,30 @@ export default function Home() {
             fetchGetOrderById(selectedOrder.id).then((orderRes) => {
               if (orderRes.data && orderRes.msg == 'success') {
                 setSelectedOrder(orderRes.data)
+                if (orderRes.data.orderStatus == 'ORDERED') {
+                  setLoading(true)
+                } else {
+                  setLoading(false)
+                }
                 if (
                   orderRes.data.taskOrderList &&
                   orderRes.data.taskOrderList.length > 0
                 ) {
                   setFile(orderRes.data.taskOrderList[0].input)
                   setOriginImage(orderRes.data.taskOrderList[0].input)
+                  setImageState(orderRes.data.taskOrderList[0].state)
                   if (orderRes.data.taskOrderList[0].output) {
                     setResultFile(orderRes.data.taskOrderList[0].output)
                   } else {
                     setResultFile(null)
+                  }
+                  if (
+                    orderRes.data.taskOrderList[0].state == 'COMPLETED' ||
+                    orderRes.data.taskOrderList[0].state == 'FAILED'
+                  ) {
+                    setLoading(false)
+                  } else {
+                    setLoading(true)
                   }
                   setSelectedOrder(orderRes.data)
                 } else {
@@ -748,11 +815,7 @@ export default function Home() {
                   setOriginImage(null)
                   setResultFile(null)
                   setSelectedOrder(orderRes.data)
-                }
-                if (orderRes.data.orderStatus == 'ORDERED') {
-                  setLoading(true)
-                } else {
-                  setLoading(false)
+                  setImageState('')
                 }
               } else if (orderRes.code == 402) {
                 message.error('登录失效，请重新登录')
@@ -811,499 +874,556 @@ export default function Home() {
   return (
     <Spin spinning={pageLoading}>
       <div className="childrenHeight bg-white rounded-[34px]  w-screen my-0 mx-auto">
-        {actions.length > 0 ? (
-          <div className="flex items-center justify-between relative h-full">
-            <div className="w-[112px] bg-white h-full flex items-center flex-col relative rounded-l-[34px] justify-around sideShadow">
-              {actions.map((item, index) => (
-                <div
-                  className={
-                    active === index
-                      ? 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer'
-                      : 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button'
-                  }
-                  onClick={() => changeActive(index, item)}
-                  key={item.id}
-                >
-                  {item.name.substring(0, 2)}
-                  <br />
-                  {item.name.substring(2)}
+        {actionLoading ? (
+          <>
+            <Spin spinning={actionLoading} tip="正在加载工具，请稍后...">
+              <div className="w-screen childrenHeight"></div>
+            </Spin>
+          </>
+        ) : (
+          <>
+            {actions.length > 0 ? (
+              <div className="flex items-center justify-between relative h-full">
+                <div className="w-[112px] bg-white h-full flex items-center flex-col relative rounded-l-[34px] justify-around sideShadow">
+                  {actions.map((item, index) => (
+                    <div
+                      className={
+                        active === index
+                          ? 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer'
+                          : 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button'
+                      }
+                      onClick={() => changeActive(index, item)}
+                      key={item.id}
+                    >
+                      {item.name.substring(0, 2)}
+                      <br />
+                      {item.name.substring(2)}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            <div className="flex-1 h-full">
-              <div className="h-full border-r border-black/[.2] flex items-center flex-col">
-                <div className="h-[28px]"></div>
-                <div className="w-[550px] h-[400px] rounded-xl bg-[#F7F7F7] flex items-center justify-center relative">
-                  {file ? (
-                    <div className="w-full h-full relative">
-                      <img
-                        src={originImage}
-                        alt="originImage"
-                        className=" object-contain w-full h-full"
-                      />
-                      {/* <Image
+                <div className="flex-1 h-full">
+                  <div className="h-full border-r border-black/[.2] flex items-center flex-col">
+                    <div className="h-[28px]"></div>
+                    <div className="w-[550px] h-[400px] rounded-xl bg-[#F7F7F7] flex items-center justify-center relative" style={{maxHeight: 400}}>
+                      {file ? (
+                        <div className="w-full h-full relative">
+                          <img
+                            src={originImage}
+                            alt="originImage"
+                            className=" object-contain w-full h-full"
+                          />
+                          {/* <Image
                       src={originImage}
                       alt="originImage"
                       layout="fill"
                       objectFit="contain"
                     /> */}
-                    </div>
-                  ) : fileLoading ? (
-                    <div className=" absolute h-[593px] bg-black/[.23] top-0 left-0 w-full flex items-center justify-center">
-                      <span className="loading loading-infinity loading-lg"></span>
-                    </div>
-                  ) : !selectedOrder.id ? (
-                    <div
-                      {...getRootProps({ className: 'dropzone' })}
-                      className="w-full h-full flex items-center justify-center flex-col"
-                    >
-                      <input {...getInputProps()} />
-                      <p className="text-[16px]">
-                        支持拖拽、Ctrl+V 复制上传图片
-                      </p>
-                      <p className="text-[16px] text-center">
-                        图片大小不超过12MB，支持PNG、JPG、JPEG、WEBP等格式
-                      </p>
-                      <div className="w-[217px] h-[40px] bg-black text-white text-[15px] font-extrabold flex items-center justify-center rounded-[28px] mt-[20px] mx-auto cursor-pointer">
-                        <PlusCircleOutlined />
-                        上传图片
-                      </div>
-                    </div>
-                  ) : (
-                    <div>暂无图片</div>
-                  )}
-                </div>
-                {file && (
-                  <div className="relative w-full pt-[56px]">
-                    {!selectedOrder.orderStatus && (
-                      <>
-                        <Tooltip title="删除原图">
-                          <div className="bg-[#F4F5F8] w-[39px] h-[38px] rounded-md absolute right-[116px] top-[18px] cursor-pointer flex items-center justify-center">
-                            <img
-                              src="/delete.png"
-                              className="w-[28px] h-[30px]"
-                              onClick={() => {
-                                if (selectedOrder.orderStatus) {
-                                } else {
-                                  setFile(null)
-                                  setOriginImage(null)
-                                }
-                              }}
-                            />
-                          </div>
-                        </Tooltip>
-                        <Tooltip title="重新上传">
-                          <div className="bg-[#F4F5F8] w-[39px] h-[38px] rounded-md absolute right-[69px] top-[18px] cursor-pointer flex items-center justify-center">
-                            <img
-                              src="/upload.png"
-                              className="w-[28px] h-[30px]"
-                              onClick={() => {
-                                if (selectedOrder.orderStatus) {
-                                } else {
-                                  handleIconClick()
-                                }
-                              }}
-                            />
-                          </div>
-                        </Tooltip>
-                      </>
-                    )}
-
-                    {file ? (
-                      loading ? (
-                        <div className="w-[217px] h-[54px] bg-gray-400 text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer">
-                          正在生成中，请稍后
                         </div>
-                      ) : !account ? (
-                        <div
-                          className="w-[217px] h-[54px] bg-black text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
-                          onClick={openModal}
-                        >
-                          登录
-                        </div>
-                      ) : selectedOrder.orderStatus == 'SUCCESS' ? (
-                        <div
-                          className="w-[217px] h-[54px] bg-black text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
-                          onClick={reDeal}
-                        >
-                          <div className="flex items-baseline">
-                            重新生成
-                            <span className="text-[12px]">
-                              消耗{actions[active].integral}积分
-                            </span>
-                          </div>
+                      ) : fileLoading ? (
+                        <div className=" absolute h-[593px] bg-black/[.23] top-0 left-0 w-full flex items-center justify-center">
+                          <span className="loading loading-infinity loading-lg"></span>
                         </div>
                       ) : !selectedOrder.id ? (
                         <div
-                          className="w-[217px] h-[54px] bg-black text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
-                          onClick={dealImage}
+                          {...getRootProps({ className: 'dropzone' })}
+                          className="w-full h-full flex items-center justify-center flex-col"
                         >
-                          <div className="flex items-baseline">
-                            立即生成
-                            <span className="text-[12px]">
-                              消耗{actions[active].integral}积分
-                            </span>
+                          <input {...getInputProps()} />
+                          <p className="text-[16px]">
+                            支持拖拽、Ctrl+V 复制上传图片
+                          </p>
+                          <p className="text-[16px] text-center">
+                            图片大小不超过12MB，支持PNG、JPG、JPEG、WEBP等格式
+                          </p>
+                          <div className="w-[217px] h-[40px] bg-black text-white text-[15px] font-extrabold flex items-center justify-center rounded-[28px] mt-[20px] mx-auto cursor-pointer">
+                            <PlusCircleOutlined />
+                            上传图片
                           </div>
                         </div>
                       ) : (
-                        <div className="w-[217px] h-[54px] bg-gray-400 text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-not-allowed">
-                          {selectedOrder.orderStatus == 'ORDERED'
-                            ? '正在生成中...'
-                            : '生成'}
-                        </div>
-                      )
-                    ) : account ? (
-                      <div className="w-[217px] h-[54px] bg-gray-400 text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-not-allowed">
-                        生成
-                      </div>
-                    ) : (
-                      <div
-                        className="w-[217px] h-[54px] bg-black text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
-                        onClick={openModal}
-                      >
-                        登录
+                        <div>暂无图片</div>
+                      )}
+                    </div>
+                    {file && (
+                      <div className="relative w-full pt-[16px] block z-[10]">
+                        {!selectedOrder.orderStatus && (
+                          <>
+                            <Tooltip title="删除原图">
+                              <div className="bg-[#F4F5F8] w-[39px] h-[38px] rounded-md absolute right-[116px] top-[18px] cursor-pointer flex items-center justify-center">
+                                <img
+                                  src="/delete.png"
+                                  className="w-[28px] h-[30px]"
+                                  onClick={() => {
+                                    if (selectedOrder.orderStatus) {
+                                    } else {
+                                      setFile(null)
+                                      setOriginImage(null)
+                                    }
+                                  }}
+                                />
+                              </div>
+                            </Tooltip>
+                            <Tooltip title="重新上传">
+                              <div className="bg-[#F4F5F8] w-[39px] h-[38px] rounded-md absolute right-[69px] top-[18px] cursor-pointer flex items-center justify-center">
+                                <img
+                                  src="/upload.png"
+                                  className="w-[28px] h-[30px]"
+                                  onClick={() => {
+                                    if (selectedOrder.orderStatus) {
+                                    } else {
+                                      handleIconClick()
+                                    }
+                                  }}
+                                />
+                              </div>
+                            </Tooltip>
+                          </>
+                        )}
+
+                        {file ? (
+                          loading ? (
+                            <div className="w-[217px] h-[54px] bg-gray-400 text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer">
+                              正在生成中，请稍后
+                            </div>
+                          ) : !account ? (
+                            <div
+                              className="w-[217px] h-[54px] bg-black text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
+                              onClick={openModal}
+                            >
+                              登录
+                            </div>
+                          ) : selectedOrder.orderStatus == 'SUCCESS' ? (
+                            <div
+                              className="w-[217px] h-[54px] bg-black text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
+                              onClick={reDeal}
+                            >
+                              <div className="flex items-baseline">
+                                重新生成
+                                <span className="text-[12px]">
+                                  消耗{actions[active].integral}积分
+                                </span>
+                              </div>
+                            </div>
+                          ) : !selectedOrder.id ? (
+                            <div
+                              className="w-[217px] h-[54px] bg-black text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
+                              onClick={dealImage}
+                            >
+                              <div className="flex items-baseline">
+                                立即生成
+                                <span className="text-[12px]">
+                                  消耗{actions[active].integral}积分
+                                </span>
+                              </div>
+                            </div>
+                          ) : imageState ? (
+                            <>
+                              {imageState == 'COMPLETED' ||
+                              imageState == 'FAILED' ? (
+                                <div
+                                  className="w-[217px] h-[54px] bg-black text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
+                                  onClick={reDeal}
+                                >
+                                  <div className="flex items-baseline">
+                                    重新生成
+                                    <span className="text-[12px]">
+                                      消耗{actions[active].integral}积分
+                                    </span>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="w-[217px] h-[54px] bg-gray-400 text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-not-allowed">
+                                  {selectedOrder.orderStatus == 'ORDERED'
+                                    ? '正在生成中，请稍后'
+                                    : '生成'}
+                                </div>
+                              )}
+                            </>
+                          ) : (
+                            <div className="w-[217px] h-[54px] bg-gray-400 text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-not-allowed">
+                              {selectedOrder.orderStatus == 'ORDERED'
+                                ? '正在生成中，请稍后'
+                                : '生成'}
+                            </div>
+                          )
+                        ) : account ? (
+                          <div className="w-[217px] h-[54px] bg-gray-400 text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-not-allowed">
+                            生成
+                          </div>
+                        ) : (
+                          <div
+                            className="w-[217px] h-[54px] bg-black text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
+                            onClick={openModal}
+                          >
+                            登录
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
-                )}
-              </div>
-            </div>
-            <div className="flex-1 h-full">
-              <div className="h-full pl-[62px]">
-                <div className="h-[28px]"></div>
-                <div className="w-[550px] h-[400px] relative">
-                  <div className="flex items-center justify-center">
-                    {resultFile ? (
-                      <>
-                        <div className="w-[550px] h-[400px] relative">
-                          {actions[active].generateImageType ==
-                          'FOUR_SQUARE' ? (
-                            <>
-                              <Image
-                                src={resultFile}
-                                alt="resultFile"
-                                onLoad={resultFileLoad}
-                                className="object-contain !w-[550px] !h-[400px]"
-                                preview={{
-                                  toolbarRender: () => <></>,
-                                  imageRender: (originalNode, info) => {
-                                    return (
-                                      <div className=" relative w-full h-full">
-                                        <div
-                                          className=" absolute top-[5%] text-white text-[32px] z-[9999]"
-                                          style={{ left: 'calc(50vw - 81px)' }}
-                                        >
-                                          鼠标滚轮放大缩小
-                                        </div>
-                                        <div className="bg-white text-black text-[32px] z-[9999] fixed top-[32px] left-[32px] h-[60px] w-[150px] flex items-center justify-center rounded-lg">
-                                          {showScale}
-                                        </div>
-                                        <TransformWrapper
-                                          initialScale={1}
-                                          minScale={0.1}
-                                          maxScale={8}
-                                          wheel={{ step: 0.1 }}
-                                          onTransformed={onTransformed}
-                                          limitToBounds={false}
-                                        >
-                                          {({ resetTransform }) => (
-                                            <>
-                                              {/* 工具栏 */}
-                                              <div className="ant-image-preview-footer z-[9999]">
-                                                <div className="ant-image-preview-operations">
-                                                  <div
-                                                    className="ant-image-preview-operations-operation"
-                                                    onClick={() => {
-                                                      resetTransform()
-                                                    }}
-                                                  >
-                                                    还原
+                </div>
+                <div className="flex-1 h-full">
+                  <div className="h-full pl-[62px]">
+                    <div className="h-[28px]"></div>
+                    <div className="w-[550px] h-[400px] relative">
+                      <div className="flex items-center justify-center">
+                        {resultFile ? (
+                          <>
+                            <div className="w-[550px] h-[400px] relative">
+                              {actions[active].generateImageType ==
+                              'FOUR_SQUARE' ? (
+                                <>
+                                  <Image
+                                    src={resultFile}
+                                    alt="resultFile"
+                                    onLoad={resultFileLoad}
+                                    className="object-contain !w-[550px] !h-[400px]"
+                                    preview={{
+                                      toolbarRender: () => <></>,
+                                      imageRender: (originalNode, info) => {
+                                        return (
+                                          <div className=" relative w-full h-full flex items-center justify-center">
+                                            <div
+                                              className=" absolute top-[5%] text-white text-[32px] z-[9999]"
+                                              style={{
+                                                left: 'calc(50vw - 81px)',
+                                              }}
+                                            >
+                                              鼠标滚轮放大缩小
+                                            </div>
+                                            <div className="bg-white text-black text-[32px] z-[9999] fixed top-[32px] left-[32px] h-[60px] w-[150px] flex items-center justify-center rounded-lg">
+                                              {showScale}
+                                            </div>
+                                            <TransformWrapper
+                                              initialScale={1}
+                                              minScale={0.1}
+                                              maxScale={8}
+                                              wheel={{ step: 0.1 }}
+                                              onTransformed={onTransformed}
+                                              limitToBounds={false}
+                                            >
+                                              {({ resetTransform }) => (
+                                                <>
+                                                  {/* 工具栏 */}
+                                                  <div className="ant-image-preview-footer z-[9999]">
+                                                    <div className="ant-image-preview-operations">
+                                                      <div
+                                                        className="ant-image-preview-operations-operation"
+                                                        onClick={() => {
+                                                          resetTransform()
+                                                        }}
+                                                      >
+                                                        还原
+                                                      </div>
+                                                    </div>
                                                   </div>
-                                                </div>
-                                              </div>
 
-                                              {/* 缩放容器 */}
-                                              <TransformComponent>
-                                                <div className="flex items-center justify-center">
-                                                  <div
-                                                    style={{
-                                                      width: '80%',
-                                                      height: '80%',
-                                                      display: 'flex',
-                                                      flexDirection: 'column',
-                                                      gap: '0px',
-                                                      alignItems: 'center',
-                                                      justifyContent: 'center',
-                                                    }}
+                                                  {/* 缩放容器 */}
+                                                  <TransformComponent
+                                                    wrapperClass="!w-full !h-full"
+                                                    contentClass="!w-full !h-full"
                                                   >
-                                                    <div
-                                                      style={{
-                                                        display: 'flex',
-                                                        gap: '0px',
-                                                        flex: 1,
-                                                      }}
-                                                    >
-                                                      <img
-                                                        src={resultFile}
+                                                    <div className="flex items-center justify-center w-full h-full">
+                                                      <div
+                                                        className=" bg-repeat w-[80%] h-[80%]"
                                                         style={{
-                                                          width: '30%',
-                                                          height: 'auto',
-                                                          objectFit: 'contain',
+                                                          backgroundImage: `url(${resultFile})`,
+                                                          backgroundSize:
+                                                            '30% auto',
                                                         }}
-                                                      />
-                                                      <img
-                                                        src={resultFile}
+                                                      ></div>
+                                                      {/* <div
                                                         style={{
-                                                          width: '30%',
-                                                          height: 'auto',
-                                                          objectFit: 'contain',
+                                                          width: '80%',
+                                                          height: '80%',
+                                                          display: 'flex',
+                                                          flexDirection:
+                                                            'column',
+                                                          gap: '0px',
+                                                          alignItems: 'center',
+                                                          justifyContent:
+                                                            'center',
                                                         }}
-                                                      />
-                                                      <img
-                                                        src={resultFile}
-                                                        style={{
-                                                          width: '30%',
-                                                          height: 'auto',
-                                                          objectFit: 'contain',
-                                                        }}
-                                                      />
+                                                      >
+                                                        <div
+                                                          style={{
+                                                            display: 'flex',
+                                                            gap: '0px',
+                                                            flex: 1,
+                                                          }}
+                                                        >
+                                                          <img
+                                                            src={resultFile}
+                                                            style={{
+                                                              width: '30%',
+                                                              height: 'auto',
+                                                              objectFit:
+                                                                'contain',
+                                                            }}
+                                                          />
+                                                          <img
+                                                            src={resultFile}
+                                                            style={{
+                                                              width: '30%',
+                                                              height: 'auto',
+                                                              objectFit:
+                                                                'contain',
+                                                            }}
+                                                          />
+                                                          <img
+                                                            src={resultFile}
+                                                            style={{
+                                                              width: '30%',
+                                                              height: 'auto',
+                                                              objectFit:
+                                                                'contain',
+                                                            }}
+                                                          />
+                                                        </div>
+                                                        <div
+                                                          style={{
+                                                            display: 'flex',
+                                                            gap: '0px',
+                                                            flex: 1,
+                                                          }}
+                                                        >
+                                                          <img
+                                                            src={resultFile}
+                                                            style={{
+                                                              width: '30%',
+                                                              height: 'auto',
+                                                              objectFit:
+                                                                'contain',
+                                                            }}
+                                                          />
+                                                          <img
+                                                            src={resultFile}
+                                                            style={{
+                                                              width: '30%',
+                                                              height: 'auto',
+                                                              objectFit:
+                                                                'contain',
+                                                            }}
+                                                          />
+                                                          <img
+                                                            src={resultFile}
+                                                            style={{
+                                                              width: '30%',
+                                                              height: 'auto',
+                                                              objectFit:
+                                                                'contain',
+                                                            }}
+                                                          />
+                                                        </div>
+                                                        <div
+                                                          style={{
+                                                            display: 'flex',
+                                                            gap: '0px',
+                                                            flex: 1,
+                                                          }}
+                                                        >
+                                                          <img
+                                                            src={resultFile}
+                                                            style={{
+                                                              width: '30%',
+                                                              height: 'auto',
+                                                              objectFit:
+                                                                'contain',
+                                                            }}
+                                                          />
+                                                          <img
+                                                            src={resultFile}
+                                                            style={{
+                                                              width: '30%',
+                                                              height: 'auto',
+                                                              objectFit:
+                                                                'contain',
+                                                            }}
+                                                          />
+                                                          <img
+                                                            src={resultFile}
+                                                            style={{
+                                                              width: '30%',
+                                                              height: 'auto',
+                                                              objectFit:
+                                                                'contain',
+                                                            }}
+                                                          />
+                                                        </div>
+                                                      </div> */}
                                                     </div>
-                                                    <div
-                                                      style={{
-                                                        display: 'flex',
-                                                        gap: '0px',
-                                                        flex: 1,
-                                                      }}
-                                                    >
-                                                      <img
-                                                        src={resultFile}
-                                                        style={{
-                                                          width: '30%',
-                                                          height: 'auto',
-                                                          objectFit: 'contain',
-                                                        }}
-                                                      />
-                                                      <img
-                                                        src={resultFile}
-                                                        style={{
-                                                          width: '30%',
-                                                          height: 'auto',
-                                                          objectFit: 'contain',
-                                                        }}
-                                                      />
-                                                      <img
-                                                        src={resultFile}
-                                                        style={{
-                                                          width: '30%',
-                                                          height: 'auto',
-                                                          objectFit: 'contain',
-                                                        }}
-                                                      />
-                                                    </div>
-                                                    <div
-                                                      style={{
-                                                        display: 'flex',
-                                                        gap: '0px',
-                                                        flex: 1,
-                                                      }}
-                                                    >
-                                                      <img
-                                                        src={resultFile}
-                                                        style={{
-                                                          width: '30%',
-                                                          height: 'auto',
-                                                          objectFit: 'contain',
-                                                        }}
-                                                      />
-                                                      <img
-                                                        src={resultFile}
-                                                        style={{
-                                                          width: '30%',
-                                                          height: 'auto',
-                                                          objectFit: 'contain',
-                                                        }}
-                                                      />
-                                                      <img
-                                                        src={resultFile}
-                                                        style={{
-                                                          width: '30%',
-                                                          height: 'auto',
-                                                          objectFit: 'contain',
-                                                        }}
-                                                      />
-                                                    </div>
-                                                  </div>
-                                                </div>
-                                              </TransformComponent>
-                                            </>
-                                          )}
-                                        </TransformWrapper>
-                                      </div>
-                                    )
-                                  },
+                                                  </TransformComponent>
+                                                </>
+                                              )}
+                                            </TransformWrapper>
+                                          </div>
+                                        )
+                                      },
+                                    }}
+                                  />
+                                </>
+                              ) : (
+                                <>
+                                  <Image
+                                    src={resultFile}
+                                    alt="resultFile"
+                                    onLoad={resultFileLoad}
+                                    className="object-contain !w-[550px] !h-[400px]"
+                                  />
+                                </>
+                              )}
+                            </div>
+                          </>
+                        ) : selectedOrder.id ? (
+                          getOrderResultShow(selectedOrder)
+                        ) : (
+                          <></>
+                        )}
+                      </div>
+                      {resultFile && (
+                        <div className=" absolute top-0 right-[-60px] text-[32px]">
+                          <Tooltip title="好评">
+                            {selectedOrder.taskOrderList[0].upvote ? (
+                              <div className="mb-[10px] cursor-pointer flex items-center justify-center w-[50px] h-[50px] rounded-sm bg-black text-white">
+                                <LikeOutlined />
+                              </div>
+                            ) : (
+                              <div
+                                className="mb-[10px] cursor-pointer flex items-center justify-center w-[50px] h-[50px] rounded-sm bg-gray-200"
+                                onClick={() => {
+                                  vote(true)
                                 }}
+                              >
+                                <LikeOutlined />
+                              </div>
+                            )}
+                          </Tooltip>
+                          <Tooltip title="差评">
+                            {selectedOrder.taskOrderList[0].downvote ? (
+                              <div className="cursor-pointer flex items-center justify-center w-[50px] h-[50px] rounded-sm bg-black text-white">
+                                <DislikeOutlined />
+                              </div>
+                            ) : (
+                              <div
+                                className="cursor-pointer flex items-center justify-center w-[50px] h-[50px] rounded-sm bg-gray-200"
+                                onClick={() => {
+                                  vote(false)
+                                }}
+                              >
+                                <DislikeOutlined />
+                              </div>
+                            )}
+                          </Tooltip>
+                        </div>
+                      )}
+                      {loading ? (
+                        <div className=" absolute h-[400px] bg-black/[.23] top-0 left-0 w-full flex items-center justify-center flex-col">
+                          <span className="loading loading-infinity loading-lg"></span>
+                          <div className="text-[16px]">图片生成中...</div>
+                        </div>
+                      ) : (
+                        <></>
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between mt-[37px] mr-[62px] z-[10]">
+                      {resultFile ? (
+                        <div
+                          className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer"
+                          onClick={downloadImage}
+                        >
+                          下载文件
+                        </div>
+                      ) : (
+                        <></>
+                      )}
+                      {getNextButton()}
+                    </div>
+                  </div>
+                </div>
+                <div className=" absolute bottomArea py-[8px] px-[16px] flex overflow-x-auto" style={{maxHeight: 227}}>
+                  <div
+                    className="min-w-[200px] min-h-[200px] border-dashed rounded-sm bg-white border-[3px] cursor-pointer flex items-center justify-center mr-[16px]"
+                    onClick={clearOrder}
+                  >
+                    <PlusOutlined className="text-[50px]" />
+                  </div>
+                  {orderList.length > 0 ? (
+                    <>
+                      {orderList.map((order) => (
+                        <div
+                          className={
+                            selectedOrder.id == order.id
+                              ? 'min-w-[200px] min-h-[200px] max-w-[200px] max-h-[200px] rounded-sm bg-white border-[3px] cursor-pointer flex items-center justify-center mr-4 border-black'
+                              : 'min-w-[200px] min-h-[200px] max-w-[200px] max-h-[200px] border-dashed rounded-sm bg-white border-[3px] cursor-pointer flex items-center justify-center mr-4'
+                          }
+                          key={order.id}
+                          onClick={() => {
+                            selectOrder(order)
+                          }}
+                        >
+                          {order.taskOrderList &&
+                          order.taskOrderList.length > 0 &&
+                          order.taskOrderList[0].input ? (
+                            <>
+                              <img
+                                src={
+                                  order.taskOrderList[0].input +
+                                  '?x-oss-process=image/resize,m_lfit,w_375,limit_0'
+                                }
+                                className="w-full h-full object-contain"
                               />
                             </>
                           ) : (
-                            <>
-                              <Image
-                                src={resultFile}
-                                alt="resultFile"
-                                onLoad={resultFileLoad}
-                                className="object-contain !w-[550px] !h-[400px]"
-                              />
-                            </>
+                            '暂无图片'
                           )}
                         </div>
-                      </>
-                    ) : selectedOrder.id ? (
-                      getOrderResultShow(selectedOrder)
-                    ) : (
-                      <></>
-                    )}
-                  </div>
-                  {resultFile && (
-                    <div className=" absolute top-0 right-[-60px] text-[32px]">
-                      <Tooltip title="好评">
-                        {selectedOrder.taskOrderList[0].upvote ? (
-                          <div className="mb-[10px] cursor-pointer flex items-center justify-center w-[50px] h-[50px] rounded-sm bg-black text-white">
-                            <LikeOutlined />
-                          </div>
-                        ) : (
-                          <div
-                            className="mb-[10px] cursor-pointer flex items-center justify-center w-[50px] h-[50px] rounded-sm bg-gray-200"
-                            onClick={() => {
-                              vote(true)
-                            }}
-                          >
-                            <LikeOutlined />
-                          </div>
-                        )}
-                      </Tooltip>
-                      <Tooltip title="差评">
-                        {selectedOrder.taskOrderList[0].downvote ? (
-                          <div className="cursor-pointer flex items-center justify-center w-[50px] h-[50px] rounded-sm bg-black text-white">
-                            <DislikeOutlined />
-                          </div>
-                        ) : (
-                          <div
-                            className="cursor-pointer flex items-center justify-center w-[50px] h-[50px] rounded-sm bg-gray-200"
-                            onClick={() => {
-                              vote(false)
-                            }}
-                          >
-                            <DislikeOutlined />
-                          </div>
-                        )}
-                      </Tooltip>
-                    </div>
-                  )}
-                  {loading ? (
-                    <div className=" absolute h-[400px] bg-black/[.23] top-0 left-0 w-full flex items-center justify-center flex-col">
-                      <span className="loading loading-infinity loading-lg"></span>
-                      <div className="text-[16px]">图片生成中...</div>
-                    </div>
-                  ) : (
-                    <></>
-                  )}
-                </div>
-                <div className="flex items-center justify-between mt-[37px] mr-[62px]">
-                  {resultFile ? (
-                    <div
-                      className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer"
-                      onClick={downloadImage}
-                    >
-                      下载文件
-                    </div>
-                  ) : (
-                    <></>
-                  )}
-                  {getNextButton()}
-                </div>
-              </div>
-            </div>
-            <div className=" absolute bottomArea py-[8px] px-[16px] flex overflow-x-auto">
-              <div
-                className="min-w-[200px] min-h-[200px] border-dashed rounded-sm bg-white border-[3px] cursor-pointer flex items-center justify-center mr-[16px]"
-                onClick={clearOrder}
-              >
-                <PlusOutlined className="text-[50px]" />
-              </div>
-              {orderList.length > 0 ? (
-                <>
-                  {orderList.map((order) => (
-                    <div
-                      className={
-                        selectedOrder.id == order.id
-                          ? 'min-w-[200px] min-h-[200px] max-w-[200px] max-h-[200px] rounded-sm bg-white border-[3px] cursor-pointer flex items-center justify-center mr-4 border-black'
-                          : 'min-w-[200px] min-h-[200px] max-w-[200px] max-h-[200px] border-dashed rounded-sm bg-white border-[3px] cursor-pointer flex items-center justify-center mr-4'
-                      }
-                      key={order.id}
-                      onClick={() => {
-                        selectOrder(order)
-                      }}
-                    >
-                      {order.taskOrderList &&
-                      order.taskOrderList.length > 0 &&
-                      order.taskOrderList[0].input ? (
-                        <>
-                          <img
-                            src={
-                              order.taskOrderList[0].input +
-                              '?x-oss-process=image/resize,m_lfit,w_375,limit_0'
-                            }
-                            className="w-full h-full object-contain"
-                          />
-                        </>
+                      ))}
+                      {!isEnd ? (
+                        <div
+                          className="min-h-[200px] rounded-sm cursor-pointer px-[4px] bg-white border-gray-300 border text-center"
+                          style={{ writingMode: 'vertical-lr' }}
+                          onClick={openOrderList}
+                        >
+                          更多
+                        </div>
                       ) : (
-                        '暂无图片'
+                        <></>
                       )}
-                    </div>
-                  ))}
-                  {!isEnd ? (
-                    <div
-                      className="min-h-[200px] rounded-sm cursor-pointer px-[4px] bg-white border-gray-300 border text-center"
-                      style={{ writingMode: 'vertical-lr' }}
-                      onClick={openOrderList}
-                    >
-                      更多
-                    </div>
+                    </>
                   ) : (
-                    <></>
+                    <>
+                      <div className="flex-1 flex items-center justify-center">
+                        <div>暂无生图订单</div>
+                      </div>
+                    </>
                   )}
-                </>
-              ) : (
-                <>
-                  <div className="flex-1 flex items-center justify-center">
-                    <div>暂无生图订单</div>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        ) : (
-          <div className="w-screen h-full">
-            <Result
-              status="500"
-              title="正在维护中"
-              subTitle="对不起，高级版数码印花文件生成工具正在维护中"
-              extra={
-                <div>
-                  <div>联系我们</div>
-                  <div className="flex items-center justify-center hover:bg-white">
-                    <img
-                      src="/wechat.png"
-                      className="w-[187px] h-[192px] rounded-[13px]"
-                    />
-                    <img
-                      src="/wcx.png"
-                      className="w-[187px] h-[192px] rounded-[13px]"
-                    />
-                  </div>
                 </div>
-              }
-            />
-          </div>
+              </div>
+            ) : (
+              <div className="w-screen h-full">
+                <Result
+                  status="500"
+                  title="正在维护中"
+                  subTitle="对不起，高级版数码印花文件生成工具正在维护中"
+                  extra={
+                    <div>
+                      <div>联系我们</div>
+                      <div className="flex items-center justify-center hover:bg-white">
+                        <img
+                          src="/wechat.png"
+                          className="w-[187px] h-[192px] rounded-[13px]"
+                        />
+                        <img
+                          src="/wcx.png"
+                          className="w-[187px] h-[192px] rounded-[13px]"
+                        />
+                      </div>
+                    </div>
+                  }
+                />
+              </div>
+            )}
+          </>
         )}
 
         <Modal
