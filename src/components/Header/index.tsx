@@ -969,8 +969,8 @@ export function Header() {
               onChange={handleRecordTypeChange}
             >
               <Radio.Button value="all">全部</Radio.Button>
-              <Radio.Button value="income">收入</Radio.Button>
-              <Radio.Button value="expand">支出</Radio.Button>
+              <Radio.Button value="income">获得</Radio.Button>
+              <Radio.Button value="expand">消耗</Radio.Button>
             </Radio.Group>
           </div>
           <Table
