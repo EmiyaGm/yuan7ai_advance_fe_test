@@ -495,6 +495,10 @@ export function Header() {
       })
   }
 
+  const goHome = () => {
+    window.open('https://home.yuanqiai.xyz', '_blank')
+  }
+
   useEffect(() => {
     if (account) {
       setPage(1)
@@ -524,7 +528,7 @@ export function Header() {
       <div className="flex items-center justify-between max-w-[1592px] my-0 mx-auto">
         <div className="flex items-center h-[80px]">
           <div className="pl-[55px] pr-[30px]">
-            <img src="/logo.jpg" alt="logo" className="w-[91.1px] h-auto" />
+            <img src="/logo.jpg" alt="logo" className="w-[91.1px] h-auto cursor-pointer" onClick={goHome} />
           </div>
           <div className="text-[25px] text-black font-extrabold">
             数码印花文件生成工具-高级版
