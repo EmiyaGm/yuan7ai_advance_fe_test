@@ -159,7 +159,7 @@ export default function Home() {
         return
       }
       if (userPoint < actions[active].integral) {
-        message.info('积分不足，请充值')
+        message.info('元宝不足，请充值')
         openPointModal()
         return
       }
@@ -376,7 +376,7 @@ export default function Home() {
           return (
             <div>
               <Result
-                title={`本次${actions[active].name}服务还未支付所需要的积分，暂未开始`}
+                title={`本次${actions[active].name}服务还未支付所需要的元宝，暂未开始`}
                 extra={
                   <Button
                     type="primary"
@@ -671,7 +671,7 @@ export default function Home() {
         return
       }
       if (userPoint < actions[active].integral) {
-        message.info('积分不足，请充值')
+        message.info('元宝不足，请充值')
         openPointModal()
         return
       }
@@ -1017,7 +1017,7 @@ export default function Home() {
                               <div className="flex items-baseline">
                                 重新生成
                                 <span className="text-[10px]">
-                                  消耗{actions[active].integral}积分
+                                  消耗{actions[active].integral}元宝
                                 </span>
                               </div>
                             </div>
@@ -1029,7 +1029,7 @@ export default function Home() {
                               <div className="flex items-baseline">
                                 立即生成
                                 <span className="text-[10px]">
-                                  消耗{actions[active].integral}积分
+                                  消耗{actions[active].integral}元宝
                                 </span>
                               </div>
                             </div>
@@ -1044,7 +1044,7 @@ export default function Home() {
                                   <div className="flex items-baseline">
                                     重新生成
                                     <span className="text-[10px]">
-                                      消耗{actions[active].integral}积分
+                                      消耗{actions[active].integral}元宝
                                     </span>
                                   </div>
                                 </div>

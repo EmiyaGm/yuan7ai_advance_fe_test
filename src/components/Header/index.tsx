@@ -173,7 +173,7 @@ export function Header() {
             openPointModal()
           }}
         >
-          充值积分
+          充值元宝
         </div>
       ),
     },
@@ -188,7 +188,7 @@ export function Header() {
             setIsMyPointOpen(true)
           }}
         >
-          积分明细
+          元宝明细
         </div>
       ),
     },
@@ -302,7 +302,7 @@ export function Header() {
           orderId: payOrder.id,
           payChannel: 'ALIPAY',
           payProduct: 'NATIVE',
-          payDesc: `积分充值下单，订单号（${payOrder.id}）`,
+          payDesc: `元宝充值下单，订单号（${payOrder.id}）`,
         }).then((res: any) => {
           if (res.data && res.msg == 'success') {
             if (res.data.payUrl) {
@@ -331,7 +331,7 @@ export function Header() {
           orderId: payOrder.id,
           payChannel: 'WXPAY',
           payProduct: 'NATIVE',
-          payDesc: `积分充值下单，订单号（${payOrder.id}）`,
+          payDesc: `元宝充值下单，订单号（${payOrder.id}）`,
         }).then((res: any) => {
           if (res.data && res.msg == 'success') {
             console.log(res)
@@ -972,7 +972,7 @@ export function Header() {
         </div>
       </Modal>
       <Modal
-        title="积分明细"
+        title="元宝明细"
         open={isMyPointOpen}
         footer={null}
         destroyOnClose={true}
@@ -983,7 +983,7 @@ export function Header() {
       >
         <div>
           <div className="text-base font-bold">
-            当前可用积分：
+            当前可用元宝：
             {(pointInfo.amount || 0) - (pointInfo.freezeAmount || 0)}
           </div>
           <div className="py-2">
@@ -1013,7 +1013,7 @@ export function Header() {
                 key: 'updateTime',
               },
               {
-                title: '积分变动',
+                title: '元宝变动',
                 dataIndex: 'amount',
                 key: 'amount',
                 render: (value, record) => (
@@ -1021,7 +1021,7 @@ export function Header() {
                 ),
               },
               {
-                title: '积分余额',
+                title: '元宝余额',
                 dataIndex: 'afterAmount',
                 key: 'afterAmount',
                 render: (_, record: any) => (
@@ -1071,7 +1071,7 @@ export function Header() {
               <div>您的订单已提交成功，请尽快支付</div>
               <div>订单号：{payOrder.id}</div>
 
-              <div>购买详情：积分{selectedPoint.points}</div>
+              <div>购买详情：元宝{selectedPoint.points}</div>
               <div>实付金额：¥ {selectedPoint.price}</div>
             </div>
           </div>
@@ -1116,7 +1116,7 @@ export function Header() {
           <Result
             status="success"
             title="支付成功"
-            subTitle={`订单：${payOrder.id} 支付成功，已成功购买积分${selectedPoint.points}`}
+            subTitle={`订单：${payOrder.id} 支付成功，已成功购买元宝${selectedPoint.points}`}
           />
         </div>
       </Modal>
