@@ -54,9 +54,15 @@ body {
 }
 
 .bottomArea{
-  width: calc(100vw - 112px);
-  height: 227px;
+  width: calc(100% - 100px);
+  height: 200px;
   background: #F7F7F7;
-  left: 112px;
+  left: 100px;
   bottom: 0px;
+}
+
+.bgImage{
+  background-image: url('/bg.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
 }

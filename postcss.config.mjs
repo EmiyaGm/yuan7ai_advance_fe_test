@@ -4,15 +4,15 @@ const config = {
     tailwindcss: {},
     autoprefixer: {},
     'postcss-mobile-forever': {
-      viewportWidth: 1592,
-      maxDisplayWidth: 1592,
+      viewportWidth: 1920,
+      maxDisplayWidth: 1920,
       valueBlackList: ['1px'],
     },
     'postcss-px-to-viewport-8-plugin': {
       unitToConvert: 'px',
-      viewportWidth: 1592,
+      viewportWidth: 1920,
       unitPrecision: 10,
-      propList: ['*', '!max-width', '!max-height', '!min-width'],
+      propList: ['*'],
       viewportUnit: 'vw',
       fontViewportUnit: 'vw',
       selectorBlackList: ['svg'],
@@ -25,6 +25,6 @@ const config = {
       landscapeWidth: 568,
     },
   },
-};
+}
 
-export default config;
+export default config

@@ -108,7 +108,10 @@ export function Header() {
       .then((res) => {
         if (res.data && res.msg == 'success') {
           window.localStorage.setItem('yqai-token', `${res.data.token}`)
-          window.localStorage.setItem('yqai-account', res.data.phone || res.data.name)
+          window.localStorage.setItem(
+            'yqai-account',
+            res.data.phone || res.data.name,
+          )
           window.localStorage.setItem(
             'yqai-accountInfo',
             JSON.stringify(res.data),
@@ -448,13 +451,17 @@ export function Header() {
                       )
                       window.localStorage.setItem(
                         'yqai-account',
-                        result.data.loginInfo.phone || result.data.loginInfo.name,
+                        result.data.loginInfo.phone ||
+                          result.data.loginInfo.name,
                       )
                       window.localStorage.setItem(
                         'yqai-accountInfo',
                         JSON.stringify(result.data.loginInfo),
                       )
-                      setAccountData(result.data.loginInfo.phone || result.data.loginInfo.name)
+                      setAccountData(
+                        result.data.loginInfo.phone ||
+                          result.data.loginInfo.name,
+                      )
                       setAccountInfoData(result.data.loginInfo)
                       message.success('登录成功')
                       getUserPoint()
@@ -524,21 +531,26 @@ export function Header() {
   }, [])
 
   return (
-    <main className="h-[80px]">
-      <div className="flex items-center justify-between max-w-[1592px] my-0 mx-auto">
+    <main className="h-[74px]">
+      <div className="flex items-center justify-between max-w-[1440px] my-0 mx-auto">
         <div className="flex items-center h-[80px]">
-          <div className="pl-[55px] pr-[30px]">
-            <img src="/logo.jpg" alt="logo" className="w-[91.1px] h-auto cursor-pointer" onClick={goHome} />
+          <div className="px-[20px]">
+            <img
+              src="/logo.jpg"
+              alt="logo"
+              className="w-[100px] h-[38px] cursor-pointer"
+              onClick={goHome}
+            />
           </div>
-          <div className="text-[25px] text-black font-extrabold">
+          <div className="text-[30px] text-black font-extrabold">
             数码印花文件生成工具-高级版
           </div>
-          <div className="flex items-center justify-center ml-[10px]">
+          <div className="flex items-center justify-center ml-[49px]">
             <div className="dropdown dropdown-hover">
               <div
                 tabIndex={0}
                 role="button"
-                className="btn m-1 bg-transparent shadow-none border-none hover:bg-transparent hover:underline underline-offset-8"
+                className="btn m-1 bg-transparent shadow-none border-none hover:bg-transparent hover:underline underline-offset-8 text-[20px] font-extrabold"
               >
                 产品服务
               </div>
@@ -573,11 +585,11 @@ export function Header() {
                 </li>
               </ul>
             </div>
-            <div className="dropdown dropdown-hover mx-[48px]">
+            <div className="dropdown dropdown-hover mx-[41px]">
               <div
                 tabIndex={0}
                 role="button"
-                className="btn m-1 bg-transparent shadow-none border-none hover:bg-transparent hover:underline underline-offset-8"
+                className="btn m-1 bg-transparent shadow-none border-none hover:bg-transparent hover:underline underline-offset-8 text-[20px] font-extrabold"
               >
                 关于我们
               </div>
@@ -606,7 +618,7 @@ export function Header() {
               <div
                 tabIndex={0}
                 role="button"
-                className="btn m-1 bg-transparent shadow-none border-none hover:bg-transparent hover:underline underline-offset-8"
+                className="btn m-1 bg-transparent shadow-none border-none hover:bg-transparent hover:underline underline-offset-8 text-[20px] font-extrabold"
               >
                 联系我们
               </div>
@@ -636,20 +648,17 @@ export function Header() {
             <Dropdown menu={{ items }}>
               <a
                 onClick={(e) => e.preventDefault()}
-                className=" text-sm text-black font-extrabold pr-[30px] cursor-pointer"
+                className=" text-[20px] text-black font-extrabold pr-[30px] cursor-pointer"
               >
                 <Space>
-                  <div className="w-[50px] h-[50px]">
+                  <div className="flex items-center justify-center rounded-[10px] w-[116px] h-[39px] border-[2px] border-black">
                     <img
-                      src={accountInfo.profile}
-                      className="w-full h-full object-contain rounded-full"
+                      src="/yuanbao.png"
+                      className="w-[30px] h-[31px] rounded-[10px]"
                     />
-                  </div>
-                  {account}
-                  <div>
-                    剩余积分：
                     {(pointInfo.amount || 0) - (pointInfo.freezeAmount || 0)}
                   </div>
+                  <div>{account}</div>
                   <DownOutlined />
                 </Space>
               </a>
@@ -657,7 +666,7 @@ export function Header() {
           ) : (
             <div className="flex items-center justify-center">
               <div
-                className="text-sm text-black font-extrabold cursor-pointer pr-[30px]"
+                className="text-sm text-black cursor-pointer pr-[21px] text-[20px] font-extrabold"
                 onClick={() => {
                   createQrcode()
                   openModal()
@@ -709,9 +718,13 @@ export function Header() {
               <div className="flex items-center justify-between flex-col my-[8px]">
                 <div className="w-[300px] h-[300px] mb-[8px] relative">
                   {loginQrcode ? (
-                    <img src={loginQrcode} className="w-full h-full" onLoad={() => {
-                      setQrcodeLogin(false)
-                    }} />
+                    <img
+                      src={loginQrcode}
+                      className="w-full h-full"
+                      onLoad={() => {
+                        setQrcodeLogin(false)
+                      }}
+                    />
                   ) : (
                     !qrcodeLogin && (
                       <div
@@ -871,16 +884,20 @@ export function Header() {
         </div>
       </Modal>
       <Modal
-        title="积分充值"
+        title=""
         open={isPointOpen}
         footer={null}
         destroyOnClose={true}
         onCancel={() => {
           closePointModal()
         }}
-        width={'60vw'}
+        width={915}
+        classNames={{ content: 'bgImage' }}
       >
-        <div className="mt-8">
+        <div>
+          <div className="text-center text-[30px] font-extrabold mb-[63px]">
+            元宝充值
+          </div>
           <Row gutter={20}>
             {pointList.map((item) => (
               <Col
@@ -924,30 +941,32 @@ export function Header() {
               </Col>
             ))}
           </Row>
-          <div className="flex items-center justify-between my-2">
-            <div className="w-14"></div>
-            <div>积分可用于 AI 图像生成，AI 公版图库商品购买等场景</div>
-            <div className="dropdown dropdown-hover">
-              <div
-                tabIndex={0}
-                role="button"
-                className="btn m-1 bg-transparent shadow-none border-none hover:bg-transparent hover:underline underline-offset-8"
-              >
-                联系客服
+          <div className="flex items-center justify-end mt-[64px] mb-[37px]">
+            <div className='flex items-center justify-center text-[16px] font-extrabold'>
+              <div>企业合作可联系</div>{' '}
+              <div className="dropdown dropdown-hover">
+                <div
+                  tabIndex={0}
+                  role="button"
+                  className="btn !p-0 bg-transparent shadow-none border-none hover:bg-transparent hover:underline underline-offset-8 text-[16px] font-extrabold"
+                >
+                  元七七
+                </div>
+                <ul
+                  tabIndex={0}
+                  className="dropdown-content menu bg-base-100 rounded-box z-[1] w-[240px] shadow"
+                >
+                  <li className="hover:bg-white">
+                    <div className="flex items-center justify-center hover:bg-white">
+                      <img
+                        src="/wechat.png"
+                        className="w-[187px] h-[192px] rounded-[13px]"
+                      />
+                    </div>
+                  </li>
+                </ul>
               </div>
-              <ul
-                tabIndex={0}
-                className="dropdown-content menu bg-base-100 rounded-box z-[1] w-[240px] shadow"
-              >
-                <li className="hover:bg-white">
-                  <div className="flex items-center justify-center hover:bg-white">
-                    <img
-                      src="/wechat.png"
-                      className="w-[187px] h-[192px] rounded-[13px]"
-                    />
-                  </div>
-                </li>
-              </ul>
+              <div>，拿到更高折扣喔</div>
             </div>
           </div>
         </div>

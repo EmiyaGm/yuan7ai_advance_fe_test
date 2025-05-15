@@ -359,10 +359,10 @@ export default function Home() {
   const getNextButton = () => {
     return actions.length > active + 1 && resultFile ? (
       <div
-        className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer"
+        className="w-[82px] h-[30px] bg-white rounded-[6px] text-black text-[14px] flex items-center justify-center cursor-pointer font-black border"
         onClick={nextStep}
       >
-        进入到{actions[active + 1].name}
+        {actions[active + 1].name}
       </div>
     ) : (
       <></>
@@ -873,24 +873,24 @@ export default function Home() {
 
   return (
     <Spin spinning={pageLoading}>
-      <div className="childrenHeight bg-white rounded-[34px]  w-screen my-0 mx-auto">
+      <div className="childrenHeight rounded-[34px] max-w-[1440px] bg-white my-0 mx-auto">
         {actionLoading ? (
           <>
             <Spin spinning={actionLoading} tip="正在加载工具，请稍后...">
-              <div className="w-screen childrenHeight"></div>
+              <div className="max-w-[1440px] childrenHeight"></div>
             </Spin>
           </>
         ) : (
           <>
             {actions.length > 0 ? (
               <div className="flex items-center justify-between relative h-full">
-                <div className="w-[112px] bg-white h-full flex items-center flex-col relative rounded-l-[34px] justify-around sideShadow">
+                <div className="w-[100px] bg-white h-full flex items-center flex-col relative rounded-l-[20px] justify-around sideShadow">
                   {actions.map((item, index) => (
                     <div
                       className={
                         active === index
-                          ? 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold text-white bg-black cursor-pointer'
-                          : 'w-[70px] h-[68px] rounded-md border border-black flex items-center justify-center text-[15px] font-extrabold cursor-pointer fill-button'
+                          ? 'w-[70px] h-[70px] rounded-[12px] border border-black flex items-center justify-center text-[16px] font-black text-white bg-black cursor-pointer'
+                          : 'w-[70px] h-[70px] rounded-[12px] border border-black flex items-center justify-center text-[16px] font-black cursor-pointer fill-button'
                       }
                       onClick={() => changeActive(index, item)}
                       key={item.id}
@@ -903,47 +903,64 @@ export default function Home() {
                 </div>
                 <div className="flex-1 h-full">
                   <div className="h-full border-r border-black/[.2] flex items-center flex-col">
-                    <div className="h-[28px]"></div>
-                    <div className="w-[550px] h-[400px] rounded-xl bg-[#F7F7F7] flex items-center justify-center relative" style={{maxHeight: 400}}>
-                      {file ? (
-                        <div className="w-full h-full relative">
-                          <img
-                            src={originImage}
-                            alt="originImage"
-                            className=" object-contain w-full h-full"
-                          />
-                          {/* <Image
+                    <div className="h-[66px]"></div>
+                    {account ? (
+                      <div className="w-[490px] h-[490px] rounded-xl bg-[#F7F7F7] flex items-center justify-center relative">
+                        {file ? (
+                          <div className="w-full h-full relative">
+                            <img
+                              src={originImage}
+                              alt="originImage"
+                              className=" object-contain w-full h-full"
+                            />
+                            {/* <Image
                       src={originImage}
                       alt="originImage"
                       layout="fill"
                       objectFit="contain"
                     /> */}
-                        </div>
-                      ) : fileLoading ? (
-                        <div className=" absolute h-[593px] bg-black/[.23] top-0 left-0 w-full flex items-center justify-center">
-                          <span className="loading loading-infinity loading-lg"></span>
-                        </div>
-                      ) : !selectedOrder.id ? (
-                        <div
-                          {...getRootProps({ className: 'dropzone' })}
-                          className="w-full h-full flex items-center justify-center flex-col"
-                        >
-                          <input {...getInputProps()} />
-                          <p className="text-[16px]">
-                            支持拖拽、Ctrl+V 复制上传图片
-                          </p>
-                          <p className="text-[16px] text-center">
-                            图片大小不超过12MB，支持PNG、JPG、JPEG、WEBP等格式
-                          </p>
-                          <div className="w-[217px] h-[40px] bg-black text-white text-[15px] font-extrabold flex items-center justify-center rounded-[28px] mt-[20px] mx-auto cursor-pointer">
-                            <PlusCircleOutlined />
-                            上传图片
                           </div>
+                        ) : fileLoading ? (
+                          <div className=" absolute h-[593px] bg-black/[.23] top-0 left-0 w-full flex items-center justify-center">
+                            <span className="loading loading-infinity loading-lg"></span>
+                          </div>
+                        ) : !selectedOrder.id ? (
+                          <div
+                            {...getRootProps({ className: 'dropzone' })}
+                            className="w-full h-full flex items-center justify-center flex-col"
+                          >
+                            <input {...getInputProps()} />
+                            <p className="text-[14px] font-bold leading-[40px]">
+                              支持拖拽、Ctrl+V 粘贴上传图片
+                            </p>
+                            <p className="text-[14px] text-center font-bold leading-[40px]">
+                              图片大小不超过12MB
+                            </p>
+                            <p className="text-[14px] text-center font-bold leading-[40px]">
+                              支持PNG、JPG、JPEG、WEBP等格式
+                            </p>
+                            <div className="w-[95px] h-[30px] bg-black text-white text-[14px] font-extrabold flex items-center justify-center rounded-[6px] mt-[20px] mx-auto cursor-pointer">
+                              点击上传
+                            </div>
+                          </div>
+                        ) : (
+                          <div>暂无图片</div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="w-[490px] h-[490px] rounded-xl bg-[#F7F7F7] flex items-center justify-center relative flex-col">
+                        <div className="text-[14px] font-bold leading-[40px] pb-[32px]">
+                          登录后使用
                         </div>
-                      ) : (
-                        <div>暂无图片</div>
-                      )}
-                    </div>
+                        <div
+                          className="text-[14px] text-white bg-black w-[95px] h-[30px] cursor-pointer flex items-center justify-center rounded-md"
+                          onClick={openModal}
+                        >
+                          点击登录
+                        </div>
+                      </div>
+                    )}
+
                     {file && (
                       <div className="relative w-full pt-[16px] block z-[10]">
                         {!selectedOrder.orderStatus && (
@@ -982,36 +999,36 @@ export default function Home() {
 
                         {file ? (
                           loading ? (
-                            <div className="w-[217px] h-[54px] bg-gray-400 text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer">
+                            <div className="w-[242px] h-[39px] bg-gray-400 text-white text-[16px] font-medium flex items-center justify-center rounded-[6px] my-0 mx-auto cursor-pointer">
                               正在生成中，请稍后
                             </div>
                           ) : !account ? (
                             <div
-                              className="w-[217px] h-[54px] bg-black text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
+                              className="w-[242px] h-[39px] bg-black text-white text-[16px] font-medium flex items-center justify-center rounded-[6px] my-0 mx-auto cursor-pointer"
                               onClick={openModal}
                             >
                               登录
                             </div>
                           ) : selectedOrder.orderStatus == 'SUCCESS' ? (
                             <div
-                              className="w-[217px] h-[54px] bg-black text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
+                              className="w-[242px] h-[39px] bg-black text-white text-[16px] font-medium flex items-center justify-center rounded-[6px] my-0 mx-auto cursor-pointer"
                               onClick={reDeal}
                             >
                               <div className="flex items-baseline">
                                 重新生成
-                                <span className="text-[12px]">
+                                <span className="text-[10px]">
                                   消耗{actions[active].integral}积分
                                 </span>
                               </div>
                             </div>
                           ) : !selectedOrder.id ? (
                             <div
-                              className="w-[217px] h-[54px] bg-black text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
+                              className="w-[242px] h-[39px] bg-black text-white text-[16px] font-medium flex items-center justify-center rounded-[6px] my-0 mx-auto cursor-pointer"
                               onClick={dealImage}
                             >
                               <div className="flex items-baseline">
                                 立即生成
-                                <span className="text-[12px]">
+                                <span className="text-[10px]">
                                   消耗{actions[active].integral}积分
                                 </span>
                               </div>
@@ -1021,12 +1038,12 @@ export default function Home() {
                               {imageState == 'COMPLETED' ||
                               imageState == 'FAILED' ? (
                                 <div
-                                  className="w-[217px] h-[54px] bg-black text-white text-[16px] font-extrabold flex items-center justify-center rounded-[28px] my-0 mx-auto cursor-pointer"
+                                  className="w-[242px] h-[39px] bg-black text-white text-[16px] font-medium flex items-center justify-center rounded-[6px] my-0 mx-auto cursor-pointer"
                                   onClick={reDeal}
                                 >
                                   <div className="flex items-baseline">
                                     重新生成
-                                    <span className="text-[12px]">
+                                    <span className="text-[10px]">
                                       消耗{actions[active].integral}积分
                                     </span>
                                   </div>
@@ -1063,13 +1080,13 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="flex-1 h-full">
-                  <div className="h-full pl-[62px]">
-                    <div className="h-[28px]"></div>
-                    <div className="w-[550px] h-[400px] relative">
+                  <div className="h-full pl-[90px]">
+                    <div className="h-[66px]"></div>
+                    <div className="w-[490px] h-[490px] relative rounded-[15px] bg-[#F9F9F9]">
                       <div className="flex items-center justify-center">
                         {resultFile ? (
                           <>
-                            <div className="w-[550px] h-[400px] relative">
+                            <div className="w-[490px] h-[490px] relative">
                               {actions[active].generateImageType ==
                               'FOUR_SQUARE' ? (
                                 <>
@@ -1077,7 +1094,7 @@ export default function Home() {
                                     src={resultFile}
                                     alt="resultFile"
                                     onLoad={resultFileLoad}
-                                    className="object-contain !w-[550px] !h-[400px]"
+                                    className="object-contain !w-[490px] !h-[490px]"
                                     preview={{
                                       toolbarRender: () => <></>,
                                       imageRender: (originalNode, info) => {
@@ -1268,7 +1285,7 @@ export default function Home() {
                                     src={resultFile}
                                     alt="resultFile"
                                     onLoad={resultFileLoad}
-                                    className="object-contain !w-[550px] !h-[400px]"
+                                    className="object-contain !w-[490px] !h-[490px]"
                                   />
                                 </>
                               )}
@@ -1280,42 +1297,7 @@ export default function Home() {
                           <></>
                         )}
                       </div>
-                      {resultFile && (
-                        <div className=" absolute top-0 right-[-60px] text-[32px]">
-                          <Tooltip title="好评">
-                            {selectedOrder.taskOrderList[0].upvote ? (
-                              <div className="mb-[10px] cursor-pointer flex items-center justify-center w-[50px] h-[50px] rounded-sm bg-black text-white">
-                                <LikeOutlined />
-                              </div>
-                            ) : (
-                              <div
-                                className="mb-[10px] cursor-pointer flex items-center justify-center w-[50px] h-[50px] rounded-sm bg-gray-200"
-                                onClick={() => {
-                                  vote(true)
-                                }}
-                              >
-                                <LikeOutlined />
-                              </div>
-                            )}
-                          </Tooltip>
-                          <Tooltip title="差评">
-                            {selectedOrder.taskOrderList[0].downvote ? (
-                              <div className="cursor-pointer flex items-center justify-center w-[50px] h-[50px] rounded-sm bg-black text-white">
-                                <DislikeOutlined />
-                              </div>
-                            ) : (
-                              <div
-                                className="cursor-pointer flex items-center justify-center w-[50px] h-[50px] rounded-sm bg-gray-200"
-                                onClick={() => {
-                                  vote(false)
-                                }}
-                              >
-                                <DislikeOutlined />
-                              </div>
-                            )}
-                          </Tooltip>
-                        </div>
-                      )}
+
                       {loading ? (
                         <div className=" absolute h-[400px] bg-black/[.23] top-0 left-0 w-full flex items-center justify-center flex-col">
                           <span className="loading loading-infinity loading-lg"></span>
@@ -1325,10 +1307,51 @@ export default function Home() {
                         <></>
                       )}
                     </div>
-                    <div className="flex items-center justify-between mt-[37px] mr-[62px] z-[10]">
+                    <div className="flex items-center justify-between mt-[24px] w-[490px] z-[10]">
+                      <div>
+                        {resultFile && (
+                          <div className="text-[35px] flex items-center justify-center">
+                            <Tooltip title="好评">
+                              {selectedOrder.taskOrderList[0].upvote ? (
+                                <div className="mr-[25px] cursor-pointer flex items-center justify-center w-[34px] h-[35px] rounded-sm bg-black text-white">
+                                  <LikeOutlined />
+                                </div>
+                              ) : (
+                                <div
+                                  className="cursor-pointer flex items-center justify-center w-[35px] h-[35px] rounded-sm bg-gray-200"
+                                  onClick={() => {
+                                    vote(true)
+                                  }}
+                                >
+                                  <LikeOutlined />
+                                </div>
+                              )}
+                            </Tooltip>
+                            <Tooltip title="差评">
+                              {selectedOrder.taskOrderList[0].downvote ? (
+                                <div className="cursor-pointer flex items-center justify-center w-[35px] h-[35px] rounded-sm bg-black text-white">
+                                  <DislikeOutlined />
+                                </div>
+                              ) : (
+                                <div
+                                  className="cursor-pointer flex items-center justify-center w-[35px] h-[35px] rounded-sm bg-gray-200"
+                                  onClick={() => {
+                                    vote(false)
+                                  }}
+                                >
+                                  <DislikeOutlined />
+                                </div>
+                              )}
+                            </Tooltip>
+                          </div>
+                        )}
+                      </div>
+                      {getNextButton()}
+                    </div>
+                    <div className="mt-[24px] flex items-center justify-center">
                       {resultFile ? (
                         <div
-                          className="w-[125px] h-[30px] bg-[#F4F5F8] rounded-md text-black text-[15px] flex items-center justify-center cursor-pointer"
+                          className="w-[242px] h-[39px] bg-black rounded-[6px] text-white text-[16px] flex items-center justify-center cursor-pointer"
                           onClick={downloadImage}
                         >
                           下载文件
@@ -1336,64 +1359,80 @@ export default function Home() {
                       ) : (
                         <></>
                       )}
-                      {getNextButton()}
                     </div>
                   </div>
                 </div>
-                <div className=" absolute bottomArea py-[8px] px-[16px] flex overflow-x-auto" style={{maxHeight: 227}}>
-                  <div
-                    className="min-w-[200px] min-h-[200px] border-dashed rounded-sm bg-white border-[3px] cursor-pointer flex items-center justify-center mr-[16px]"
-                    onClick={clearOrder}
-                  >
-                    <PlusOutlined className="text-[50px]" />
-                  </div>
-                  {orderList.length > 0 ? (
-                    <>
-                      {orderList.map((order) => (
-                        <div
-                          className={
-                            selectedOrder.id == order.id
-                              ? 'min-w-[200px] min-h-[200px] max-w-[200px] max-h-[200px] rounded-sm bg-white border-[3px] cursor-pointer flex items-center justify-center mr-4 border-black'
-                              : 'min-w-[200px] min-h-[200px] max-w-[200px] max-h-[200px] border-dashed rounded-sm bg-white border-[3px] cursor-pointer flex items-center justify-center mr-4'
-                          }
-                          key={order.id}
-                          onClick={() => {
-                            selectOrder(order)
-                          }}
-                        >
-                          {order.taskOrderList &&
-                          order.taskOrderList.length > 0 &&
-                          order.taskOrderList[0].input ? (
-                            <>
-                              <img
-                                src={
-                                  order.taskOrderList[0].input +
-                                  '?x-oss-process=image/resize,m_lfit,w_375,limit_0'
-                                }
-                                className="w-full h-full object-contain"
-                              />
-                            </>
-                          ) : (
-                            '暂无图片'
-                          )}
+                <div className=" absolute bottomArea py-[8px] px-[16px] flex overflow-x-auto h-[200px]">
+                  {account && (
+                    <div
+                      className="min-w-[167px] min-h-[173px] rounded-[20px] bg-white cursor-pointer flex items-center justify-center mr-[16px] flex-col"
+                      onClick={clearOrder}
+                    >
+                      <PlusOutlined className="text-[36px]" />
+                      <div className="text-[16px] font-extrabold">
+                        增加新任务
+                      </div>
+                    </div>
+                  )}
+                  {account ? (
+                    orderList.length > 0 ? (
+                      <>
+                        {orderList.map((order) => (
+                          <div
+                            className={
+                              selectedOrder.id == order.id
+                                ? 'min-w-[167px] min-h-[173px] max-w-[167px] max-h-[173px] rounded-[20px] bg-white border-[3px] cursor-pointer flex items-center justify-center mr-4 border-black'
+                                : 'min-w-[167px] min-h-[173px] max-w-[167px] max-h-[173px] border-dashed rounded-[20px] bg-white border-[3px] cursor-pointer flex items-center justify-center mr-4 border-transparent'
+                            }
+                            key={order.id}
+                            onClick={() => {
+                              selectOrder(order)
+                            }}
+                          >
+                            {order.taskOrderList &&
+                            order.taskOrderList.length > 0 &&
+                            order.taskOrderList[0].input ? (
+                              <>
+                                <img
+                                  src={
+                                    order.taskOrderList[0].input +
+                                    '?x-oss-process=image/resize,m_lfit,w_375,limit_0'
+                                  }
+                                  className="w-full h-full object-contain"
+                                />
+                              </>
+                            ) : (
+                              '暂无图片'
+                            )}
+                          </div>
+                        ))}
+                        {!isEnd ? (
+                          <div
+                            className="min-h-[173px] rounded-[20px] cursor-pointer bg-white text-center w-[42px] text-[16px] font-extrabold flex items-center justify-center"
+                            style={{ writingMode: 'vertical-lr' }}
+                            onClick={openOrderList}
+                          >
+                            查看全部
+                          </div>
+                        ) : (
+                          <></>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex-1 flex items-center justify-center">
+                          <div className="text-[16px] font-extrabold">
+                            暂无任务~
+                          </div>
                         </div>
-                      ))}
-                      {!isEnd ? (
-                        <div
-                          className="min-h-[200px] rounded-sm cursor-pointer px-[4px] bg-white border-gray-300 border text-center"
-                          style={{ writingMode: 'vertical-lr' }}
-                          onClick={openOrderList}
-                        >
-                          更多
-                        </div>
-                      ) : (
-                        <></>
-                      )}
-                    </>
+                      </>
+                    )
                   ) : (
                     <>
                       <div className="flex-1 flex items-center justify-center">
-                        <div>暂无生图订单</div>
+                        <div className="text-[16px] font-extrabold">
+                          登录后查看
+                        </div>
                       </div>
                     </>
                   )}
